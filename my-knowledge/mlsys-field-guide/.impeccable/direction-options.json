@@ -1,0 +1,72 @@
+{
+  "title": "Choose the field guide's visual world",
+  "question": "Which world should carry the same verified curriculum from notebook question to equation, code, experiment, and evidence?",
+  "options": [
+    {
+      "id": "pipeline-debugger",
+      "label": "Pipeline Debugger",
+      "kicker": "PROPOSED WORLD",
+      "lineage": "compiler IR viewers, tensor inspectors, and GPU timeline debuggers",
+      "thesis": "Learn the LLM lifecycle by single-stepping it and probing every tensor, recipe choice, and released artifact.",
+      "palette": ["#f3f5f3", "#111418", "#1557d6", "#f2c84b", "#c63d32"],
+      "materials": ["matte instrument panel", "probe traces", "diagnostic tape"],
+      "viewport": "A narrow lifecycle rail on the left, a live token-to-report execution trace in the center, and a proof inspector on the right; a blue probe opens the first derivation in place.",
+      "risk": "Dense instrumentation can intimidate unless the reading path and beginner explanations stay obvious.",
+      "sketch": ".impeccable/sketches/pipeline-debugger.webp"
+    },
+    {
+      "id": "labanotation-score",
+      "label": "Training Score",
+      "kicker": "CHALLENGER",
+      "lineage": "Labanotation movement scores",
+      "thesis": "Training becomes a vertical score where symbol shape is operation, fill is confidence, and block length is compute or duration.",
+      "case": "Fits simultaneous training phases beautifully, but its unfamiliar reading direction makes first-use clarity weaker than the debugger.",
+      "palette": ["#f8f8f6", "#101214", "#d8dadd", "#1557d6"],
+      "materials": ["score paper", "solid and hatched symbols", "moving beat band"],
+      "viewport": "A vertical center staff rises through data, model, train, eval, and serve; paired side lanes hold equations and system evidence while the active beat exposes a lesson.",
+      "risk": "The notation itself needs teaching before it can teach the model.",
+      "sketch": ".impeccable/sketches/labanotation-score.webp",
+      "hero": "https://impeccable.style/worlds/cards/notation-diagram-systems-labanotation-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/notation-diagram-systems-labanotation.webp"
+    },
+    {
+      "id": "data-sublime",
+      "label": "Data Sublime",
+      "kicker": "CHALLENGER",
+      "lineage": "Ryoji Ikeda-style data fields",
+      "thesis": "Every scale, token, expert, and latency sample becomes a black-and-white field that can be sampled down to its source.",
+      "case": "The audience recognizes measurement density, but pure abstraction obscures the novice's explanatory path.",
+      "palette": ["#ffffff", "#000000"],
+      "materials": ["pixel-crisp bar fields", "sine lattices", "tabular numerics"],
+      "viewport": "A full-width lifecycle barcode dominates the fold; selecting a frequency band pulls one concept, equation, and code trace into focus beneath it.",
+      "risk": "Long reading can become visually severe and the blue-dot source artifact disappears.",
+      "sketch": ".impeccable/sketches/data-sublime.webp",
+      "hero": "https://impeccable.style/worlds/cards/ikeda-datamatics-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/ikeda-datamatics.webp"
+    },
+    {
+      "id": "industrial-labels",
+      "label": "Quoted Systems",
+      "kicker": "CHALLENGER",
+      "lineage": "industrial stockroom labels and streetwear quote grammar",
+      "thesis": "Every ambiguous term is literally labeled, quoted, and left tagged until its evidence is verified.",
+      "case": "Literal labels support evidence status, but the fashion lineage identifies less strongly with sustained systems study.",
+      "palette": ["#f7f7f2", "#101113", "#f06a24"],
+      "materials": ["white cotton", "black nylon", "safety-orange tags"],
+      "viewport": "A diagonal verification stripe crosses a three-zone study map; quoted term plates detach into definitions, equations, and code trails.",
+      "risk": "The hazard language can overstate routine uncertainty and fatigue the reader.",
+      "sketch": ".impeccable/sketches/industrial-labels.webp",
+      "hero": "https://impeccable.style/worlds/cards/textiles-weave-drape-fashion-industrial-quote-grammar-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/textiles-weave-drape-fashion-industrial-quote-grammar.webp"
+    }
+  ],
+  "reroll": true,
+  "canon": true,
+  "canonCard": {
+    "label": "The category standard",
+    "thesis": "A polished documentation portal with a sidebar, chapters, conventional diagrams, and interactive labs.",
+    "viewport": "A familiar course landing page and table of contents, executed at full craft without an unusual governing metaphor.",
+    "sketch": ".impeccable/sketches/canon.webp"
+  },
+  "steer": true
+}
