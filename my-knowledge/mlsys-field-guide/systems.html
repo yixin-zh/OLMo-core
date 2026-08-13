@@ -267,7 +267,7 @@
 
           <div class="lab-console">
             <div><h3>Do not report “8-way parallel”</h3><p>Record the full mesh tuple, per-rank shapes, microbatches, schedule, activation checkpointing, collective volumes, topology, peak allocated memory, tokens/s/GPU, MFU, and straggler distribution.</p></div>
-            <a class="button button-primary" href="labs.html#lab-parallelism">Open mesh lab</a>
+            <a class="button button-primary" href="labs.html#lab-inference">Carry the mesh into the inference lab</a>
           </div>
         </section>
 
@@ -477,7 +477,7 @@
 
           <div class="caution-box"><strong>Online versus offline is a data-generation distinction.</strong><p>PPO/GRPO-style online methods repeatedly sample from a behavior policy and must manage policy lag. DPO trains from an existing preference dataset and has no online actor loop in the optimization step, though the preference data still has a generation provenance.</p></div>
 
-          <div class="lab-console"><div><h3>Rollout trace lab</h3><p>Simulate variable completion lengths, a bounded queue, actor versions, learner steps, and weight sync. Plot utilization and lag; then decide where to apply backpressure or discard stale trajectories.</p></div><a class="button button-primary" href="labs.html#lab-rollout">Open rollout lab</a></div>
+          <div class="lab-console"><div><h3>Rollout trace lab</h3><p>Simulate variable completion lengths, a bounded queue, actor versions, learner steps, and weight sync. Plot utilization and lag; then decide where to apply backpressure or discard stale trajectories.</p></div><a class="button button-primary" href="labs.html#lab-rl">Open rollout lab</a></div>
         </section>
 
         <section id="systems-handoff" class="section-band" aria-labelledby="handoff-title">

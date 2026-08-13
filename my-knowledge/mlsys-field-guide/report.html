@@ -1,0 +1,1125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="An interactive evidence ledger for writing a transparent LLM technical report, with a partially reconstructed OLMo 3 7B example."
+    />
+    <title>ML Systems Field Guide — Transparent report builder</title>
+    <link rel="stylesheet" href="assets/css/site.css" />
+    <script src="assets/js/site.js" defer></script>
+    <style>
+      .report-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+        align-items: center;
+      }
+
+      .report-actions .button {
+        min-height: 2.35rem;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.76rem;
+      }
+
+      .persist-status {
+        min-height: 1.2rem;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+      }
+
+      .audit-layout {
+        display: grid;
+        grid-template-columns: minmax(17rem, 0.55fr) minmax(0, 1.45fr);
+        gap: 1rem;
+        align-items: start;
+      }
+
+      .audit-sidebar {
+        position: sticky;
+        top: 6.8rem;
+        display: grid;
+        gap: 1rem;
+      }
+
+      .score-panel {
+        display: grid;
+        grid-template-columns: 7.5rem minmax(0, 1fr);
+        gap: 1rem;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid var(--rule);
+        border-top: 4px solid var(--probe);
+        background: var(--surface);
+      }
+
+      .score-graphic {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 7.5rem;
+        height: 7.5rem;
+      }
+
+      .score-graphic svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+
+      .score-track,
+      .score-progress {
+        fill: none;
+        stroke-width: 8;
+      }
+
+      .score-track {
+        stroke: var(--surface-3);
+      }
+
+      .score-progress {
+        stroke: var(--probe);
+        stroke-linecap: square;
+        transition: stroke-dashoffset 180ms ease;
+      }
+
+      .score-value {
+        position: relative;
+        z-index: 1;
+        font-family: var(--font-mono);
+        font-size: 1.5rem;
+      }
+
+      .score-copy h2 {
+        margin-bottom: 0.35rem;
+        font-size: 1rem;
+      }
+
+      .score-copy p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.74rem;
+      }
+
+      .matrix-panel {
+        max-height: calc(100vh - 16.5rem);
+        overflow: auto;
+        border: 1px solid var(--rule);
+        background: var(--surface);
+      }
+
+      .matrix-panel .panel-toolbar {
+        position: sticky;
+        z-index: 2;
+        top: 0;
+        padding: 0.8rem;
+        background: var(--surface);
+      }
+
+      .matrix-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .matrix-table th,
+      .matrix-table td {
+        padding: 0.55rem 0.45rem;
+        border-bottom: 1px solid var(--rule);
+        text-align: left;
+        vertical-align: top;
+        font-size: 0.68rem;
+      }
+
+      .matrix-table th {
+        color: var(--muted);
+        background: var(--surface-2);
+      }
+
+      .matrix-table select {
+        width: 100%;
+        min-height: 2rem;
+        border: 1px solid var(--rule);
+        border-radius: var(--radius-sm);
+        background: var(--surface);
+        font-size: 0.68rem;
+      }
+
+      .matrix-state {
+        display: block;
+        margin-top: 0.25rem;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+      }
+
+      .matrix-state.is-blocked {
+        color: var(--red);
+      }
+
+      .ledger-stack {
+        display: grid;
+        gap: 0.85rem;
+      }
+
+      .reconstruction-banner {
+        padding: 1rem;
+        border: 1px solid #c6a62e;
+        border-left: 5px solid var(--amber);
+        background: var(--amber-soft);
+      }
+
+      .reconstruction-banner h2 {
+        margin-bottom: 0.4rem;
+        font-size: 1.15rem;
+      }
+
+      .reconstruction-banner p:last-child {
+        margin-bottom: 0;
+      }
+
+      .ledger-section {
+        border: 1px solid var(--rule);
+        background: var(--surface);
+      }
+
+      .ledger-section > summary {
+        display: grid;
+        grid-template-columns: 2.2rem minmax(0, 1fr) auto;
+        gap: 0.75rem;
+        align-items: center;
+        min-height: 4rem;
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .ledger-section > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .ledger-section > summary::after {
+        content: "+";
+        color: var(--probe);
+        font-family: var(--font-mono);
+        font-size: 1.2rem;
+      }
+
+      .ledger-section[open] > summary::after {
+        content: "−";
+      }
+
+      .ledger-index {
+        display: grid;
+        place-items: center;
+        width: 2rem;
+        height: 2rem;
+        border: 1px solid var(--probe);
+        color: var(--probe);
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+      }
+
+      .ledger-title strong,
+      .ledger-title small {
+        display: block;
+      }
+
+      .ledger-title strong {
+        font-size: 0.92rem;
+      }
+
+      .ledger-title small {
+        margin-top: 0.18rem;
+        color: var(--muted);
+        font-size: 0.7rem;
+      }
+
+      .ledger-body {
+        padding: 1rem;
+        border-top: 1px solid var(--rule);
+      }
+
+      .ledger-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.9rem;
+      }
+
+      .ledger-field {
+        display: grid;
+        gap: 0.32rem;
+        align-content: start;
+      }
+
+      .ledger-field.wide {
+        grid-column: 1 / -1;
+      }
+
+      .ledger-field > span:first-child {
+        font-size: 0.76rem;
+        font-weight: 650;
+      }
+
+      .required-flag,
+      .conditional-flag {
+        display: inline-block;
+        margin-left: 0.35rem;
+        padding: 0.08rem 0.3rem;
+        border: 1px solid #c6a62e;
+        color: #725b00;
+        background: var(--amber-soft);
+        font-family: var(--font-mono);
+        font-size: 0.58rem;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .conditional-flag {
+        border-color: var(--rule-strong);
+        color: var(--muted);
+        background: var(--surface-2);
+      }
+
+      .ledger-field input,
+      .ledger-field select,
+      .ledger-field textarea {
+        width: 100%;
+        border: 1px solid var(--rule-strong);
+        border-radius: var(--radius-sm);
+        background: var(--surface);
+      }
+
+      .ledger-field input,
+      .ledger-field select {
+        min-height: 2.55rem;
+        padding: 0.5rem 0.6rem;
+      }
+
+      .ledger-field textarea {
+        min-height: 6.2rem;
+        padding: 0.6rem;
+        resize: vertical;
+      }
+
+      .field-help {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.68rem;
+      }
+
+      .proof-field {
+        margin-top: 1rem;
+        padding-top: 0.9rem;
+        border-top: 1px solid var(--rule);
+      }
+
+      .proof-field input {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+      }
+
+      .source-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        margin-top: 1rem;
+      }
+
+      .architecture-warning {
+        margin: 0 0 1rem;
+        padding: 0.75rem 0.9rem;
+        border: 1px solid #d9928b;
+        background: var(--red-soft);
+        font-size: 0.75rem;
+      }
+
+      .token-reconciliation {
+        width: 100%;
+        margin-bottom: 1rem;
+        border-collapse: collapse;
+      }
+
+      .token-reconciliation th,
+      .token-reconciliation td {
+        padding: 0.6rem;
+        border: 1px solid var(--rule);
+        text-align: left;
+        vertical-align: top;
+        font-size: 0.72rem;
+      }
+
+      .token-reconciliation th {
+        color: var(--muted);
+        background: var(--surface-2);
+      }
+
+      .token-reconciliation td:nth-child(n + 2) {
+        font-family: var(--font-mono);
+      }
+
+      .conflict-note {
+        padding: 0.85rem 1rem;
+        border: 1px solid #d9928b;
+        border-left: 5px solid var(--red);
+        background: var(--red-soft);
+        font-size: 0.75rem;
+      }
+
+      .phase-row {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 8.2rem repeat(3, minmax(0, 1fr));
+        gap: 0.45rem;
+        padding: 0.7rem;
+        border: 1px solid var(--rule);
+        background: var(--surface-2);
+      }
+
+      .phase-row > strong {
+        align-self: center;
+        font-size: 0.75rem;
+      }
+
+      .phase-row label {
+        display: grid;
+        gap: 0.25rem;
+        color: var(--muted);
+        font-size: 0.62rem;
+      }
+
+      .phase-row input {
+        min-width: 0;
+        min-height: 2.35rem;
+        padding: 0.45rem;
+        border: 1px solid var(--rule-strong);
+        border-radius: var(--radius-sm);
+        background: var(--surface);
+        font-size: 0.68rem;
+      }
+
+      .report-verdict {
+        padding: 1.2rem;
+        border: 1px solid var(--rule);
+        border-left: 5px solid var(--probe);
+        background: var(--surface);
+      }
+
+      .report-verdict h2 {
+        font-size: 1.2rem;
+      }
+
+      .report-verdict ul {
+        margin-bottom: 0;
+        padding-left: 1.2rem;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      @media (max-width: 1180px) {
+        .audit-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .audit-sidebar {
+          position: static;
+        }
+
+        .matrix-panel {
+          max-height: none;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .score-panel,
+        .ledger-grid,
+        .phase-row {
+          grid-template-columns: 1fr;
+        }
+
+        .score-graphic {
+          width: 6.5rem;
+          height: 6.5rem;
+        }
+
+        .ledger-section > summary {
+          grid-template-columns: 2rem minmax(0, 1fr) auto;
+          padding-right: 0.75rem;
+          padding-left: 0.75rem;
+        }
+      }
+
+      @media print {
+        .audit-sidebar {
+          position: static;
+        }
+
+        .report-actions,
+        .utility-actions,
+        .matrix-table select {
+          display: none;
+        }
+
+        .ledger-section:not([open]) > .ledger-body {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the report ledger</a>
+    <header class="utility-bar">
+      <a class="brand" href="index.html" aria-label="ML Systems Field Guide home">
+        <span class="brand-mark" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </span>
+        <span class="brand-copy">
+          <strong>ML Systems Field Guide</strong>
+          <span>From blue dot to evidence</span>
+        </span>
+      </a>
+      <nav class="primary-nav" data-primary-nav aria-label="Primary navigation">
+        <a href="index.html">Study console</a>
+        <a href="notebook.html">Notebook</a>
+        <a href="model.html">Model</a>
+        <a href="training.html">Training</a>
+        <a href="systems.html">Systems</a>
+        <a href="labs.html">Labs</a>
+        <a href="report.html" aria-current="page">Report</a>
+        <a href="sources.html">Evidence</a>
+      </nav>
+      <div class="utility-actions">
+        <button class="utility-button" type="button" data-print>Print</button>
+        <button
+          class="utility-button nav-toggle"
+          type="button"
+          data-nav-toggle
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >Menu</button>
+      </div>
+    </header>
+
+    <div class="evidence-ribbon" role="note" aria-label="Evidence legend">
+      <strong>Report states</strong>
+      <span class="status-key status-caution">intended or configured</span>
+      <span class="status-key status-repo">executed or verified</span>
+      <span class="status-key status-primary">released with proof</span>
+      <span class="status-key status-contradiction">missing or conflicting evidence</span>
+    </div>
+
+    <div class="app-shell">
+      <aside class="lifecycle-rail" aria-label="Learning lifecycle">
+        <p class="rail-heading">Lifecycle</p>
+        <ol class="rail-list">
+          <li class="is-complete"><a href="notebook.html"><span class="rail-dot" aria-hidden="true"></span><span class="rail-label"><strong>Sources</strong><small>notes · authority · gaps</small></span></a></li>
+          <li class="is-complete"><a href="training.html#tokens"><span class="rail-dot" aria-hidden="true"></span><span class="rail-label"><strong>Tokens</strong><small>curate · tokenize · pack</small></span></a></li>
+          <li class="is-complete"><a href="model.html"><span class="rail-dot" aria-hidden="true"></span><span class="rail-label"><strong>Model</strong><small>attend · route · predict</small></span></a></li>
+          <li class="is-complete"><a href="training.html"><span class="rail-dot" aria-hidden="true"></span><span class="rail-label"><strong>Train</strong><small>scale · optimize · checkpoint</small></span></a></li>
+          <li class="is-complete"><a href="training.html#eval-gates"><span class="rail-dot" aria-hidden="true"></span><span class="rail-label"><strong>Eval</strong><small>monitor · select · claim</small></span></a></li>
+          <li class="is-complete"><a href="systems.html#inference"><span class="rail-dot" aria-hidden="true"></span><span class="rail-label"><strong>Serve</strong><small>prefill · decode · schedule</small></span></a></li>
+          <li><a href="report.html" aria-current="step"><span class="rail-dot" aria-hidden="true"></span><span class="rail-label"><strong>Release</strong><small>artifacts · evidence · risk</small></span></a></li>
+        </ol>
+        <div class="rail-block">
+          <strong>100% means reproducible proof</strong>
+          <p>Filled prose is not enough. Every required section marked executed, verified, or released needs an immutable artifact reference.</p>
+        </div>
+      </aside>
+
+      <main class="page-main" id="main">
+        <section class="page-lede" aria-labelledby="page-title">
+          <div>
+            <h1 id="page-title">Architecture is one ledger, not the report.</h1>
+            <p>
+              Build a transparent LLM technical report as a chain of claims and proofs: identity,
+              data, scaling trials, recipe, phase lineage, curves, evaluation, systems, security,
+              and released artifacts. Missing evidence remains visible instead of becoming prose.
+            </p>
+          </div>
+          <div class="lede-controls">
+            <strong>Capstone mode · OLMo 3 7B example</strong>
+            <p>Prefilled values are <em>partially reconstructed from public artifacts</em>. They are an audit starting point, not a claim that the run has been independently reproduced.</p>
+            <div class="report-actions" role="group" aria-label="Report actions">
+              <button class="button button-primary" id="download-json" type="button">Download JSON</button>
+              <button class="button" id="copy-markdown" type="button">Copy Markdown</button>
+              <button class="button" type="button" data-print>Print</button>
+              <button class="button" id="reset-report" type="button">Reset example</button>
+            </div>
+            <output class="persist-status" id="persist-status" aria-live="polite">Saved locally when edited.</output>
+          </div>
+        </section>
+
+        <section class="section-band" aria-labelledby="builder-title">
+          <div class="section-heading">
+            <h2 id="builder-title">Transparent-report completeness matrix</h2>
+            <p>
+              Severity says whether a ledger is required for this report scope. Evidence state says
+              how far the claim travelled. An executed or released claim without a proof reference
+              is blocked, even when every narrative field is filled.
+            </p>
+          </div>
+
+          <form id="report-form" novalidate>
+            <button class="print-only" type="submit">Update report audit</button>
+            <div class="audit-layout">
+              <aside class="audit-sidebar" aria-label="Completeness controls">
+                <section class="score-panel" aria-labelledby="score-title">
+                  <div class="score-graphic" aria-hidden="true">
+                    <svg viewBox="0 0 120 120">
+                      <circle class="score-track" cx="60" cy="60" r="49"></circle>
+                      <circle id="score-progress" class="score-progress" cx="60" cy="60" r="49" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"></circle>
+                    </svg>
+                    <strong class="score-value"><output id="score-value">0%</output></strong>
+                  </div>
+                  <div class="score-copy">
+                    <h2 id="score-title">Evidence completeness</h2>
+                    <p id="score-summary" aria-live="polite">Calculating the ledger…</p>
+                  </div>
+                </section>
+
+                <section class="matrix-panel" aria-labelledby="matrix-title">
+                  <div class="panel-toolbar"><h3 id="matrix-title">13 ledgers</h3><span class="status status-caution" id="matrix-alert">audit open</span></div>
+                  <table class="matrix-table">
+                    <thead><tr><th>Ledger</th><th>Severity</th><th>Evidence</th></tr></thead>
+                    <tbody>
+                      <tr data-matrix-row="identity"><td><a href="#identity">Identity</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Identity severity</span><select name="severity_identity" data-severity="identity" aria-label="identity severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Identity evidence</span><select name="evidence_identity" data-evidence="identity" aria-label="identity evidence state"><option value="intended">intended</option><option value="configured">configured</option><option value="executed">executed</option><option value="verified" selected>verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="architecture"><td><a href="#architecture">Architecture</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Architecture severity</span><select name="severity_architecture" data-severity="architecture" aria-label="architecture severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Architecture evidence</span><select name="evidence_architecture" data-evidence="architecture" aria-label="architecture evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="data"><td><a href="#data">Data</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Data severity</span><select name="severity_data" data-severity="data" aria-label="data severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Data evidence</span><select name="evidence_data" data-evidence="data" aria-label="data evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="mixture"><td><a href="#mixture">Mixture</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Mixture severity</span><select name="severity_mixture" data-severity="mixture" aria-label="mixture severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Mixture evidence</span><select name="evidence_mixture" data-evidence="mixture" aria-label="mixture evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="scaling"><td><a href="#scaling">Scaling</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Scaling severity</span><select name="severity_scaling" data-severity="scaling" aria-label="scaling severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Scaling evidence</span><select name="evidence_scaling" data-evidence="scaling" aria-label="scaling evidence state"><option value="intended" selected>intended</option><option value="configured">configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="recipe"><td><a href="#recipe">Recipe</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Recipe severity</span><select name="severity_recipe" data-severity="recipe" aria-label="recipe severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Recipe evidence</span><select name="evidence_recipe" data-evidence="recipe" aria-label="recipe evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="phases"><td><a href="#phases">Phase lineage</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Phase lineage severity</span><select name="severity_phases" data-severity="phases" aria-label="phases severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Phase lineage evidence</span><select name="evidence_phases" data-evidence="phases" aria-label="phases evidence state"><option value="intended">intended</option><option value="configured">configured</option><option value="executed" selected>executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="losses"><td><a href="#losses">Losses + curves</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Loss severity</span><select name="severity_losses" data-severity="losses" aria-label="losses severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Loss evidence</span><select name="evidence_losses" data-evidence="losses" aria-label="losses evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="evaluation"><td><a href="#evaluation">Evaluation</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Evaluation severity</span><select name="severity_evaluation" data-severity="evaluation" aria-label="evaluation severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Evaluation evidence</span><select name="evidence_evaluation" data-evidence="evaluation" aria-label="evaluation evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="infrastructure"><td><a href="#infrastructure">Infrastructure</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Infrastructure severity</span><select name="severity_infrastructure" data-severity="infrastructure" aria-label="infrastructure severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Infrastructure evidence</span><select name="evidence_infrastructure" data-evidence="infrastructure" aria-label="infrastructure evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="inference"><td><a href="#inference">Inference</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Inference severity</span><select name="severity_inference" data-severity="inference" aria-label="inference severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Inference evidence</span><select name="evidence_inference" data-evidence="inference" aria-label="inference evidence state"><option value="intended" selected>intended</option><option value="configured">configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="security"><td><a href="#security">Security T + D</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Security severity</span><select name="severity_security" data-severity="security" aria-label="security severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Security evidence</span><select name="evidence_security" data-evidence="security" aria-label="security evidence state"><option value="intended" selected>intended</option><option value="configured">configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="release"><td><a href="#release">Release</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Release severity</span><select name="severity_release" data-severity="release" aria-label="release severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Release evidence</span><select name="evidence_release" data-evidence="release" aria-label="release evidence state"><option value="intended">intended</option><option value="configured">configured</option><option value="executed">executed</option><option value="verified" selected>verified</option><option value="released">released</option></select></label></td></tr>
+                    </tbody>
+                  </table>
+                </section>
+              </aside>
+
+              <div class="ledger-stack">
+                <aside class="reconstruction-banner" role="note">
+                  <h2>OLMo 3 7B · partially reconstructed from public artifacts</h2>
+                  <p>
+                    Public scripts, a checkpoint CSV, an official README, model repositories, and
+                    the OLMo 3 paper support many fields. Empty or bracketed “missing” values are
+                    deliberate epistemic debt. Change severity only when the report scope truly makes
+                    a section conditional or not applicable.
+                  </p>
+                </aside>
+
+                <details class="ledger-section" id="identity" data-ledger="identity" open>
+                  <summary><span class="ledger-index">01</span><span class="ledger-title"><strong>Model identity + immutable boundary</strong><small>Name the artifact before describing it.</small></span></summary>
+                  <div class="ledger-body">
+                    <div class="ledger-grid">
+                      <label class="ledger-field"><span>Model / release name <span class="required-flag">required</span></span><input type="text" name="identity_model_name" data-report-field data-required value="OLMo 3 7B (Olmo-3-1025-7B)" /></label>
+                      <label class="ledger-field"><span>Report scope <span class="required-flag">required</span></span><input type="text" name="identity_scope" data-report-field data-required value="Base model: broad pretrain → midtrain → long-context; posttraining lineage noted but not reconstructed" /></label>
+                      <label class="ledger-field"><span>Code repository + commit <span class="required-flag">required</span></span><input type="text" name="identity_code" data-report-field data-required value="allenai/OLMo-core @ 1e03ad1c2dcb0836c6805e27b89e22a70cd7523f (inspection baseline)" /></label>
+                      <label class="ledger-field"><span>Resolved config hash <span class="required-flag">required</span></span><input type="text" name="identity_config_hash" data-report-field data-required value="[not published as one canonical resolved-config digest]" /></label>
+                      <label class="ledger-field wide"><span>Checkpoint identity / hashes <span class="required-flag">required</span></span><textarea name="identity_checkpoints" data-report-field data-required>Final public OLMo-core checkpoint URL: https://olmo-checkpoints.org/ai2-llm/Olmo-3-1025-7B/stage3/step11921/
+Model-weight SHA-256: [not reconstructed]</textarea><span class="field-help">A mutable model name is not an identity. Record content digests, exact checkpoint paths, and conversion provenance.</span></label>
+                      <label class="ledger-field wide"><span>Reconstruction status + known boundary <span class="required-flag">required</span></span><textarea name="identity_boundary" data-report-field data-required>Partially reconstructed from public artifacts. OLMo-core scripts establish configurable behavior; the CSV establishes published checkpoint counters; neither alone proves every runtime override, incident, or artifact digest from the executed jobs.</textarea></label>
+                    </div>
+                    <label class="ledger-field proof-field"><span>Identity proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_identity" data-proof="identity" value="src/scripts/official/OLMo3/README.md + OLMo-3-1025-7B.csv + public checkpoint URL" /><span class="field-help">For executed, verified, or released states, cite an immutable manifest, content hash, or versioned artifact.</span></label>
+                    <div class="source-strip"><a class="source-chip is-repo" href="../../src/scripts/official/OLMo3/README.md">OLMo 3 README</a><a class="source-chip is-repo" href="../../src/scripts/official/OLMo3/OLMo-3-1025-7B.csv">checkpoint CSV</a><a class="source-chip is-primary" href="https://arxiv.org/abs/2512.13961">OLMo 3 paper</a></div>
+                  </div>
+                </details>
+
+                <details class="ledger-section" id="architecture" data-ledger="architecture" open>
+                  <summary><span class="ledger-index">02</span><span class="ledger-title"><strong>Architecture</strong><small>Dense/MoE, dimensions, norms, activations, attention, position, and vision.</small></span></summary>
+                  <div class="ledger-body">
+                    <p class="architecture-warning"><strong>Architecture alone is visibly incomplete.</strong> It is one of 13 report ledgers and cannot establish the data order, scaling search, executed recipe, failures, loss curves, evaluation validity, serving behavior, security posture, or released checksums.</p>
+                    <div class="ledger-grid">
+                      <label class="ledger-field"><span>Topology <span class="required-flag">required</span></span><input type="text" name="architecture_topology" data-report-field data-required value="Dense decoder-only Transformer; 32 layers; d_model 4096; SwiGLU hidden size 11008" /></label>
+                      <label class="ledger-field"><span>Parameter conventions <span class="required-flag">required</span></span><input type="text" name="architecture_parameters" data-report-field data-required value="7B class; exact total / non-embedding / active counts should be generated from resolved config" /></label>
+                      <label class="ledger-field"><span>Normalization + residual order <span class="required-flag">required</span></span><input type="text" name="architecture_norm" data-report-field data-required value="reordered_norm block; RMSNorm ε=1e-6; QK normalization enabled" /></label>
+                      <label class="ledger-field"><span>Activation / FFN <span class="required-flag">required</span></span><input type="text" name="architecture_activation" data-report-field data-required value="SwiGLU: W2[SiLU(W1x) ⊙ W3x], bias-free projections" /></label>
+                      <label class="ledger-field"><span>Attention heads + pattern <span class="required-flag">required</span></span><input type="text" name="architecture_attention" data-report-field data-required value="32 query heads; 32 KV heads (MHA); head dim 128; sliding windows [4096,4096,4096,global]" /></label>
+                      <label class="ledger-field"><span>RoPE / context <span class="required-flag">required</span></span><input type="text" name="architecture_rope" data-report-field data-required value="RoPE θ=500000; base 8192; long-context YaRN factor=8, β_fast=32, β_slow=1; target 65536" /></label>
+                      <label class="ledger-field wide"><span>MoE experts / routing / capacity <span class="conditional-flag">conditional</span></span><input type="text" name="architecture_moe" data-report-field value="Not applicable: dense FFN. For MoE, record total/shared/routed experts, top-k, capacity/drop policy, router, expert parallelism, and active parameter convention." /></label>
+                      <label class="ledger-field wide"><span>Vision or multimodal position path <span class="conditional-flag">explicit N/A allowed</span></span><input type="text" name="architecture_vision" data-report-field value="Not applicable: this reconstructed artifact is text-only; do not infer 2D RoPE or M-RoPE" /></label>
+                    </div>
+                    <label class="ledger-field proof-field"><span>Architecture proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_architecture" data-proof="architecture" value="src/olmo_core/nn/transformer/config.py::olmo3_7B and official 7B scripts" /></label>
+                    <div class="source-strip"><a class="source-chip is-repo" href="../../src/olmo_core/nn/transformer/config.py">Transformer config</a><a class="source-chip is-repo" href="../../src/olmo_core/nn/rope.py">RoPE implementation</a><a class="source-chip is-primary" href="papers/olmo-3.pdf">local OLMo 3 PDF</a></div>
+                  </div>
+                </details>
+
+                <details class="ledger-section" id="data" data-ledger="data" open>
+                  <summary><span class="ledger-index">03</span><span class="ledger-title"><strong>Data provenance, curation + tokenizer</strong><small>Document the path before the pre-tokenized arrays.</small></span></summary>
+                  <div class="ledger-body">
+                    <div class="ledger-grid">
+                      <label class="ledger-field wide"><span>Source provenance + licenses <span class="required-flag">required</span></span><textarea name="data_provenance" data-report-field data-required>Dolma 3 / Dolma 3 Dolmino / Dolma 3 Longmino public dataset families. Per-source snapshot IDs, eligibility decisions, takedown policy, and license ledger: [not reconstructed here].</textarea></label>
+                      <label class="ledger-field wide"><span>Curation pipeline <span class="required-flag">required</span></span><textarea name="data_curation" data-report-field data-required>Raw acquisition → normalization → language/quality filters → safety/PII policy → exact/near dedup → benchmark decontamination → document IDs → tokenization → shard manifest. Exact executed stage reports and counts: [missing].</textarea></label>
+                      <label class="ledger-field"><span>Tokenizer identifier + hash <span class="required-flag">required</span></span><input type="text" name="data_tokenizer" data-report-field data-required value="allenai/dolma2-tokenizer (README calls it dolma3-tokenizer alias); tokenizer-file SHA-256: [missing]" /></label>
+                      <label class="ledger-field"><span>Vocabulary + padding <span class="required-flag">required</span></span><input type="text" name="data_vocab" data-report-field data-required value="Logical vocab 100278; model-padded vocab 100352 (multiple of 128); EOS 100257; PAD 100277" /></label>
+                      <label class="ledger-field"><span>Normalization / special-token rules <span class="required-flag">required</span></span><input type="text" name="data_tokenizer_rules" data-report-field data-required value="[tokenizer normalization and pre-tokenization rules not reconstructed]" /></label>
+                      <label class="ledger-field"><span>Packing / masking / padding accounting <span class="required-flag">required</span></span><input type="text" name="data_packing" data-report-field data-required value="FSL 8192 for pre/mid; packed FSL 65536 with intra-document masking for long-context; loss-bearing vs padding totals [missing]" /></label>
+                    </div>
+                    <label class="ledger-field proof-field"><span>Data proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_data" data-proof="data" value="official OLMo 3 README + data mix manifests; executed curation audit digest missing" /></label>
+                    <div class="source-strip"><a class="source-chip is-repo" href="../../src/olmo_core/data/tokenizer.py">tokenizer metadata</a><a class="source-chip is-repo" href="../../src/olmo_core/data/mixes/OLMo-mix-0625-official.txt">pretrain manifest</a><a class="source-chip is-primary" href="papers/dolma.pdf">Dolma paper</a></div>
+                  </div>
+                </details>
+
+                <details class="ledger-section" id="mixture" data-ledger="mixture">
+                  <summary><span class="ledger-index">04</span><span class="ledger-title"><strong>Data mixture + token accounting</strong><small>Requested weights are not realized batches.</small></span></summary>
+                  <div class="ledger-body">
+                    <table class="token-reconciliation" aria-label="OLMo 3 7B phase token reconciliation">
+                      <thead><tr><th>Phase</th><th>README budget</th><th>CSV exact cumulative endpoint</th><th>CSV-derived phase delta</th></tr></thead>
+                      <tbody>
+                        <tr><td>Broad pretrain</td><td>5.93T</td><td>5,929,965,715,456</td><td>5,929,965,715,456</td></tr>
+                        <tr><td>Midtrain</td><td>100B</td><td>6,027,869,159,424</td><td>97,903,443,968</td></tr>
+                        <tr><td>Long-context</td><td>50B</td><td>6,073,675,153,408</td><td>45,805,993,984</td></tr>
+                      </tbody>
+                    </table>
+                    <div class="ledger-grid">
+                      <label class="ledger-field wide"><span>Requested mixture <span class="required-flag">required</span></span><textarea name="mixture_requested" data-report-field data-required>Stage 1: OLMo_mix_0625_official; stage 2: OLMo_midtraining_mix_0625_100B; stage 3: OLMo_longmino_mix_0625. Preserve normalized source weights and manifest hashes.</textarea></label>
+                      <label class="ledger-field wide"><span>Realized mixture <span class="required-flag">required</span></span><textarea name="mixture_realized" data-report-field data-required>[Per-source examples/tokens actually sampled after retries, filtering, packing, truncation, and job restarts are missing.]</textarea></label>
+                      <label class="ledger-field"><span>Unique eligible tokens <span class="required-flag">required</span></span><input type="text" name="mixture_unique" data-report-field data-required value="[missing by source and phase]" /></label>
+                      <label class="ledger-field"><span>Seen / loss-bearing / padding tokens <span class="required-flag">required</span></span><input type="text" name="mixture_seen" data-report-field data-required value="CSV cumulative final: 6,073,675,153,408; loss-bearing and padding split [missing]" /></label>
+                      <label class="ledger-field"><span>Repetition / epoch convention <span class="required-flag">required</span></span><input type="text" name="mixture_repetition" data-report-field data-required value="[missing: seen_i / unique_eligible_i by source]" /></label>
+                      <label class="ledger-field"><span>Manifest + realized-order hashes <span class="required-flag">required</span></span><input type="text" name="mixture_hashes" data-report-field data-required value="Published requested manifests available; exact realized data-order digest [missing]" /></label>
+                    </div>
+                    <label class="ledger-field proof-field"><span>Mixture proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_mixture" data-proof="mixture" value="src/scripts/official/OLMo3/OLMo-3-1025-7B.csv + three requested mix manifests" /></label>
+                    <div class="source-strip"><a class="source-chip is-repo" href="../../src/scripts/official/OLMo3/OLMo-3-1025-7B.csv">exact checkpoint counters</a><a class="source-chip is-repo" href="../../src/olmo_core/data/composable/">composable loader</a></div>
+                  </div>
+                </details>
+
+                <details class="ledger-section" id="scaling" data-ledger="scaling">
+                  <summary><span class="ledger-index">05</span><span class="ledger-title"><strong>Scaling hypothesis, points + trials</strong><small>A released target is not evidence of the search that chose it.</small></span></summary>
+                  <div class="ledger-body">
+                    <div class="ledger-grid">
+                      <label class="ledger-field wide"><span>Scaling hypothesis / law <span class="required-flag">required</span></span><textarea name="scaling_hypothesis" data-report-field data-required>[No complete OLMo 3 7B scaling-law fit reconstructed here.] State loss model, compute proxy, parameter convention, data-quality assumptions, and extrapolation range.</textarea></label>
+                      <label class="ledger-field wide"><span>Independent scaling points <span class="required-flag">required</span></span><textarea name="scaling_points" data-report-field data-required>[missing] One row per separately trained point: N_total, N_active, D, C, batch, LR, mix hash, seed, status, validation loss.</textarea></label>
+                      <label class="ledger-field"><span>Trials per point / seed policy <span class="required-flag">required</span></span><input type="text" name="scaling_trials" data-report-field data-required value="[missing; checkpoints from one trajectory are not independent points]" /></label>
+                      <label class="ledger-field"><span>All failures / censored runs <span class="required-flag">required</span></span><input type="text" name="scaling_failures" data-report-field data-required value="[missing failure ledger]" /></label>
+                      <label class="ledger-field"><span>Fit + uncertainty <span class="required-flag">required</span></span><input type="text" name="scaling_fit" data-report-field data-required value="[missing coefficients, residuals, confidence interval, sensitivity]" /></label>
+                      <label class="ledger-field"><span>Forecast + held-out point <span class="required-flag">required</span></span><input type="text" name="scaling_forecast" data-report-field data-required value="[missing forecast and prospective held-out validation]" /></label>
+                      <label class="ledger-field wide"><span>Token budget / TPP convention <span class="required-flag">required</span></span><input type="text" name="scaling_tpp" data-report-field data-required value="README pretrain budget 5.93T; final CSV cumulative 6.073675T. TPP unresolved until total/non-embedding parameter denominator and phase scope are pinned." /></label>
+                    </div>
+                    <label class="ledger-field proof-field"><span>Scaling proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_scaling" data-proof="scaling" value="[missing trial registry and fit artifact]" /></label>
+                    <div class="source-strip"><a class="source-chip is-primary" href="papers/chinchilla.pdf">Chinchilla paper</a><a class="source-chip is-repo" href="../../src/scripts/train/ladder/">OLMo-core ladder scripts</a></div>
+                  </div>
+                </details>
+
+                <details class="ledger-section" id="recipe" data-ledger="recipe">
+                  <summary><span class="ledger-index">06</span><span class="ledger-title"><strong>Training recipe</strong><small>Resolve optimizer, groups, batch, precision, schedule, and state policy together.</small></span></summary>
+                  <div class="ledger-body">
+                    <div class="conflict-note"><strong>Published script defaults conflict with the executed endpoints.</strong> Pretrain scripts contain 5T then 7T duration defaults while the stage-1 CSV stops at 5.929965715456T. The long-context script retains <code>max_duration=5e12</code> and <code>hard_stop=597046</code>, while the released CSV ends stage 3 at step 11,921 and adds 45.806B tokens. Therefore script defaults are configured or historical intent, not exact proof of executed stopping conditions; runtime overrides or operational stop decisions remain required.</div>
+                    <div class="ledger-grid" style="margin-top:1rem">
+                      <label class="ledger-field wide"><span>Optimizer + parameter groups <span class="required-flag">required</span></span><textarea name="recipe_optimizer" data-report-field data-required>SkipStep AdamW. Pretrain LR 3e-4; mid/long LR 0.00020712352850360292; β=(0.9,0.95); weight decay 0.1; embedding weight decay 0; max grad norm 1.0.</textarea></label>
+                      <label class="ledger-field"><span>Global / micro / accumulation batch <span class="required-flag">required</span></span><input type="text" name="recipe_batch" data-report-field data-required value="Pretrain ≈4.194M tokens; midtrain 2.097M; long-context 4.194M. Exact effective executed batch after restarts [not independently verified]." /></label>
+                      <label class="ledger-field"><span>Precision / kernels <span class="required-flag">required</span></span><input type="text" name="recipe_precision" data-report-field data-required value="bf16 params; fp32 reductions; FlashAttention 2. Float8 disabled pre/mid and enabled in long-context script." /></label>
+                      <label class="ledger-field wide"><span>Schedule as a numeric function <span class="required-flag">required</span></span><textarea name="recipe_schedule" data-report-field data-required>Pretrain part 1 cosine + 2000 warmup steps; part 2 HalfCosWithWarmup continuation. Midtrain linear decay, warmup 0, α_f=0. Long-context linear, warmup 200, α_f=0. Exact runtime horizons must be reconciled with CSV endpoints.</textarea></label>
+                      <label class="ledger-field"><span>Seeds / determinism <span class="required-flag">required</span></span><input type="text" name="recipe_seeds" data-report-field data-required value="Data seed 34521 pre/long; midtrain init/data seed 1337; source permutation seed 123 long-context; full RNG/environment digest [missing]" /></label>
+                      <label class="ledger-field"><span>Checkpoint state load/reset <span class="required-flag">required</span></span><input type="text" name="recipe_state" data-report-field data-required value="Pretrain part 2 loads trainer+optimizer; mid/long load optimizer but reset trainer state. Dataloader/RNG exact handoff evidence [missing]." /></label>
+                    </div>
+                    <label class="ledger-field proof-field"><span>Recipe proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_recipe" data-proof="recipe" value="four official 7B scripts at inspection baseline; resolved executed config digest missing" /></label>
+                    <div class="source-strip"><a class="source-chip is-repo" href="../../src/scripts/official/OLMo3/OLMo-3-1025-7B-pretrain-1.py">pretrain 1</a><a class="source-chip is-repo" href="../../src/scripts/official/OLMo3/OLMo-3-1025-7B-pretrain-2.py">pretrain 2</a><a class="source-chip is-repo" href="../../src/scripts/official/OLMo3/OLMo-3-1025-7B-midtrain.py">midtrain</a><a class="source-chip is-repo" href="../../src/scripts/official/OLMo3/OLMo-3-1025-7B-long-context.py">long-context</a></div>
+                  </div>
+                </details>
+
+                <details class="ledger-section" id="phases" data-ledger="phases">
+                  <summary><span class="ledger-index">07</span><span class="ledger-title"><strong>Phase lineage</strong><small>Each arrow needs a parent, state policy, data/objective delta, and budget.</small></span></summary>
+                  <div class="ledger-body">
+                    <div class="ledger-grid">
+                      <div class="phase-row"><strong>Broad pretrain</strong><label>Parent / state<input type="text" name="phase_pretrain_parent" data-report-field data-required value="random init; continuation at step596047 loads trainer+optim" /></label><label>Data / objective delta<input type="text" name="phase_pretrain_delta" data-report-field data-required value="OLMo-mix-0625; next-token CE + z-loss" /></label><label>Budget / endpoint<input type="text" name="phase_pretrain_budget" data-report-field data-required value="README 5.93T; CSV 5,929,965,715,456" /></label></div>
+                      <div class="phase-row"><strong>Midtrain</strong><label>Parent / state<input type="text" name="phase_mid_parent" data-report-field data-required value="stage1 step1413814; optimizer loaded; trainer reset" /></label><label>Data / objective delta<input type="text" name="phase_mid_delta" data-report-field data-required value="Dolmino targeted mix; CE; context 8192" /></label><label>Budget / endpoint<input type="text" name="phase_mid_budget" data-report-field data-required value="README 100B; CSV delta 97,903,443,968" /></label></div>
+                      <div class="phase-row"><strong>Long-context</strong><label>Parent / state<input type="text" name="phase_long_parent" data-report-field data-required value="stage2 step47684; optimizer loaded; trainer reset" /></label><label>Data / objective delta<input type="text" name="phase_long_delta" data-report-field data-required value="Longmino; context 65536; YaRN ×8; CP degree 8" /></label><label>Budget / endpoint<input type="text" name="phase_long_budget" data-report-field data-required value="README 50B; CSV delta 45,805,993,984" /></label></div>
+                      <div class="phase-row"><strong>SFT</strong><label>Parent / state<input type="text" name="phase_sft_parent" data-report-field data-required value="Public OLMo 3 Base → named SFT artifacts; exact parent hashes [not reconstructed]" /></label><label>Data / objective delta<input type="text" name="phase_sft_delta" data-report-field data-required value="Supervised chat/reasoning examples; implementation spans local SFT scripts and Open Instruct" /></label><label>Budget / endpoint<input type="text" name="phase_sft_budget" data-report-field data-required value="[examples, tokens, epochs, checkpoint hashes missing]" /></label></div>
+                      <div class="phase-row"><strong>DPO</strong><label>Parent / state<input type="text" name="phase_dpo_parent" data-report-field data-required value="Named SFT → named DPO artifacts; exact hash lineage [not reconstructed]" /></label><label>Data / objective delta<input type="text" name="phase_dpo_delta" data-report-field data-required value="Offline preference pairs; DPO is not online rollout RL" /></label><label>Budget / endpoint<input type="text" name="phase_dpo_budget" data-report-field data-required value="[pair counts, β, steps, checkpoint hashes missing]" /></label></div>
+                      <div class="phase-row"><strong>Online RL / RLVR</strong><label>Parent / state<input type="text" name="phase_rl_parent" data-report-field data-required value="Named DPO → final Think/Instruct model; Open Instruct boundary" /></label><label>Data / objective delta<input type="text" name="phase_rl_delta" data-report-field data-required value="Prompt → rollout → verifier/reward → advantage → policy update; not orchestrated by OLMo-core" /></label><label>Budget / endpoint<input type="text" name="phase_rl_budget" data-report-field data-required value="[rollout count, samples/prompt, KL, steps, hashes missing]" /></label></div>
+                    </div>
+                    <label class="ledger-field proof-field"><span>Phase-lineage proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_phases" data-proof="phases" value="OLMo 3 README stage tables + 7B checkpoint CSV; exact posttraining lineage manifests missing" /></label>
+                    <div class="source-strip"><a class="source-chip is-primary" href="https://arxiv.org/abs/2512.13961">OLMo 3 report</a><a class="source-chip is-caution" href="https://github.com/allenai/open-instruct">adjacent Open Instruct stack</a></div>
+                  </div>
+                </details>
+
+                <details class="ledger-section" id="losses" data-ledger="losses">
+                  <summary><span class="ledger-index">08</span><span class="ledger-title"><strong>Losses, coefficients + measured curves</strong><small>An equation is not a curve; a dashboard is not an immutable log.</small></span></summary>
+                  <div class="ledger-body">
+                    <div class="ledger-grid">
+                      <label class="ledger-field wide"><span>Training objectives + coefficients <span class="required-flag">required</span></span><textarea name="losses_objectives" data-report-field data-required>Base phases: masked next-token cross-entropy + router-independent logit z-loss multiplier 1e-5. Dense model: MoE load-balance/router losses are not applicable. SFT/DPO/RLVR exact coefficients: [not reconstructed].</textarea></label>
+                      <label class="ledger-field wide"><span>MoE-specific losses / router controls <span class="conditional-flag">conditional</span></span><textarea name="losses_moe" data-report-field>Not applicable: dense FFN. For MoE, distinguish token/load balance, router logit z-loss, capacity overflow/drop penalties, expert-choice constraints, and auxiliary-loss-free routing bias; record every coefficient and averaging scope.</textarea></label>
+                      <label class="ledger-field wide"><span>Loss curves + raw metric artifact <span class="required-flag">required</span></span><textarea name="losses_curves" data-report-field data-required>README links a W&amp;B monitoring report. Immutable raw metric export, schema, run IDs, checksum, smoothing policy, and phase-aligned curve bundle: [missing].</textarea></label>
+                      <label class="ledger-field"><span>Stability signals <span class="required-flag">required</span></span><input type="text" name="losses_stability" data-report-field data-required value="grad norm, LR, throughput, skipped steps, NaN/overflow, z-loss, per-source loss: [executed series missing]" /></label>
+                      <label class="ledger-field"><span>Restarts / discarded intervals <span class="required-flag">required</span></span><input type="text" name="losses_discarded" data-report-field data-required value="[missing incident and censoring annotations]" /></label>
+                    </div>
+                    <label class="ledger-field proof-field"><span>Loss/curve proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_losses" data-proof="losses" value="W&amp;B report URL in README; immutable exported series + digest missing" /></label>
+                    <div class="source-strip"><a class="source-chip is-repo" href="../../src/olmo_core/nn/transformer/model.py">loss path</a><a class="source-chip is-repo" href="../../src/olmo_core/train/">training loop</a></div>
+                  </div>
+                </details>
+
+                <details class="ledger-section" id="evaluation" data-ledger="evaluation">
+                  <summary><span class="ledger-index">09</span><span class="ledger-title"><strong>Evaluation role, cadence + uncertainty</strong><small>Monitoring, selection, ablation, regression, and final claims are different jobs.</small></span></summary>
+                  <div class="ledger-body">
+                    <div class="ledger-grid">
+                      <label class="ledger-field wide"><span>Evaluation role + cadence <span class="required-flag">required</span></span><textarea name="evaluation_role" data-report-field data-required>Pretrain-1 script attaches LM/downstream evaluation every 10,000 steps. Equivalent callbacks are not visible in the midtrain or long-context scripts; phase entry/exit and final-claim cadence must be supplied separately.</textarea></label>
+                      <label class="ledger-field"><span>Harness / task versions / prompts <span class="required-flag">required</span></span><input type="text" name="evaluation_harness" data-report-field data-required value="[exact harness commit, task revisions, prompt templates, decoding, few-shot seeds missing]" /></label>
+                      <label class="ledger-field"><span>Contamination procedure <span class="required-flag">required</span></span><input type="text" name="evaluation_contamination" data-report-field data-required value="[benchmark decontamination corpus, matching rule, threshold, exclusions, audit report missing]" /></label>
+                      <label class="ledger-field"><span>Uncertainty / repeat policy <span class="required-flag">required</span></span><input type="text" name="evaluation_uncertainty" data-report-field data-required value="[sample counts, paired seeds, confidence intervals, multiple-comparison policy missing]" /></label>
+                      <label class="ledger-field wide"><span>Selection vs untouched final claims <span class="required-flag">required</span></span><textarea name="evaluation_selection" data-report-field data-required>[missing split ledger] Record which metrics affected data, hyperparameters, checkpoints, merges, or stopping; reserve untouched suites for final claims and report every selection exposure.</textarea></label>
+                    </div>
+                    <label class="ledger-field proof-field"><span>Evaluation proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_evaluation" data-proof="evaluation" value="pretrain-1 callback config; complete phase/final eval artifacts missing" /></label>
+                    <div class="source-strip"><a class="source-chip is-repo" href="../../src/olmo_core/train/callbacks/evaluator_callback.py">evaluator callback</a><a class="source-chip is-repo" href="../../src/olmo_core/eval/">evaluation code</a></div>
+                  </div>
+                </details>
+
+                <details class="ledger-section" id="infrastructure" data-ledger="infrastructure">
+                  <summary><span class="ledger-index">10</span><span class="ledger-title"><strong>Training infrastructure + profiler evidence</strong><small>Hardware counts do not explain utilization or failures.</small></span></summary>
+                  <div class="ledger-body">
+                    <div class="ledger-grid">
+                      <label class="ledger-field"><span>Hardware / accelerator hours <span class="required-flag">required</span></span><input type="text" name="infra_hardware" data-report-field data-required value="README: 512 H100 pretrain; 128 H100 midtrain; 256 H100 long-context. Exact SKU/memory/host/accelerator-hours/energy [missing]." /></label>
+                      <label class="ledger-field"><span>Cluster topology / network / storage <span class="required-flag">required</span></span><input type="text" name="infra_topology" data-report-field data-required value="[nodes, GPUs/node, NVLink/NVSwitch, fabric, bandwidth, filesystem, placement missing]" /></label>
+                      <label class="ledger-field wide"><span>Parallelism + sharding map <span class="required-flag">required</span></span><textarea name="infra_parallelism" data-report-field data-required>Pre/mid configure HSDP; long-context HSDP plus context parallel degree 8 and head stride 4. Exact world-size factorization, shard degree, rank map, and runtime overrides: [missing].</textarea></label>
+                      <label class="ledger-field"><span>Profiler trace + utilization <span class="required-flag">required</span></span><input type="text" name="infra_profiler" data-report-field data-required value="[trace, MFU, tokens/s, kernel/communication/IO breakdown, warmup window missing]" /></label>
+                      <label class="ledger-field"><span>Failures / retries / lost work <span class="required-flag">required</span></span><input type="text" name="infra_failures" data-report-field data-required value="[incident ledger, restart count, skipped data, checkpoint recovery, censored time missing]" /></label>
+                    </div>
+                    <label class="ledger-field proof-field"><span>Infrastructure proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_infrastructure" data-proof="infrastructure" value="README GPU counts + script parallel configs; executed topology/profiler/incident bundle missing" /></label>
+                    <div class="source-strip"><a class="source-chip is-repo" href="../../src/olmo_core/distributed/parallel/">parallelism code</a><a class="source-chip is-repo" href="../../src/olmo_core/train/callbacks/">training callbacks</a></div>
+                  </div>
+                </details>
+
+                <details class="ledger-section" id="inference" data-ledger="inference">
+                  <summary><span class="ledger-index">11</span><span class="ledger-title"><strong>Inference workload, engine + quality</strong><small>Profile prefill and decode under an explicit arrival process.</small></span></summary>
+                  <div class="ledger-body">
+                    <div class="ledger-grid">
+                      <label class="ledger-field wide"><span>Workload / arrival model <span class="required-flag">required</span></span><textarea name="inference_workload" data-report-field data-required>[missing] Record prompt/output length distributions, concurrency, open/closed loop, arrival rate, warmup, duration, and cache reuse. “Batch size” alone is not a serving workload.</textarea></label>
+                      <label class="ledger-field"><span>Engine / commit / kernels / quantization <span class="required-flag">required</span></span><input type="text" name="inference_engine" data-report-field data-required value="[missing serving engine and immutable environment]" /></label>
+                      <label class="ledger-field"><span>Hardware / topology / memory policy <span class="required-flag">required</span></span><input type="text" name="inference_hardware" data-report-field data-required value="[missing TP/PP layout, KV-cache dtype, block size, prefix cache, spill policy]" /></label>
+                      <label class="ledger-field"><span>SLO + latency distribution <span class="required-flag">required</span></span><input type="text" name="inference_slo" data-report-field data-required value="[missing arrival-to-first-token TTFT, inter-token latency, p50/p95/p99, throughput, admission failures]" /></label>
+                      <label class="ledger-field"><span>Quality / accuracy guardrail <span class="required-flag">required</span></span><input type="text" name="inference_quality" data-report-field data-required value="[missing exact-vs-optimized logits check and task-quality delta]" /></label>
+                      <label class="ledger-field"><span>Bottleneck attribution <span class="required-flag">required</span></span><input type="text" name="inference_profile" data-report-field data-required value="[missing prefill/decode compute, memory, communication, scheduler, queue, tokenizer, network breakdown]" /></label>
+                    </div>
+                    <label class="ledger-field proof-field"><span>Inference proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_inference" data-proof="inference" value="[missing benchmark config, raw traces, request log, and checksum]" /></label>
+                    <div class="source-strip"><a class="source-chip is-repo" href="../../src/olmo_core/generate/">OLMo generation path</a><a class="source-chip is-primary" href="papers/pagedattention-vllm.pdf">PagedAttention/vLLM paper</a></div>
+                  </div>
+                </details>
+
+                <details class="ledger-section" id="security" data-ledger="security">
+                  <summary><span class="ledger-index">12</span><span class="ledger-title"><strong>Security of T + D</strong><small>This builder interprets T as training/model artifacts and D as data; replace the symbols if your threat model differs.</small></span></summary>
+                  <div class="ledger-body">
+                    <div class="ledger-grid">
+                      <label class="ledger-field wide"><span>Threat model / assets / trust boundaries <span class="required-flag">required</span></span><textarea name="security_threat_model" data-report-field data-required>[missing] Enumerate actors and boundaries across raw data, manifests, tokenizer, code, dependency images, workers, checkpoints, logs, registries, serving, and users.</textarea></label>
+                      <label class="ledger-field"><span>D: provenance, poisoning, privacy <span class="required-flag">required</span></span><input type="text" name="security_data" data-report-field data-required value="[missing controls, audit results, takedown/erasure propagation, access policy]" /></label>
+                      <label class="ledger-field"><span>T: code, job, checkpoint, registry <span class="required-flag">required</span></span><input type="text" name="security_training" data-report-field data-required value="[missing signed commits/images, least privilege, secrets path, checkpoint signing, rollback policy]" /></label>
+                      <label class="ledger-field"><span>Supply chain / dependency lock <span class="required-flag">required</span></span><input type="text" name="security_supply_chain" data-report-field data-required value="[missing SBOM, container digest, package lock, vulnerability scan, exception ledger]" /></label>
+                      <label class="ledger-field"><span>Abuse / model-release risk <span class="required-flag">required</span></span><input type="text" name="security_release_risk" data-report-field data-required value="[missing misuse evaluation, access decision, monitoring, incident and withdrawal plan]" /></label>
+                    </div>
+                    <label class="ledger-field proof-field"><span>Security proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_security" data-proof="security" value="[missing signed threat model, control evidence, audit results, and ownership]" /></label>
+                    <div class="source-strip"><a class="source-chip is-primary" href="https://csrc.nist.gov/pubs/ai/100/2/e2025/final">NIST adversarial ML taxonomy</a><a class="source-chip is-repo" href="../../src/Dockerfile">training image recipe</a></div>
+                  </div>
+                </details>
+
+                <details class="ledger-section" id="release" data-ledger="release">
+                  <summary><span class="ledger-index">13</span><span class="ledger-title"><strong>Release artifact manifest, rights + known gaps</strong><small>Let another reader verify every byte and every omission.</small></span></summary>
+                  <div class="ledger-body">
+                    <div class="ledger-grid">
+                      <label class="ledger-field wide"><span>Artifact manifest + checksums <span class="required-flag">required</span></span><textarea name="release_manifest" data-report-field data-required>Public model and OLMo-core checkpoint locations are named. Required consolidated manifest: weights, tokenizer, configs, code, environment, data manifests, raw logs, profiler traces, eval outputs, checkpoint lineage, model card, hashes [incomplete].</textarea></label>
+                      <label class="ledger-field"><span>Licenses / terms / data obligations <span class="required-flag">required</span></span><input type="text" name="release_licenses" data-report-field data-required value="[exact artifact-by-artifact license and source obligation ledger not reconstructed]" /></label>
+                      <label class="ledger-field"><span>Conversion / compatibility tests <span class="required-flag">required</span></span><input type="text" name="release_compatibility" data-report-field data-required value="[OLMo-core ↔ HF conversion commit, hash mapping, logits parity, supported runtimes missing]" /></label>
+                      <label class="ledger-field wide"><span>Known gaps / negative results <span class="required-flag">required</span></span><textarea name="release_gaps" data-report-field data-required>Missing exact resolved config digest; realized data order and per-source counts; full scaling trial/failure ledger; immutable curves; complete phase/final eval provenance; topology/profiler/incidents; serving benchmark; signed security evidence; posttraining lineage and rollout ledger.</textarea></label>
+                      <label class="ledger-field wide"><span>Claim-to-artifact index <span class="required-flag">required</span></span><textarea name="release_claim_index" data-report-field data-required>[incomplete] Map each table number and report claim to artifact path, hash, producing command/job, owner, and retention policy.</textarea></label>
+                    </div>
+                    <label class="ledger-field proof-field"><span>Release proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_release" data-proof="release" value="OLMo 3 paper + README + public HF/checkpoint locations; consolidated signed manifest missing" /></label>
+                    <div class="source-strip"><a class="source-chip is-primary" href="https://huggingface.co/allenai/Olmo-3-1025-7B">model release</a><a class="source-chip is-repo" href="https://github.com/allenai/OLMo-core/tree/1e03ad1c2dcb0836c6805e27b89e22a70cd7523f">pinned OLMo-core</a><a class="source-chip is-primary" href="sources.html">evidence desk</a></div>
+                  </div>
+                </details>
+
+                <section class="report-verdict" aria-labelledby="verdict-title">
+                  <h2 id="verdict-title">Current release verdict</h2>
+                  <p id="verdict-copy" aria-live="polite">The ledger is calculating its blocking gaps.</p>
+                  <ul id="blocking-list"></ul>
+                </section>
+              </div>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <footer class="site-footer">
+      <p>Transparent report builder · local persistence only · no field is uploaded by this page.</p>
+      <p><a href="sources.html">Evidence desk</a> · <span data-current-year></span></p>
+    </footer>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const storageKey = "mlsys-transparent-report-v1";
+        const form = document.getElementById("report-form");
+        const scoreValue = document.getElementById("score-value");
+        const scoreProgress = document.getElementById("score-progress");
+        const scoreSummary = document.getElementById("score-summary");
+        const matrixAlert = document.getElementById("matrix-alert");
+        const verdictCopy = document.getElementById("verdict-copy");
+        const blockingList = document.getElementById("blocking-list");
+        const persistStatus = document.getElementById("persist-status");
+        const sectionIds = [
+          "identity", "architecture", "data", "mixture", "scaling", "recipe", "phases",
+          "losses", "evaluation", "infrastructure", "inference", "security", "release"
+        ];
+        const evidenceRank = { intended: 0, configured: 1, executed: 2, verified: 3, released: 4 };
+        const evidenceWeight = { intended: 0, configured: 0.25, executed: 0.62, verified: 0.84, released: 1 };
+        const emptyMarker = /^\s*(?:\[?(?:missing|unknown|not reconstructed|not published|not provided|incomplete|n\/a|none)\]?|—|-)(?:\b|\s|$)/i;
+        let saveTimer = 0;
+        let currentAudit = null;
+
+        function isSubstantive(control) {
+          if (control.type === "checkbox" || control.type === "radio") return control.checked;
+          const value = String(control.value || "").trim();
+          return Boolean(value) && !emptyMarker.test(value);
+        }
+
+        function controlsFor(sectionId) {
+          const container = document.querySelector('[data-ledger="' + sectionId + '"]');
+          return container ? Array.from(container.querySelectorAll("[data-report-field][data-required]")) : [];
+        }
+
+        function serializeForm() {
+          const values = {};
+          Array.from(form.elements).forEach((control) => {
+            if (!control.name) return;
+            values[control.name] = control.type === "checkbox" ? control.checked : control.value;
+          });
+          return values;
+        }
+
+        function restoreForm() {
+          let saved;
+          try {
+            saved = JSON.parse(localStorage.getItem(storageKey));
+          } catch (_error) {
+            saved = null;
+          }
+          if (!saved || !saved.values) return;
+          Array.from(form.elements).forEach((control) => {
+            if (!control.name || !(control.name in saved.values)) return;
+            if (control.type === "checkbox") control.checked = Boolean(saved.values[control.name]);
+            else control.value = saved.values[control.name];
+          });
+          persistStatus.textContent = "Restored your local draft.";
+        }
+
+        function saveForm() {
+          try {
+            localStorage.setItem(storageKey, JSON.stringify({ version: 1, saved_at: new Date().toISOString(), values: serializeForm() }));
+            persistStatus.textContent = "Saved locally at " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + ".";
+          } catch (_error) {
+            persistStatus.textContent = "Local save unavailable; export JSON before leaving.";
+          }
+        }
+
+        function scheduleSave() {
+          window.clearTimeout(saveTimer);
+          saveTimer = window.setTimeout(saveForm, 250);
+        }
+
+        function audit() {
+          let weightedScore = 0;
+          let weightTotal = 0;
+          let activeRequired = 0;
+          const blocking = [];
+          const sections = {};
+
+          sectionIds.forEach((sectionId) => {
+            const severityControl = document.querySelector('[data-severity="' + sectionId + '"]');
+            const evidenceControl = document.querySelector('[data-evidence="' + sectionId + '"]');
+            const proofControl = document.querySelector('[data-proof="' + sectionId + '"]');
+            const row = document.querySelector('[data-matrix-row="' + sectionId + '"]');
+            const rowStatus = row.querySelector("[data-row-status]");
+            const severity = severityControl.value;
+            const evidence = evidenceControl.value;
+            const requiredFields = controlsFor(sectionId);
+            const completeFields = requiredFields.filter(isSubstantive).length;
+            const fieldRatio = requiredFields.length ? completeFields / requiredFields.length : 1;
+            const proofPresent = proofControl ? isSubstantive(proofControl) : false;
+            const proofNeeded = evidenceRank[evidence] >= evidenceRank.executed;
+
+            if (severity === "not_applicable") {
+              rowStatus.textContent = "N/A by scope";
+              rowStatus.classList.remove("is-blocked");
+              sections[sectionId] = { severity, evidence, field_ratio: fieldRatio, proof_present: proofPresent, score: null };
+              return;
+            }
+
+            const sectionWeight = severity === "required" ? 1 : 0.5;
+            let sectionScore = 0.72 * fieldRatio + 0.28 * evidenceWeight[evidence];
+            const missingProof = proofNeeded && !proofPresent;
+            if (missingProof) sectionScore = Math.min(sectionScore, 0.72);
+
+            weightedScore += sectionScore * sectionWeight;
+            weightTotal += sectionWeight;
+            if (severity === "required") activeRequired += 1;
+
+            const missingFieldCount = requiredFields.length - completeFields;
+            if (severity === "required" && missingFieldCount > 0) {
+              blocking.push(sectionId + ": " + missingFieldCount + " required field" + (missingFieldCount === 1 ? "" : "s") + " lack substantive evidence");
+            }
+            if (severity === "required" && missingProof) {
+              blocking.push(sectionId + ": " + evidence + " claim has no executed/released proof reference");
+            }
+            if (severity === "required" && evidence !== "released") {
+              blocking.push(sectionId + ": evidence state is " + evidence + ", not released");
+            }
+
+            rowStatus.textContent = Math.round(sectionScore * 100) + "% · " + completeFields + "/" + requiredFields.length + " fields" + (missingProof ? " · proof blocked" : "");
+            rowStatus.classList.toggle("is-blocked", missingProof || (severity === "required" && missingFieldCount > 0));
+            sections[sectionId] = {
+              severity,
+              evidence,
+              fields_complete: completeFields,
+              fields_total: requiredFields.length,
+              field_ratio: fieldRatio,
+              proof_present: proofPresent,
+              score: Math.round(sectionScore * 100)
+            };
+          });
+
+          let score = weightTotal ? Math.round((weightedScore / weightTotal) * 100) : 0;
+          const requiredReleasedWithProof = sectionIds.every((sectionId) => {
+            const severity = document.querySelector('[data-severity="' + sectionId + '"]').value;
+            if (severity !== "required") return true;
+            const evidence = document.querySelector('[data-evidence="' + sectionId + '"]').value;
+            const proof = document.querySelector('[data-proof="' + sectionId + '"]');
+            return evidence === "released" && proof && isSubstantive(proof) && controlsFor(sectionId).every(isSubstantive);
+          });
+          if (!requiredReleasedWithProof) score = Math.min(score, 99);
+
+          scoreValue.textContent = score + "%";
+          scoreProgress.setAttribute("stroke-dashoffset", String(100 - score));
+          scoreSummary.textContent = activeRequired + " required ledgers · " + blocking.length + " blocking conditions. 100% requires every required ledger to be released with substantive fields and immutable proof.";
+          matrixAlert.textContent = blocking.length ? blocking.length + " blockers" : "release-ready";
+          matrixAlert.className = "status " + (blocking.length ? "status-contradiction" : "status-pass");
+          verdictCopy.textContent = blocking.length
+            ? "This is not yet a fully transparent technical report. The public reconstruction is useful, but its evidence boundary remains explicit."
+            : "Every required ledger is released with a proof reference. Re-run artifact checks before publication.";
+          blockingList.innerHTML = "";
+          blocking.slice(0, 12).forEach((item) => {
+            const li = document.createElement("li");
+            li.textContent = item;
+            blockingList.appendChild(li);
+          });
+          if (blocking.length > 12) {
+            const li = document.createElement("li");
+            li.textContent = "+ " + (blocking.length - 12) + " more blockers in the matrix.";
+            blockingList.appendChild(li);
+          }
+
+          currentAudit = { score, blocking, sections };
+          return currentAudit;
+        }
+
+        function reportObject() {
+          const values = serializeForm();
+          const sections = {};
+          sectionIds.forEach((sectionId) => {
+            const prefixNames = Array.from(document.querySelectorAll('[data-ledger="' + sectionId + '"] [name]'));
+            sections[sectionId] = {
+              severity: values["severity_" + sectionId],
+              evidence_state: values["evidence_" + sectionId],
+              fields: Object.fromEntries(prefixNames.map((control) => [control.name, values[control.name]])),
+              audit: currentAudit.sections[sectionId]
+            };
+          });
+          return {
+            schema: "mlsys-transparent-report/v1",
+            exported_at: new Date().toISOString(),
+            example_status: "partially reconstructed from public artifacts",
+            completeness_score: currentAudit.score,
+            blocking_conditions: currentAudit.blocking,
+            sections
+          };
+        }
+
+        function downloadJson() {
+          audit();
+          const blob = new Blob([JSON.stringify(reportObject(), null, 2) + "\n"], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = "transparent-llm-report.json";
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+          persistStatus.textContent = "Downloaded a JSON snapshot.";
+        }
+
+        function markdownReport() {
+          audit();
+          const lines = [
+            "# Transparent LLM technical report",
+            "",
+            "Status: partially reconstructed from public artifacts",
+            "Completeness: " + currentAudit.score + "%",
+            ""
+          ];
+          sectionIds.forEach((sectionId, index) => {
+            const detail = document.querySelector('[data-ledger="' + sectionId + '"]');
+            const title = detail.querySelector(".ledger-title strong").textContent.trim();
+            const severity = document.querySelector('[data-severity="' + sectionId + '"]').value.replace("_", " ");
+            const evidence = document.querySelector('[data-evidence="' + sectionId + '"]').value;
+            lines.push("## " + String(index + 1).padStart(2, "0") + " · " + title, "", "Severity: " + severity + " · Evidence: " + evidence, "");
+            Array.from(detail.querySelectorAll("[data-report-field], [data-proof]")).forEach((control) => {
+              const label = control.closest("label");
+              const name = label ? label.querySelector("span").textContent.replace(/required|proof|explicit N\/A allowed/gi, "").trim() : control.name;
+              lines.push("- **" + name + ":** " + String(control.value || "[missing]").replace(/\n/g, " "));
+            });
+            lines.push("");
+          });
+          lines.push("## Blocking conditions", "");
+          currentAudit.blocking.forEach((item) => lines.push("- " + item));
+          return lines.join("\n");
+        }
+
+        async function copyMarkdown() {
+          const markdown = markdownReport();
+          try {
+            await navigator.clipboard.writeText(markdown);
+            persistStatus.textContent = "Copied the report as Markdown.";
+          } catch (_error) {
+            const helper = document.createElement("textarea");
+            helper.value = markdown;
+            helper.setAttribute("readonly", "");
+            helper.style.position = "fixed";
+            helper.style.opacity = "0";
+            document.body.appendChild(helper);
+            helper.select();
+            document.execCommand("copy");
+            helper.remove();
+            persistStatus.textContent = "Copied the report as Markdown.";
+          }
+        }
+
+        form.addEventListener("submit", (event) => { event.preventDefault(); audit(); });
+        form.addEventListener("input", () => { audit(); scheduleSave(); });
+        form.addEventListener("change", () => { audit(); scheduleSave(); });
+        document.querySelectorAll("[data-matrix-row] a[href^='#']").forEach((link) => {
+          link.addEventListener("click", () => {
+            const detail = document.querySelector(link.getAttribute("href"));
+            if (detail && detail.tagName === "DETAILS") detail.open = true;
+          });
+        });
+        document.getElementById("download-json").addEventListener("click", downloadJson);
+        document.getElementById("copy-markdown").addEventListener("click", copyMarkdown);
+        document.getElementById("reset-report").addEventListener("click", () => {
+          if (!window.confirm("Reset every field to the prefilled OLMo 3 reconstruction? Your local edits will be removed.")) return;
+          localStorage.removeItem(storageKey);
+          window.location.reload();
+        });
+
+        restoreForm();
+        audit();
+      })();
+    </script>
+  </body>
+</html>

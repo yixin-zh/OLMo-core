@@ -94,7 +94,7 @@
             </a>
           </li>
           <li>
-            <a href="sources.html" aria-current="step">
+            <a href="report.html">
               <span class="rail-dot" aria-hidden="true"></span>
               <span class="rail-label"><strong>Release</strong><small>artifacts · evidence · risk</small></span>
             </a>
@@ -118,7 +118,7 @@
           </div>
           <div class="lede-controls">
             <strong>Registry state · 2026-08-13</strong>
-            <p><span class="status status-caution">0 local PDFs</span> Every paper link below is canonical and remote. “P0/P1/P2 download” is a queue label, not proof of download.</p>
+            <p><span class="status status-primary">16 local PDFs verified</span> Each cached paper has a source URL, page count, and SHA-256 digest; uncached registry entries remain explicitly remote-only.</p>
             <div class="button-row">
               <a class="button button-primary" href="#paper-registry">Open paper registry</a>
               <a class="button" href="#corrections">Read corrections</a>
@@ -390,14 +390,14 @@
           <div class="section-heading">
             <h2 id="papers-title">Primary-paper registry</h2>
             <p>
-              Canonical abstract and PDF links are live and remote. P0 is foundational for the first
+              Canonical abstract and PDF links remain available. P0 is foundational for the first
               learning pass, P1 supports a named comparison or lab, and P2 is a deeper implementation
-              extension. No paper has been downloaded into this repository.
+              extension. Sixteen high-priority papers are also pinned in the local study packet.
             </p>
           </div>
           <div class="caution-box">
             <strong>Download ledger</strong>
-            <p><span class="status status-caution">0 files cached</span> A “P0 download” chip is a planned action. It must not be converted to “available locally” until a file, checksum, license note, and source URL are recorded.</p>
+            <p><span class="status status-primary">16 files · 16 matching hashes</span> Open the <a href="papers/README.md">packet manifest</a> or <a href="papers/SHA256SUMS.txt">checksum ledger</a>. A remaining “P0/P1/P2 download” chip is still a planned action, never implied local availability.</p>
           </div>
           <div class="instrument-panel">
             <div class="trace-toolbar">
@@ -418,7 +418,7 @@
                       <td><strong>Transformer</strong><br />Vaswani et al., “Attention Is All You Need” (2017)</td>
                       <td>Defines scaled dot-product attention, multi-head attention, positional encoding, and the original block.</td>
                       <td>Original encoder–decoder architecture; not a modern decoder-only recipe or serving design.</td>
-                      <td><a href="https://arxiv.org/abs/1706.03762">abstract</a> · <a href="https://arxiv.org/pdf/1706.03762">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/1706.03762">abstract</a> · <a href="papers/attention-is-all-you-need.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/1706.03762">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>Subword tokenization</strong><br />Sennrich et al., “Neural Machine Translation of Rare Words with Subword Units” (2015)</td>
@@ -430,31 +430,31 @@
                       <td><strong>ReLU, GLU, SwiGLU</strong><br />Shazeer, “GLU Variants Improve Transformer” (2020)</td>
                       <td>Motivates and empirically compares gated FFN variants, including GEGLU and SwiGLU.</td>
                       <td>Empirical model-quality comparison, not a universal hardware-efficiency ranking.</td>
-                      <td><a href="https://arxiv.org/abs/2002.05202">abstract</a> · <a href="https://arxiv.org/pdf/2002.05202">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/2002.05202">abstract</a> · <a href="papers/glu-variants.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2002.05202">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>1D RoPE</strong><br />Su et al., “RoFormer” (2021)</td>
                       <td>Defines rotary position embedding and its relative-position dot-product structure.</td>
                       <td>Does not define Qwen’s multimodal M-RoPE or guarantee extrapolation beyond training context.</td>
-                      <td><a href="https://arxiv.org/abs/2104.09864">abstract</a> · <a href="https://arxiv.org/pdf/2104.09864">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/2104.09864">abstract</a> · <a href="papers/roformer.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2104.09864">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>RoPE context extension</strong><br />Peng et al., “YaRN” (2023)</td>
                       <td>Combines frequency-aware interpolation and attention scaling for context-window extension.</td>
                       <td>Results depend on the base model, target length, data, and continued-training recipe.</td>
-                      <td><a href="https://arxiv.org/abs/2309.00071">abstract</a> · <a href="https://arxiv.org/pdf/2309.00071">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/2309.00071">abstract</a> · <a href="papers/yarn.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2309.00071">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>MHA → GQA</strong><br />Ainslie et al., “GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints” (2023)</td>
                       <td>Defines grouped-query attention and analyzes the quality/speed trade between MHA and MQA.</td>
                       <td>Serving gains remain workload- and kernel-dependent; head grouping alone is not a full inference system.</td>
-                      <td><a href="https://arxiv.org/abs/2305.13245">abstract</a> · <a href="https://arxiv.org/pdf/2305.13245">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/2305.13245">abstract</a> · <a href="papers/grouped-query-attention.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2305.13245">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>Multimodal RoPE</strong><br />Wang et al., “Qwen2-VL” (2024)</td>
                       <td>Reports multimodal rotary position embedding over temporal and spatial dimensions.</td>
                       <td>A model technical report; not evidence that the inspected OLMo vision path implements M-RoPE.</td>
-                      <td><a href="https://arxiv.org/abs/2409.12191">abstract</a> · <a href="https://arxiv.org/pdf/2409.12191">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/2409.12191">abstract</a> · <a href="papers/qwen2-vl.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2409.12191">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>Interleaved M-RoPE</strong><br />Qwen Team, “Qwen3-VL Technical Report” (2025)</td>
@@ -466,7 +466,7 @@
                       <td><strong>Sparse experts</strong><br />Fedus et al., “Switch Transformers” (2021)</td>
                       <td>Establishes a practical top-1 sparse-expert design and its capacity/load-balancing concerns.</td>
                       <td>Encoder–decoder experiments and specific routing choices do not define all modern decoder MoEs.</td>
-                      <td><a href="https://arxiv.org/abs/2101.03961">abstract</a> · <a href="https://arxiv.org/pdf/2101.03961">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/2101.03961">abstract</a> · <a href="papers/switch-transformer.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2101.03961">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>Stable MoE routing</strong><br />Zoph et al., “ST-MoE” (2022)</td>
@@ -478,19 +478,19 @@
                       <td><strong>Fine-grained/shared experts</strong><br />Dai et al., “DeepSeekMoE” (2024)</td>
                       <td>Motivates expert segmentation and shared experts to increase specialization.</td>
                       <td>Reported architecture and ablations do not expose every production implementation detail.</td>
-                      <td><a href="https://arxiv.org/abs/2401.06066">abstract</a> · <a href="https://arxiv.org/pdf/2401.06066">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/2401.06066">abstract</a> · <a href="papers/deepseek-moe.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2401.06066">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>Auxiliary-loss-free balance</strong><br />DeepSeek-AI, “DeepSeek-V3 Technical Report” (2024)</td>
                       <td>Describes per-expert routing bias, complementary sequence-wise balance loss, and an MoE training system.</td>
                       <td>Technical-report disclosure is substantial but not a complete trial ledger or fully open run environment.</td>
-                      <td><a href="https://arxiv.org/abs/2412.19437">abstract</a> · <a href="https://arxiv.org/pdf/2412.19437">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/2412.19437">abstract</a> · <a href="papers/deepseek-v3.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2412.19437">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>Dense real example</strong><br />Touvron et al., “Llama 2” (2023)</td>
                       <td>Concrete decoder-only example using RMSNorm, SwiGLU, RoPE, GQA at larger sizes, and phased posttraining.</td>
                       <td>A system/model report, not full pretraining data release or a complete reproducibility package.</td>
-                      <td><a href="https://arxiv.org/abs/2307.09288">abstract</a> · <a href="https://arxiv.org/pdf/2307.09288">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/2307.09288">abstract</a> · <a href="papers/llama-2.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2307.09288">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>Open MoE real example</strong><br />Muennighoff et al., “OLMoE” (2024)</td>
@@ -518,19 +518,25 @@
                       <td><strong>Compute-optimal training</strong><br />Hoffmann et al., “Training Compute-Optimal Large Language Models” (2022)</td>
                       <td>Re-estimates compute-optimal model/data allocation and motivates the Chinchilla point.</td>
                       <td>The often-repeated ≈20 tokens/parameter is contextual, not a universal recipe; parameter counting must be explicit.</td>
-                      <td><a href="https://arxiv.org/abs/2203.15556">abstract</a> · <a href="https://arxiv.org/pdf/2203.15556">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/2203.15556">abstract</a> · <a href="papers/chinchilla.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2203.15556">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>Open training lifecycle</strong><br />Groeneveld et al., “OLMo” (2024)</td>
                       <td>Links architecture, training data, code, checkpoints, logs, and evaluations in an open language-model release.</td>
                       <td>Still version-specific; openness does not remove the need to match hashes, manifests, and run IDs.</td>
-                      <td><a href="https://arxiv.org/abs/2402.00838">abstract</a> · <a href="https://arxiv.org/pdf/2402.00838">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/2402.00838">abstract</a> · <a href="papers/olmo.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2402.00838">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>Midtraining and staged recipe</strong><br />OLMo Team, “2 OLMo 2 Furious” (2025)</td>
                       <td>Documents a modern open recipe, including training-stage choices and evaluation evidence.</td>
                       <td>The paper’s release snapshot is not automatically the same as this checkout or any locally executed run.</td>
-                      <td><a href="https://arxiv.org/abs/2501.00656">abstract</a> · <a href="https://arxiv.org/pdf/2501.00656">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/2501.00656">abstract</a> · <a href="papers/olmo-2.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2501.00656">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Full open model lifecycle</strong><br />OLMo Team, “OLMo 3” (2025)</td>
+                      <td>Connects data tooling, pretraining stages, posttraining, evaluation, and asynchronous RL infrastructure in one report.</td>
+                      <td>The report spans OLMo-core, Open Instruct, data tools, and evaluation stacks; it does not mean every component lives in this checkout.</td>
+                      <td><a href="https://arxiv.org/abs/2512.13961">abstract</a> · <a href="papers/olmo-3.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2512.13961">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>Training dynamics and checkpoints</strong><br />Biderman et al., “Pythia” (2023)</td>
@@ -542,7 +548,7 @@
                       <td><strong>Data curation and mixture</strong><br />Soldaini et al., “Dolma” (2024)</td>
                       <td>Documents a large open corpus, source composition, filtering, deduplication, and tooling.</td>
                       <td>Dataset documentation does not prove a downstream run used an unchanged manifest or every governance control.</td>
-                      <td><a href="https://arxiv.org/abs/2402.00159">abstract</a> · <a href="https://arxiv.org/pdf/2402.00159">remote PDF</a> · <a href="https://github.com/allenai/dolma">toolkit</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/2402.00159">abstract</a> · <a href="papers/dolma.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2402.00159">remote PDF</a> · <a href="https://github.com/allenai/dolma">toolkit</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>Data selection benchmark</strong><br />Li et al., “DataComp-LM” (2024)</td>
@@ -582,7 +588,7 @@
                       <td><strong>Paged KV cache and serving</strong><br />Kwon et al., “Efficient Memory Management for Large Language Model Serving with PagedAttention” (2023)</td>
                       <td>Connects paged KV-cache management, continuous batching, fragmentation, and serving throughput.</td>
                       <td>Reported throughput is not a promise for current hardware or OLMo-core, which is not a vLLM serving stack.</td>
-                      <td><a href="https://arxiv.org/abs/2309.06180">abstract</a> · <a href="https://arxiv.org/pdf/2309.06180">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                      <td><a href="https://arxiv.org/abs/2309.06180">abstract</a> · <a href="papers/pagedattention-vllm.pdf">local PDF</a> · <a href="https://arxiv.org/pdf/2309.06180">remote PDF</a><br /><span class="source-chip is-primary">cached + hashed</span></td>
                     </tr>
                     <tr>
                       <td><strong>RLHF pipeline</strong><br />Ouyang et al., “Training Language Models to Follow Instructions with Human Feedback” (2022)</td>
