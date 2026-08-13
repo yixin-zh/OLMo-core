@@ -77,7 +77,7 @@
 
           <div class="notebook-workspace">
             <div class="notebook-viewer">
-              <div class="panel-toolbar" style="padding:.75rem 1rem;background:var(--ink);color:white">
+              <div class="panel-toolbar notebook-toolbar" style="padding:.75rem 1rem;background:var(--ink);color:white">
                 <h3 id="photo-title">Page 1 · model, vision, MoE</h3>
                 <div class="button-row">
                   <button class="utility-button" id="zoom-out" type="button" aria-label="Zoom out">−</button>
@@ -177,13 +177,18 @@
           '20260812_174430.JPG': { image: 'assets/images/notes/note-3.webp', original: '../20260812_174430.JPG', title: 'Page 3 · scheduler, tokenizer, eval, data', alt: 'Upright full notebook page three, covering scheduler, tokenizer, initialization, evaluation, and data-loader fields.' }
         };
         const routes = {
-          model: 'model.html', position: 'model.html#rope', attention: 'model.html#attention', moe: 'model.html#moe', activation: 'model.html#activations', normalization: 'model.html#transformer', ffn: 'model.html#activations', vision: 'model.html#rope', weight: 'model.html#transformer', initialization: 'training.html#recipe', token: 'training.html#tokens', tokenizer: 'training.html#tokens', data: 'training.html#data', scheduler: 'training.html#scaling', optimizer: 'training.html#recipe', batch: 'training.html#recipe', checkpoint: 'training.html#phases', resume: 'training.html#phases', evaluation: 'training.html#eval-gates', training: 'training.html', run: 'training.html', scaling: 'training.html#scaling', profiling: 'systems.html#profiling', fsdp: 'systems.html#parallelism', distributed: 'systems.html#parallelism', kernel: 'systems.html#profiling', preemption: 'systems.html#parallelism', multimodal: 'model.html#rope', projection: 'model.html#transformer', special: 'training.html#tokens'
+          model: 'model.html', position: 'model.html#rope', attention: 'model.html#attention', moe: 'model.html#moe', activation: 'model.html#activations', normalization: 'model.html#transformer', ffn: 'model.html#activations', vision: 'model.html#rope', weight: 'model.html#transformer', initialization: 'training.html#recipe', token: 'training.html#tokens', tokenizer: 'training.html#tokens', data: 'training.html#data', scheduler: 'training.html#recipe', optimizer: 'training.html#recipe', batch: 'training.html#recipe', checkpoint: 'training.html#phases', resume: 'training.html#phases', evaluation: 'training.html#eval-gates', training: 'training.html', run: 'training.html', scaling: 'training.html#scaling', profiling: 'systems.html#profiler', fsdp: 'systems.html#parallelism', distributed: 'systems.html#parallelism', kernel: 'systems.html#profiler', preemption: 'systems.html#parallelism', multimodal: 'model.html#rope', projection: 'model.html#transformer', special: 'training.html#tokens'
         };
         const coords = {
           '20260812_174414.JPG': [[71,9],[39,26],[36,35],[51,39],[70,38],[52,45],[77,45],[13,53],[42,55],[54,57],[69,57],[87,58],[31,65],[23,68],[62,69],[58,78],[89,79],[53,87],[49,93],[54,97],[23,96],[34,97],[88,96],[8,96]],
-          '20260812_174420.JPG': [[44,8],[48,13],[48,19],[33,27],[20,32],[48,35],[61,38],[63,44],[63,49],[62,55],[60,60],[66,65],[42,70],[50,74],[53,78],[58,82],[66,87],[62,92],[67,96]],
+          '20260812_174420.JPG': [[44,8],[48,13],[48,19],[33,27],[20,32],[48,35],[61,38],[63,44],[63,49],[62,55],[60,60],[66,65],[42,70],[50,74],[53,78],[58,82],[66,87],[62,92],[67,96],[70,98],[52,99]],
           '20260812_174430.JPG': [[42,8],[61,13],[78,18],[50,23],[68,27],[31,31],[54,36],[42,45],[75,50],[45,61],[48,72],[70,78],[72,84],[70,90],[57,96]]
         };
+        Object.keys(pages).forEach((page) => {
+          const recordCount = records.filter((record) => record.page === page).length;
+          const coordinateCount = (coords[page] || []).length;
+          if (recordCount !== coordinateCount) throw new Error('Notebook probe coordinate mismatch for ' + page + ': ' + recordCount + ' records, ' + coordinateCount + ' coordinates');
+        });
         const confidenceValue = { high: 0.94, medium: 0.67, low: 0.35 };
         let currentPage = '20260812_174414.JPG';
         let selected = 0;

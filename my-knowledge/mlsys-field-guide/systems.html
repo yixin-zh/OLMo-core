@@ -35,12 +35,12 @@
 
       .systems-signal strong {
         margin-bottom: 0.35rem;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
       }
 
       .systems-signal span {
         color: var(--muted);
-        font-size: 0.76rem;
+        font-size: 0.9rem;
       }
 
       .systems-profiler-grid {
@@ -88,7 +88,7 @@
         margin-bottom: 0;
         padding-left: 1.2rem;
         color: var(--muted);
-        font-size: 0.78rem;
+        font-size: 0.9rem;
       }
 
       .systems-citation-list li + li {
@@ -292,7 +292,7 @@
                   <tbody>
                     <tr><th>User-visible TTFT</th><td>arrival → first byte/token received: network + auth/tokenization + queue/scheduler + prefill/sampling + stream.</td></tr>
                     <tr><th>OLMo-core “TTFT”</th><td>The beta generation loop times its first model-forward interval after setup; it excludes an external request queue, network path, and production scheduler.</td></tr>
-                    <tr><th>TPOT / ITL</th><td>time per output token / inter-token latency; report a distribution, not only a mean.</td></tr>
+                    <tr><th>TPOT / ITL</th><td>time between subsequent output tokens during iterative decode; with O=1 there is no inter-token interval because the only output token comes from prefill. For O&gt;1, report a distribution, not only a mean.</td></tr>
                     <tr><th>Throughput</th><td>aggregate prompt/output tokens per second at a declared concurrency and input/output-length distribution.</td></tr>
                     <tr><th>Goodput</th><td>requests or tokens meeting the latency-and-quality SLO; capacity outside the SLO is not useful throughput.</td></tr>
                   </tbody>
@@ -311,7 +311,7 @@
         <section id="profiler" class="section-band" aria-labelledby="profiler-title">
           <div class="section-heading">
             <h2 id="profiler-title">Sweep the workload before choosing the engine.</h2>
-            <p>This calculator is an explanatory roofline, not a benchmark. It estimates cache size and lower-bound compute/bandwidth times from simple formulas, then scales them by an explicit efficiency factor. It omits attention FLOPs in prefill, kernel launch costs, collectives, fragmentation, and queuing.</p>
+            <p>This calculator is an explanatory roofline, not a benchmark. Prefill produces the first output token; iterative decode therefore runs <code>max(O−1, 0)</code> steps. The scratchpad estimates allocated and live cache size plus lower-bound compute/bandwidth times, then scales them by an explicit efficiency factor. It omits attention FLOPs in prefill, kernel launch costs, collectives, fragmentation, and queuing.</p>
           </div>
 
           <section class="instrument-panel" aria-labelledby="profiler-panel-title">
@@ -320,7 +320,7 @@
               <div class="panel-body control-grid">
                 <div class="control"><label for="serve-batch">Batch / active sequences</label><input id="serve-batch" type="range" min="1" max="64" step="1" value="8" /><output id="serve-batch-out" for="serve-batch">8</output></div>
                 <div class="control"><label for="serve-context">Prompt context S</label><input id="serve-context" type="range" min="256" max="32768" step="256" value="4096" /><output id="serve-context-out" for="serve-context">4,096</output></div>
-                <div class="control"><label for="serve-output">Output tokens O</label><input id="serve-output" type="range" min="16" max="2048" step="16" value="512" /><output id="serve-output-out" for="serve-output">512</output></div>
+                <div class="control"><label for="serve-output">Output tokens O</label><input id="serve-output" type="range" min="1" max="2048" step="1" value="512" /><output id="serve-output-out" for="serve-output">512</output></div>
                 <div class="control"><label for="serve-kv-heads">KV heads H<sub>kv</sub></label><input id="serve-kv-heads" type="range" min="1" max="32" step="1" value="8" /><output id="serve-kv-heads-out" for="serve-kv-heads">8</output></div>
                 <label class="control">Layers L <input id="serve-layers" type="number" min="1" max="160" step="1" value="32" /></label>
                 <label class="control">Head dimension d<sub>head</sub> <input id="serve-head-dim" type="number" min="16" max="512" step="16" value="128" /></label>
@@ -334,12 +334,13 @@
               </div>
               <div>
                 <div class="systems-metrics metric-stack">
-                  <div class="metric"><span>Peak KV cache</span><strong id="serve-kv">—</strong></div>
+                  <div class="metric"><span>Allocated KV capacity (S+O)</span><strong id="serve-kv">—</strong></div>
+                  <div class="metric"><span>Final live KV (S+O−1)</span><strong id="serve-live-kv">—</strong></div>
                   <div class="metric"><span>Illustrative TTFT</span><strong id="serve-ttft">—</strong></div>
-                  <div class="metric"><span>Decode TPOT</span><strong id="serve-tpot">—</strong></div>
-                  <div class="metric"><span>Aggregate output throughput</span><strong id="serve-throughput">—</strong></div>
-                  <div class="metric"><span>Output phase duration</span><strong id="serve-duration">—</strong></div>
-                  <div class="metric"><span>Roofline limiter</span><strong id="serve-limiter">—</strong></div>
+                  <div class="metric"><span>Iterative decode TPOT</span><strong id="serve-tpot">—</strong></div>
+                  <div class="metric"><span>Steady-state decode throughput</span><strong id="serve-throughput">—</strong></div>
+                  <div class="metric"><span>Iterative decode duration (O−1)</span><strong id="serve-duration">—</strong></div>
+                  <div class="metric"><span>Iterative decode limiter</span><strong id="serve-limiter">—</strong></div>
                 </div>
                 <div class="plot-wrap"><canvas id="serve-plot" width="960" height="320" role="img" aria-label="Illustrative prefill and decode lower-bound timing bars"></canvas></div>
                 <div class="live-conclusion" id="serve-conclusion" aria-live="polite"></div>
@@ -349,11 +350,14 @@
 
           <div class="workbench-grid">
             <section class="instrument-panel" aria-labelledby="scratchpad-formulas-title"><div class="panel-toolbar inspector-section"><h3 id="scratchpad-formulas-title">What the scratchpad computes</h3></div><div class="panel-body formula-stack">
-              <div class="formula-line"><strong>Peak KV</strong><code>2BL(S+O)Hkv·dhead·bKV</code></div>
-              <div class="formula-line"><strong>Decode traffic / step</strong><code>≈ P·bw + 2BL(S+(O−1)/2)Hkv·dhead·bKV</code></div>
+              <div class="formula-line"><strong>Decode steps</strong><code>decode_steps = max(O−1, 0)</code></div>
+              <div class="formula-line"><strong>Allocated KV</strong><code>2BL(S+O)Hkv·dhead·bKV</code></div>
+              <div class="formula-line"><strong>Final live KV</strong><code>2BL(S+decode_steps)Hkv·dhead·bKV</code></div>
+              <div class="formula-line"><strong>Decode traffic / step</strong><code>≈ P·bw + 2BL(S+O/2)Hkv·dhead·bKV, for O&gt;1</code></div>
               <div class="formula-line"><strong>Bandwidth floor</strong><code>traffic / memory_bandwidth</code></div>
               <div class="formula-line"><strong>Decode compute floor</strong><code>2PB / peak_FLOP/s</code></div>
               <div class="formula-line"><strong>Step estimate</strong><code>max(floors) / efficiency</code></div>
+              <div class="formula-line"><strong>Decode duration</strong><code>decode_steps · step_estimate</code></div>
             </div></section>
             <aside class="instrument-panel" aria-labelledby="scratchpad-reading-title"><div class="panel-toolbar inspector-section"><h3 id="scratchpad-reading-title">Read the result correctly</h3></div><div class="panel-body"><p>The weight-stream term assumes one pass over quantized weights per batch step and perfect reuse across the batch. The KV term assumes the full average cache is read. Real kernels tile, fuse, shard, and overlap work; TP/PP add communication. Measure the exact engine on a prompt/output-length distribution and report p50/p95/p99.</p><div class="caution-box"><strong>A larger batch can raise throughput while worsening latency.</strong><p>The numerator gains more active sequences per weight stream, but queueing and per-step KV traffic grow. Capacity planning is an SLO optimization, not “maximize tokens/s.”</p></div></div></aside>
           </div>
@@ -367,11 +371,11 @@
             <div class="panel-body"><div class="systems-table-scroll"><table class="comparison-table">
               <thead><tr><th>Mechanism</th><th>Motivation</th><th>What changes</th><th>Cost / failure mode</th><th>OLMo-core boundary</th></tr></thead>
               <tbody>
-                <tr><td><strong>Continuous batching</strong></td><td>Finished sequences leave holes in a static batch.</td><td>Admit and retire sequences between decode steps.</td><td>Scheduler complexity, fairness, preemption, reproducibility.</td><td>No production request scheduler. The README recommends external <a href="https://docs.vllm.ai/">vLLM</a>.</td></tr>
+                <tr><td><strong>Continuous batching</strong></td><td>Finished sequences leave holes in a static batch.</td><td>Admit and retire sequences between decode steps.</td><td>Scheduler complexity, fairness, preemption, reproducibility.</td><td>OLMo-core lacks a production request scheduler; its README recommends external <a href="https://docs.vllm.ai/">vLLM</a>.</td></tr>
                 <tr><td><strong>PagedAttention</strong></td><td>Contiguous KV reservations cause fragmentation and over-reservation.</td><td>Map logical KV blocks to non-contiguous physical blocks.</td><td>Block-table overhead and paging policy; still bounded by physical memory.</td><td>Not present. See the primary <a href="https://arxiv.org/abs/2309.06180">vLLM/PagedAttention paper</a>.</td></tr>
-                <tr><td><strong>Prefix caching</strong></td><td>Shared system prompts and documents repeat prefill work.</td><td>Reuse KV blocks for byte/token-identical prefixes.</td><td>Hash correctness, tenant isolation, eviction, cache poisoning.</td><td>No cross-request prefix cache in the beta generation loop.</td></tr>
-                <tr><td><strong>Speculative decode</strong></td><td>One target-model step emits only one accepted token.</td><td>A draft proposes several tokens; the target verifies in parallel without changing the target distribution when implemented exactly.</td><td>Draft/verify mismatch can erase speedup; rejection adds work. See <a href="https://arxiv.org/abs/2211.17192">Leviathan et al.</a></td><td>No draft-target scheduler in OLMo-core generation.</td></tr>
-                <tr><td><strong>Serving quantization</strong></td><td>Weights/KV consume bandwidth and capacity.</td><td>Use lower-bit weight/activation/KV formats with calibrated kernels.</td><td>Quality drift, outliers, kernel coverage, mixed-format overhead.</td><td>No serving quantizer/scheduler. <a href="../../src/olmo_core/float8/__init__.py"><code>float8/</code></a> contains training/linear conversion utilities—a different boundary.</td></tr>
+                <tr><td><strong>Prefix caching</strong></td><td>Shared system prompts and documents repeat prefill work.</td><td>Reuse KV blocks for byte/token-identical prefixes.</td><td>Hash correctness, tenant isolation, eviction, cache poisoning.</td><td>The beta generation loop has no cross-request prefix cache.</td></tr>
+                <tr><td><strong>Speculative decode</strong></td><td>One target-model step emits only one accepted token.</td><td>A draft proposes several tokens; the target verifies in parallel without changing the target distribution when implemented exactly.</td><td>Draft/verify mismatch can erase speedup; rejection adds work. See <a href="https://arxiv.org/abs/2211.17192">Leviathan et al.</a></td><td>OLMo-core generation has no draft-target scheduler.</td></tr>
+                <tr><td><strong>Serving quantization</strong></td><td>Weights/KV consume bandwidth and capacity.</td><td>Use lower-bit weight/activation/KV formats with calibrated kernels.</td><td>Quality drift, outliers, kernel coverage, mixed-format overhead.</td><td>Serving quantization and scheduling sit outside this checkout. <a href="../../src/olmo_core/float8/__init__.py"><code>float8/</code></a> contains training/linear conversion utilities, which address a different boundary.</td></tr>
               </tbody>
             </table></div></div>
           </div>
@@ -451,18 +455,19 @@
 
           <div class="workbench-grid">
             <section class="instrument-panel" aria-labelledby="olmorl-example-title">
-              <div class="panel-toolbar inspector-section"><h3 id="olmorl-example-title">OlmoRL: an exact published systems example</h3><span class="source-chip is-primary">external primary report</span></div>
+              <div class="panel-toolbar inspector-section"><h3 id="olmorl-example-title">OlmoRL: separate primary-source accounts</h3><span class="source-chip is-caution">source configurations differ</span></div>
               <div class="panel-body">
-                <p>The Olmo 3 report describes an <strong>off-policy asynchronous</strong> actor–learner setup with continuous batching and inflight actor-weight updates. For same-prompt groups, its advantage removes the group mean without dividing by the reward standard deviation; training also corrects mismatch between vLLM behavior log-probabilities and the learner.</p>
+                <p><strong>Olmo 3 technical report, arXiv v2.</strong> The report describes an <strong>off-policy asynchronous</strong> actor–learner setup with continuous batching and inflight actor-weight updates. For same-prompt groups, its advantage removes the group mean without dividing by the reward standard deviation; training also corrects mismatch between vLLM behavior log-probabilities and the learner. The source-specific measurements below are intentionally not merged.</p>
                 <div class="equation"><strong>Static-batch idle fraction</strong>waste = (L<sub>max</sub> − mean(L)) / L<sub>max</sub> = 1 − mean(L) / L<sub>max</sub></div>
-                <p>The report gives <strong>14,628 mean</strong> versus <strong>32,000 maximum</strong> generation length; the static formula gives about <strong>54.3% waste</strong>. This is a workload-specific upper-bound comparison, not a universal serving constant.</p>
+                <p><strong>arXiv v2 length example.</strong> The report gives <strong>14,628 mean</strong> versus <strong>32,000 maximum</strong> generation length; the static formula gives about <strong>54.3% waste</strong>. This is a workload-specific upper-bound comparison, not a universal serving constant.</p>
                 <table class="evidence-table">
                   <tbody>
-                    <tr><th>Benchmark workload</th><td>Qwen 2.5 7B; 16 prompts × 4 samples; max 32k output and 2k prompt; 2 × 8-H100 nodes; 8 one-GPU actors; 2 hours.</td></tr>
-                    <tr><th>Measured sequence</th><td>881 tokens/s baseline → 975 with continuous batching → 1,358 with threading changes → 2,949 with inflight updates.</td></tr>
-                    <tr><th>Resource split</th><td>32B: 8 H100 nodes for the learner and 20 for inference; the learner waited about 75% for data, with roughly 5× inference compute. 7B: 2 learner nodes and 7 inference nodes, roughly 14× inference compute.</td></tr>
-                    <tr><th>Reported headline</th><td>Inflight weight updates avoided actor pauses and KV-cache dumps; the report states up to 4× throughput at the same resources.</td></tr>
-                    <tr><th>Interpretation</th><td>A queue/synchronization redesign changed utilization by more than an architecture-only view would predict. These are that setup’s measurements, not universal speedups.</td></tr>
+                    <tr><th>arXiv v2 · production resource split</th><td>32B: 8 H100 nodes for the learner and 20 for inference; the learner waited about 75% for data, with roughly 5× inference compute. 7B: 2 learner nodes and 7 inference nodes, with roughly 14× inference compute.</td></tr>
+                    <tr><th>arXiv v2 · Table 23 ablation</th><td>Two 8×A100 nodes for 2 hours, one training and one inference; 64 prompts × 2 samples = 128 completions per step; maximum output 32,000 and input 2,048. Table 23 reports 881 → 975 → 1,358 → 2,949 tokens/s across the four cumulative configurations.</td></tr>
+                    <tr><th>arXiv v2 · stated headline</th><td>The report says inflight updates avoid actor pauses and KV-cache invalidation and can reach up to 4× throughput at the same resources. Keep that prose claim scoped to the report; it is not a universal speedup or a recomputation of Table 23’s endpoint ratio.</td></tr>
+                    <tr><th>Author blog · H100 benchmark</th><td>Qwen 2.5 7B; 16 prompts × 4 samples; maximum 32k output and 2k prompt; two 8×H100 nodes, one trainer and one actor node; 8 one-GPU actors; 2 hours. The blog lists the same 881 → 975 → 1,358 → 2,949 tokens/s sequence and links implementation commits.</td></tr>
+                    <tr><th>Reconciliation status</th><td>The arXiv-v2 and author-blog configurations differ in accelerator and prompt/sample counts even though the throughput sequence matches. Treat them as two attributed source claims until the discrepancy is reconciled; no blended row is an “exact” benchmark.</td></tr>
+                    <tr><th>Systems interpretation</th><td>Queueing and synchronization changes can dominate utilization, but every measurement must retain its model, batch construction, hardware, actor layout, duration, code revision, and source.</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -471,7 +476,7 @@
               <div class="panel-toolbar inspector-section"><h3 id="rl-code-boundary-title">Code ownership boundary</h3><span class="status status-caution">external stack</span></div>
               <div class="inspector-section"><p>This OLMo-core checkout has no PPO, DPO, GRPO, reward/verifier, actor fleet, rollout queue, or RL weight-synchronization orchestration. Its trainer/FSDP components can be reused by another project; reuse does not move orchestration into this repository.</p></div>
               <div class="inspector-section"><p><a href="https://allenai.github.io/open-instruct/algorithms/grpo/">Open Instruct’s GRPO documentation</a> is the adjacent implementation boundary: it uses Ray and vLLM and describes implementations built on OLMo-core’s native training infrastructure.</p></div>
-              <div class="inspector-section"><ul class="systems-citation-list"><li><a href="https://arxiv.org/pdf/2512.13961">Olmo 3 technical report</a> — algorithm and asynchronous infrastructure.</li><li><a href="https://finbarr.ca/making-rl-fast/">Making RL Fast</a> — author’s exact workload and throughput table.</li><li><a href="../../src/olmo_core/train/train_module/transformer/train_module.py"><code>TransformerTrainModule</code></a> — reusable learner-side training substrate in this checkout.</li></ul></div>
+              <div class="inspector-section"><ul class="systems-citation-list"><li><a href="https://arxiv.org/pdf/2512.13961v2">Olmo 3 technical report · arXiv v2</a> — asynchronous algorithm, production resource ratios, and the A100 64×2 Table 23 ablation.</li><li><a href="https://finbarr.ca/making-rl-fast/">Making RL Fast</a> — author blog’s distinct H100 16×4 benchmark description and commit-linked table.</li><li><a href="../../src/olmo_core/train/train_module/transformer/train_module.py"><code>TransformerTrainModule</code></a> — reusable learner-side training substrate in this checkout.</li></ul></div>
             </aside>
           </div>
 
@@ -493,7 +498,7 @@
       </main>
     </div>
 
-    <footer class="site-footer"><p>Profiler outputs are illustrative estimates. Published OlmoRL measurements remain scoped to their cited workload and external stack.</p><p><a href="labs.html">Continue to hands-on labs</a></p></footer>
+    <footer class="site-footer"><p>Profiler outputs are illustrative estimates. Published OlmoRL measurements remain scoped to each cited source, workload, hardware configuration, and external stack.</p><p><a href="labs.html">Continue to hands-on labs</a></p></footer>
 
     <script>
       window.addEventListener("DOMContentLoaded", () => {
@@ -633,7 +638,7 @@
           return ms.toFixed(2) + " ms";
         }
 
-        function drawProfiler(prefillMs, bandwidthMs, computeMs) {
+        function drawProfiler(prefillMs, bandwidthMs, computeMs, decodeSteps) {
           const width = plot.width;
           const height = plot.height;
           const left = 210;
@@ -641,7 +646,9 @@
           const top = 44;
           const row = 76;
           const values = [prefillMs, bandwidthMs, computeMs];
-          const labels = ["Prefill compute estimate", "Decode bandwidth floor", "Decode compute floor"];
+          const labels = decodeSteps > 0
+            ? ["Prefill compute estimate", "Decode bandwidth floor", "Decode compute floor"]
+            : ["Prefill compute estimate", "Decode bandwidth · 0 steps", "Decode compute · 0 steps"];
           const colors = ["#1557d6", "#b28c00", "#087a50"];
           const maximum = Math.max(...values, 0.001);
           ctx.clearRect(0, 0, width, height);
@@ -650,7 +657,7 @@
           ctx.font = "16px Avenir Next, sans-serif";
           labels.forEach((label, index) => {
             const y = top + index * row;
-            const barWidth = Math.max(2, values[index] / maximum * (width - left - right));
+            const barWidth = values[index] > 0 ? Math.max(2, values[index] / maximum * (width - left - right)) : 0;
             ctx.fillStyle = "#4f5b66";
             ctx.fillText(label, 18, y + 19);
             ctx.fillStyle = "#e9edeb";
@@ -663,7 +670,9 @@
           ctx.fillStyle = "#77838d";
           ctx.font = "14px Avenir Next, sans-serif";
           ctx.fillText("Bars are normalized within this scenario; compare labels, not pixel length across sweeps.", 18, height - 18);
-          plot.setAttribute("aria-label", "Illustrative bars: prefill " + formatDuration(prefillMs) + ", decode bandwidth floor " + formatDuration(bandwidthMs) + ", decode compute floor " + formatDuration(computeMs) + ".");
+          plot.setAttribute("aria-label", decodeSteps > 0
+            ? "Illustrative bars: prefill " + formatDuration(prefillMs) + ", decode bandwidth floor " + formatDuration(bandwidthMs) + ", decode compute floor " + formatDuration(computeMs) + "."
+            : "Illustrative bars: prefill " + formatDuration(prefillMs) + "; output O equals 1, so iterative decode has zero steps.");
         }
 
         function updateProfiler() {
@@ -687,31 +696,41 @@
           $("serve-kv-heads-out").textContent = kvHeads.toLocaleString();
           $("serve-efficiency-out").textContent = Math.round(efficiency * 100) + "%";
 
+          const decodeSteps = Math.max(output - 1, 0);
+          const hasIterativeDecode = decodeSteps > 0;
           const kvPerSequenceToken = 2 * layers * kvHeads * headDim * kvBytes;
-          const peakKv = batch * (context + output) * kvPerSequenceToken;
-          const averageContext = context + (output - 1) / 2;
-          const averageKvRead = batch * averageContext * kvPerSequenceToken;
+          const allocatedKv = batch * (context + output) * kvPerSequenceToken;
+          const finalLiveKv = batch * (context + decodeSteps) * kvPerSequenceToken;
+          const averageContext = hasIterativeDecode ? context + (decodeSteps + 1) / 2 : context;
+          const averageKvRead = hasIterativeDecode ? batch * averageContext * kvPerSequenceToken : 0;
           const weightStream = params * weightBytes;
-          const bandwidthFloorMs = (weightStream + averageKvRead) / bandwidth * 1000;
-          const computeFloorMs = (2 * params * batch) / compute * 1000;
-          const decodeStepMs = Math.max(bandwidthFloorMs, computeFloorMs) / efficiency;
+          const bandwidthFloorMs = hasIterativeDecode ? (weightStream + averageKvRead) / bandwidth * 1000 : 0;
+          const computeFloorMs = hasIterativeDecode ? (2 * params * batch) / compute * 1000 : 0;
+          const decodeStepMs = hasIterativeDecode ? Math.max(bandwidthFloorMs, computeFloorMs) / efficiency : 0;
           const prefillComputeMs = (2 * params * batch * context) / compute * 1000 / efficiency;
           const illustrativeTtft = overhead + prefillComputeMs;
-          const throughput = batch / (decodeStepMs / 1000);
-          const duration = output * decodeStepMs;
-          const limiter = bandwidthFloorMs >= computeFloorMs ? "bandwidth / bytes" : "compute / FLOPs";
-          const modelShare = weightStream / Math.max(weightStream + averageKvRead, 1);
+          const throughput = hasIterativeDecode ? batch / (decodeStepMs / 1000) : 0;
+          const duration = decodeSteps * decodeStepMs;
+          const limiter = hasIterativeDecode
+            ? (bandwidthFloorMs >= computeFloorMs ? "bandwidth / bytes" : "compute / FLOPs")
+            : "none · 0 decode steps";
+          const modelShare = hasIterativeDecode ? weightStream / Math.max(weightStream + averageKvRead, 1) : 0;
 
-          $("serve-kv").textContent = formatBytes(peakKv);
+          $("serve-kv").textContent = formatBytes(allocatedKv);
+          $("serve-live-kv").textContent = formatBytes(finalLiveKv);
           $("serve-ttft").textContent = formatDuration(illustrativeTtft);
-          $("serve-tpot").textContent = formatDuration(decodeStepMs) + " / step";
-          $("serve-throughput").textContent = throughput.toFixed(1) + " tok/s";
-          $("serve-duration").textContent = formatDuration(duration);
+          $("serve-tpot").textContent = hasIterativeDecode ? formatDuration(decodeStepMs) + " / step" : "n/a · first token from prefill";
+          $("serve-throughput").textContent = hasIterativeDecode ? throughput.toFixed(1) + " tok/s" : "n/a · no decode phase";
+          $("serve-duration").textContent = formatDuration(duration) + " · " + decodeSteps.toLocaleString() + (decodeSteps === 1 ? " step" : " steps");
           $("serve-limiter").textContent = limiter;
 
           const gqaLabel = kvHeads === 1 ? "MQA-like" : (kvHeads < 16 ? "GQA-like" : "many-KV-head");
-          $("serve-conclusion").textContent = "At batch " + batch + ", " + context.toLocaleString() + " prompt tokens, and " + output.toLocaleString() + " output tokens, this " + gqaLabel + " setup allocates about " + formatBytes(peakKv) + " of KV cache. The simplified decode roofline is " + limiter + "-limited; approximately " + (modelShare * 100).toFixed(0) + "% of modeled decode bytes are the weight stream and " + ((1 - modelShare) * 100).toFixed(0) + "% are KV reads. The TTFT number adds your " + overhead.toFixed(0) + " ms overhead assumption to a compute-only prefill estimate and is not a measured SLO.";
-          drawProfiler(prefillComputeMs, bandwidthFloorMs, computeFloorMs);
+          const capacityConclusion = "At batch " + batch + ", " + context.toLocaleString() + " prompt tokens, and " + output.toLocaleString() + " output tokens, this " + gqaLabel + " setup allocates about " + formatBytes(allocatedKv) + " for S+O KV capacity. The final live cache is about " + formatBytes(finalLiveKv) + " at S+O−1 because the last sampled token has not been fed back into the model.";
+          const decodeConclusion = hasIterativeDecode
+            ? " Iterative decode runs " + decodeSteps.toLocaleString() + " steps. Its simplified roofline is " + limiter + "-limited; approximately " + (modelShare * 100).toFixed(0) + "% of modeled decode bytes are the weight stream and " + ((1 - modelShare) * 100).toFixed(0) + "% are KV reads."
+            : " The first and only output token comes from prefill, so iterative decode runs zero steps; TPOT, steady-state decode throughput, and a decode limiter are not applicable.";
+          $("serve-conclusion").textContent = capacityConclusion + decodeConclusion + " The TTFT number adds your " + overhead.toFixed(0) + " ms overhead assumption to a compute-only prefill estimate and is not a measured SLO.";
+          drawProfiler(prefillComputeMs, bandwidthFloorMs, computeFloorMs, decodeSteps);
         }
 
         profilerIds.forEach((id) => $(id).addEventListener("input", updateProfiler));

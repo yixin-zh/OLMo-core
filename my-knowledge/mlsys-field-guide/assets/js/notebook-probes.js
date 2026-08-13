@@ -438,7 +438,7 @@ window.NOTEBOOK_PROBES = [
     question_semantics: "not-question",
     confidence: "high",
     correction:
-      "FSDP is not merely data parallelism: report sharding mode, wrap boundaries, mesh size, parameter/reduction dtypes, resharding, and checkpoint format.",
+      "FSDP is sharded data parallelism, not replicated DDP: report sharding mode, wrap boundaries, mesh size, parameter/reduction dtypes, resharding, and checkpoint format.",
     lesson_id: "fsdp-anatomy",
   },
   {

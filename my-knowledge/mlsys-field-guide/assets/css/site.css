@@ -1194,8 +1194,26 @@ a[aria-current="step"] .rail-dot,
   height: auto;
 }
 
+.notebook-toolbar .utility-button,
+.notebook-toolbar .button {
+  color: var(--ink);
+}
+
 .probe-pin {
   position: absolute;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  transform: translate(-50%, -50%);
+}
+
+.probe-pin::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
   width: 1.15rem;
   height: 1.15rem;
   border: 3px solid var(--surface);
@@ -1209,7 +1227,7 @@ a[aria-current="step"] .rail-dot,
   content: attr(data-index);
   position: absolute;
   top: 50%;
-  left: calc(100% + 0.35rem);
+  left: calc(50% + 0.85rem);
   min-width: 1.1rem;
   padding: 0.1rem 0.25rem;
   color: var(--surface);
@@ -1220,8 +1238,18 @@ a[aria-current="step"] .rail-dot,
 }
 
 .probe-pin[aria-pressed="true"] {
+  z-index: 2;
+}
+
+.probe-pin[aria-pressed="true"]::before {
   width: 1.45rem;
   height: 1.45rem;
+  border-radius: 32%;
+  background: var(--amber);
+}
+
+.probe-pin[aria-pressed="true"]::after {
+  color: var(--ink);
   background: var(--amber);
 }
 
@@ -1500,8 +1528,8 @@ a[aria-current="step"] .rail-dot,
   }
 
   .evidence-ribbon {
-    overflow-x: auto;
-    flex-wrap: nowrap;
+    overflow-x: visible;
+    flex-wrap: wrap;
   }
 
   .page-main {

@@ -532,7 +532,7 @@
                 <span class="status status-caution">SwiGLU slice is illustrative</span>
               </div>
               <div class="plot-wrap">
-                <canvas id="activation-canvas" height="320" role="img" aria-describedby="activation-conclusion">
+                <canvas id="activation-canvas" height="320" role="img" aria-labelledby="activation-plot-title" aria-describedby="activation-conclusion">
                   Activation curves from x = −4 to 4. Use the text comparison below if canvas is unavailable.
                 </canvas>
               </div>
@@ -579,7 +579,8 @@
                   <div class="metric"><span>Parameter delta</span><strong id="ffn-param-delta">+0.8%</strong></div>
                 </div>
                 <div class="equation has-top-gap">
-                  Plain ≈ 2dh<br>Gated ≈ 3dh<sub>g</sub><br>h<sub>g</sub> = 2h/3
+                  No bias: plain = 2dh; gated = 3dh<sub>g</sub>; h<sub>g</sub> = 2h/3<br>
+                  With bias: h<sub>g</sub> = h(2d + 1)/(3d + 2)
                 </div>
                 <output class="live-conclusion" id="ffn-conclusion" aria-live="polite">At d=4,096, a 4d plain FFN uses width 16,384. The exact matched gated width is 10,922.7; rounding to 256 gives 11,008 and a +0.8% parameter difference.</output>
               </div>
@@ -624,7 +625,7 @@
                 <span class="status status-primary">derived invariant</span>
               </div>
               <div class="plot-wrap">
-                <canvas id="rope-canvas" height="320" role="img" aria-describedby="rope-conclusion">
+                <canvas id="rope-canvas" height="320" role="img" aria-labelledby="rope-plot-title" aria-describedby="rope-conclusion">
                   Position-dependent rotations for temporal, height, and width axes.
                 </canvas>
               </div>
@@ -1111,7 +1112,9 @@
           const multiple = clampNumber(document.getElementById("ffn-multiple").value, 1, 4096, 256);
           const bias = document.getElementById("ffn-bias").value === "1";
           const plainWidth = d * ratio;
-          const exactGatedWidth = (2 * plainWidth) / 3;
+          const exactGatedWidth = bias
+            ? plainWidth * (2 * d + 1) / (3 * d + 2)
+            : (2 * plainWidth) / 3;
           const gatedWidth = Math.ceil(exactGatedWidth / multiple) * multiple;
           const plainParams = 2 * d * plainWidth + (bias ? plainWidth + d : 0);
           const gatedParams = 3 * d * gatedWidth + (bias ? 2 * gatedWidth + d : 0);
@@ -1119,7 +1122,7 @@
           document.getElementById("plain-width").textContent = formatInteger.format(plainWidth);
           document.getElementById("gated-width").textContent = formatInteger.format(gatedWidth);
           document.getElementById("ffn-param-delta").textContent = `${delta >= 0 ? "+" : ""}${delta.toFixed(1)}%`;
-          document.getElementById("ffn-conclusion").textContent = `At d=${formatInteger.format(d)}, a ${ratio}d plain FFN uses width ${formatInteger.format(plainWidth)}. The exact matched gated width is ${exactGatedWidth.toFixed(1)}; rounding to ${formatInteger.format(multiple)} gives ${formatInteger.format(gatedWidth)} and a ${delta >= 0 ? "+" : ""}${delta.toFixed(1)}% parameter difference${bias ? " with biases counted" : " without biases"}.`;
+          document.getElementById("ffn-conclusion").textContent = `At d=${formatInteger.format(d)}, a ${ratio}d plain FFN uses width ${formatInteger.format(plainWidth)}. The exact parameter-matched gated width is ${exactGatedWidth.toFixed(1)} ${bias ? "from h(2d+1)/(3d+2) with biases" : "from 2h/3 without biases"}; rounding to ${formatInteger.format(multiple)} gives ${formatInteger.format(gatedWidth)} and a ${delta >= 0 ? "+" : ""}${delta.toFixed(1)}% parameter difference.`;
         }
         ["ffn-d-model", "ffn-ratio", "ffn-multiple", "ffn-bias"].forEach((id) => {
           document.getElementById(id).addEventListener("input", updateFfnMatch);

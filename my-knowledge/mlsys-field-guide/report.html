@@ -168,8 +168,8 @@
 
       .reconstruction-banner {
         padding: 1rem;
-        border: 1px solid #c6a62e;
-        border-left: 5px solid var(--amber);
+        border: 2px solid var(--amber-deep);
+        border-top: 5px solid var(--amber);
         background: var(--amber-soft);
       }
 
@@ -365,8 +365,8 @@
 
       .conflict-note {
         padding: 0.85rem 1rem;
-        border: 1px solid #d9928b;
-        border-left: 5px solid var(--red);
+        border: 2px solid var(--red);
+        border-top-width: 5px;
         background: var(--red-soft);
         font-size: 0.75rem;
       }
@@ -405,8 +405,8 @@
 
       .report-verdict {
         padding: 1.2rem;
-        border: 1px solid var(--rule);
-        border-left: 5px solid var(--probe);
+        border: 2px solid var(--probe);
+        border-top-width: 5px;
         background: var(--surface);
       }
 
@@ -526,8 +526,8 @@
           <li><a href="report.html" aria-current="step"><span class="rail-dot" aria-hidden="true"></span><span class="rail-label"><strong>Release</strong><small>artifacts · evidence · risk</small></span></a></li>
         </ol>
         <div class="rail-block">
-          <strong>100% means reproducible proof</strong>
-          <p>Filled prose is not enough. Every required section marked executed, verified, or released needs an immutable artifact reference.</p>
+          <strong>100% means form-complete self-attestation</strong>
+          <p>This browser checks field and reference shape only; it does not fetch artifacts or independently verify reproducibility.</p>
         </div>
       </aside>
 
@@ -559,8 +559,9 @@
             <h2 id="builder-title">Transparent-report completeness matrix</h2>
             <p>
               Severity says whether a ledger is required for this report scope. Evidence state says
-              how far the claim travelled. An executed or released claim without a proof reference
-              is blocked, even when every narrative field is filled.
+              how far the claim travelled. An executed, verified, or released claim without an
+              artifact location plus a digest, commit, checkpoint, or run identifier is blocked.
+              The percentage is browser-local form completeness, not external verification.
             </p>
           </div>
 
@@ -569,15 +570,15 @@
             <div class="audit-layout">
               <aside class="audit-sidebar" aria-label="Completeness controls">
                 <section class="score-panel" aria-labelledby="score-title">
-                  <div class="score-graphic" aria-hidden="true">
-                    <svg viewBox="0 0 120 120">
+                  <div class="score-graphic">
+                    <svg viewBox="0 0 120 120" aria-hidden="true">
                       <circle class="score-track" cx="60" cy="60" r="49"></circle>
                       <circle id="score-progress" class="score-progress" cx="60" cy="60" r="49" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"></circle>
                     </svg>
-                    <strong class="score-value"><output id="score-value">0%</output></strong>
+                    <strong class="score-value"><output id="score-value" aria-label="Form completeness percentage" aria-live="polite">0%</output></strong>
                   </div>
                   <div class="score-copy">
-                    <h2 id="score-title">Evidence completeness</h2>
+                    <h2 id="score-title">Form completeness</h2>
                     <p id="score-summary" aria-live="polite">Calculating the ledger…</p>
                   </div>
                 </section>
@@ -587,19 +588,19 @@
                   <table class="matrix-table">
                     <thead><tr><th>Ledger</th><th>Severity</th><th>Evidence</th></tr></thead>
                     <tbody>
-                      <tr data-matrix-row="identity"><td><a href="#identity">Identity</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Identity severity</span><select name="severity_identity" data-severity="identity" aria-label="identity severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Identity evidence</span><select name="evidence_identity" data-evidence="identity" aria-label="identity evidence state"><option value="intended">intended</option><option value="configured">configured</option><option value="executed">executed</option><option value="verified" selected>verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="identity"><td><a href="#identity">Identity</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Identity severity</span><select name="severity_identity" data-severity="identity" aria-label="identity severity"><option value="required" selected>required</option></select></label></td><td><label><span class="print-only">Identity evidence</span><select name="evidence_identity" data-evidence="identity" aria-label="identity evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
                       <tr data-matrix-row="architecture"><td><a href="#architecture">Architecture</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Architecture severity</span><select name="severity_architecture" data-severity="architecture" aria-label="architecture severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Architecture evidence</span><select name="evidence_architecture" data-evidence="architecture" aria-label="architecture evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
                       <tr data-matrix-row="data"><td><a href="#data">Data</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Data severity</span><select name="severity_data" data-severity="data" aria-label="data severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Data evidence</span><select name="evidence_data" data-evidence="data" aria-label="data evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
                       <tr data-matrix-row="mixture"><td><a href="#mixture">Mixture</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Mixture severity</span><select name="severity_mixture" data-severity="mixture" aria-label="mixture severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Mixture evidence</span><select name="evidence_mixture" data-evidence="mixture" aria-label="mixture evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
                       <tr data-matrix-row="scaling"><td><a href="#scaling">Scaling</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Scaling severity</span><select name="severity_scaling" data-severity="scaling" aria-label="scaling severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Scaling evidence</span><select name="evidence_scaling" data-evidence="scaling" aria-label="scaling evidence state"><option value="intended" selected>intended</option><option value="configured">configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
                       <tr data-matrix-row="recipe"><td><a href="#recipe">Recipe</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Recipe severity</span><select name="severity_recipe" data-severity="recipe" aria-label="recipe severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Recipe evidence</span><select name="evidence_recipe" data-evidence="recipe" aria-label="recipe evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
-                      <tr data-matrix-row="phases"><td><a href="#phases">Phase lineage</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Phase lineage severity</span><select name="severity_phases" data-severity="phases" aria-label="phases severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Phase lineage evidence</span><select name="evidence_phases" data-evidence="phases" aria-label="phases evidence state"><option value="intended">intended</option><option value="configured">configured</option><option value="executed" selected>executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="phases"><td><a href="#phases">Phase lineage</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Phase lineage severity</span><select name="severity_phases" data-severity="phases" aria-label="phases severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Phase lineage evidence</span><select name="evidence_phases" data-evidence="phases" aria-label="phases evidence state"><option value="intended" selected>intended</option><option value="configured">configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
                       <tr data-matrix-row="losses"><td><a href="#losses">Losses + curves</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Loss severity</span><select name="severity_losses" data-severity="losses" aria-label="losses severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Loss evidence</span><select name="evidence_losses" data-evidence="losses" aria-label="losses evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
                       <tr data-matrix-row="evaluation"><td><a href="#evaluation">Evaluation</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Evaluation severity</span><select name="severity_evaluation" data-severity="evaluation" aria-label="evaluation severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Evaluation evidence</span><select name="evidence_evaluation" data-evidence="evaluation" aria-label="evaluation evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
                       <tr data-matrix-row="infrastructure"><td><a href="#infrastructure">Infrastructure</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Infrastructure severity</span><select name="severity_infrastructure" data-severity="infrastructure" aria-label="infrastructure severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Infrastructure evidence</span><select name="evidence_infrastructure" data-evidence="infrastructure" aria-label="infrastructure evidence state"><option value="intended">intended</option><option value="configured" selected>configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
                       <tr data-matrix-row="inference"><td><a href="#inference">Inference</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Inference severity</span><select name="severity_inference" data-severity="inference" aria-label="inference severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Inference evidence</span><select name="evidence_inference" data-evidence="inference" aria-label="inference evidence state"><option value="intended" selected>intended</option><option value="configured">configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
                       <tr data-matrix-row="security"><td><a href="#security">Security T + D</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Security severity</span><select name="severity_security" data-severity="security" aria-label="security severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Security evidence</span><select name="evidence_security" data-evidence="security" aria-label="security evidence state"><option value="intended" selected>intended</option><option value="configured">configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
-                      <tr data-matrix-row="release"><td><a href="#release">Release</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Release severity</span><select name="severity_release" data-severity="release" aria-label="release severity"><option value="required" selected>required</option><option value="conditional">conditional</option><option value="not_applicable">not applicable</option></select></label></td><td><label><span class="print-only">Release evidence</span><select name="evidence_release" data-evidence="release" aria-label="release evidence state"><option value="intended">intended</option><option value="configured">configured</option><option value="executed">executed</option><option value="verified" selected>verified</option><option value="released">released</option></select></label></td></tr>
+                      <tr data-matrix-row="release"><td><a href="#release">Release</a><output class="matrix-state" data-row-status>—</output></td><td><label><span class="print-only">Release severity</span><select name="severity_release" data-severity="release" aria-label="release severity"><option value="required" selected>required</option></select></label></td><td><label><span class="print-only">Release evidence</span><select name="evidence_release" data-evidence="release" aria-label="release evidence state"><option value="intended" selected>intended</option><option value="configured">configured</option><option value="executed">executed</option><option value="verified">verified</option><option value="released">released</option></select></label></td></tr>
                     </tbody>
                   </table>
                 </section>
@@ -628,7 +629,7 @@
 Model-weight SHA-256: [not reconstructed]</textarea><span class="field-help">A mutable model name is not an identity. Record content digests, exact checkpoint paths, and conversion provenance.</span></label>
                       <label class="ledger-field wide"><span>Reconstruction status + known boundary <span class="required-flag">required</span></span><textarea name="identity_boundary" data-report-field data-required>Partially reconstructed from public artifacts. OLMo-core scripts establish configurable behavior; the CSV establishes published checkpoint counters; neither alone proves every runtime override, incident, or artifact digest from the executed jobs.</textarea></label>
                     </div>
-                    <label class="ledger-field proof-field"><span>Identity proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_identity" data-proof="identity" value="src/scripts/official/OLMo3/README.md + OLMo-3-1025-7B.csv + public checkpoint URL" /><span class="field-help">For executed, verified, or released states, cite an immutable manifest, content hash, or versioned artifact.</span></label>
+                    <label class="ledger-field proof-field"><span>Identity proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_identity" data-proof="identity" value="src/scripts/official/OLMo3/README.md + OLMo-3-1025-7B.csv + public checkpoint URL" /><span class="field-help">For executed, verified, or released states, provide an artifact URI/path plus a digest, commit, checkpoint, or run identifier. This page checks shape but does not dereference the artifact.</span></label>
                     <div class="source-strip"><a class="source-chip is-repo" href="../../src/scripts/official/OLMo3/README.md">OLMo 3 README</a><a class="source-chip is-repo" href="../../src/scripts/official/OLMo3/OLMo-3-1025-7B.csv">checkpoint CSV</a><a class="source-chip is-primary" href="https://arxiv.org/abs/2512.13961">OLMo 3 paper</a></div>
                   </div>
                 </details>
@@ -671,14 +672,16 @@ Model-weight SHA-256: [not reconstructed]</textarea><span class="field-help">A m
                 <details class="ledger-section" id="mixture" data-ledger="mixture">
                   <summary><span class="ledger-index">04</span><span class="ledger-title"><strong>Data mixture + token accounting</strong><small>Requested weights are not realized batches.</small></span></summary>
                   <div class="ledger-body">
-                    <table class="token-reconciliation" aria-label="OLMo 3 7B phase token reconciliation">
-                      <thead><tr><th>Phase</th><th>README budget</th><th>CSV exact cumulative endpoint</th><th>CSV-derived phase delta</th></tr></thead>
-                      <tbody>
-                        <tr><td>Broad pretrain</td><td>5.93T</td><td>5,929,965,715,456</td><td>5,929,965,715,456</td></tr>
-                        <tr><td>Midtrain</td><td>100B</td><td>6,027,869,159,424</td><td>97,903,443,968</td></tr>
-                        <tr><td>Long-context</td><td>50B</td><td>6,073,675,153,408</td><td>45,805,993,984</td></tr>
-                      </tbody>
-                    </table>
+                    <div class="table-scroll" role="region" aria-label="OLMo 3 7B phase token reconciliation; scroll horizontally on narrow screens" tabindex="0">
+                      <table class="token-reconciliation">
+                        <thead><tr><th>Phase</th><th>README budget</th><th>CSV exact cumulative endpoint</th><th>CSV-derived phase delta</th></tr></thead>
+                        <tbody>
+                          <tr><td>Broad pretrain</td><td>5.93T</td><td>5,929,965,715,456</td><td>5,929,965,715,456</td></tr>
+                          <tr><td>Midtrain</td><td>100B</td><td>6,027,869,159,424</td><td>97,903,443,968</td></tr>
+                          <tr><td>Long-context</td><td>50B</td><td>6,073,675,153,408</td><td>45,805,993,984</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
                     <div class="ledger-grid">
                       <label class="ledger-field wide"><span>Requested mixture <span class="required-flag">required</span></span><textarea name="mixture_requested" data-report-field data-required>Stage 1: OLMo_mix_0625_official; stage 2: OLMo_midtraining_mix_0625_100B; stage 3: OLMo_longmino_mix_0625. Preserve normalized source weights and manifest hashes.</textarea></label>
                       <label class="ledger-field wide"><span>Realized mixture <span class="required-flag">required</span></span><textarea name="mixture_realized" data-report-field data-required>[Per-source examples/tokens actually sampled after retries, filtering, packing, truncation, and job restarts are missing.]</textarea></label>
@@ -716,7 +719,7 @@ Model-weight SHA-256: [not reconstructed]</textarea><span class="field-help">A m
                     <div class="ledger-grid" style="margin-top:1rem">
                       <label class="ledger-field wide"><span>Optimizer + parameter groups <span class="required-flag">required</span></span><textarea name="recipe_optimizer" data-report-field data-required>SkipStep AdamW. Pretrain LR 3e-4; mid/long LR 0.00020712352850360292; β=(0.9,0.95); weight decay 0.1; embedding weight decay 0; max grad norm 1.0.</textarea></label>
                       <label class="ledger-field"><span>Global / micro / accumulation batch <span class="required-flag">required</span></span><input type="text" name="recipe_batch" data-report-field data-required value="Pretrain ≈4.194M tokens; midtrain 2.097M; long-context 4.194M. Exact effective executed batch after restarts [not independently verified]." /></label>
-                      <label class="ledger-field"><span>Precision / kernels <span class="required-flag">required</span></span><input type="text" name="recipe_precision" data-report-field data-required value="bf16 params; fp32 reductions; FlashAttention 2. Float8 disabled pre/mid and enabled in long-context script." /></label>
+                      <label class="ledger-field"><span>Precision / kernels <span class="required-flag">required</span></span><input type="text" name="recipe_precision" data-report-field data-required value="FSDP parameter compute/materialization dtype bf16; gradient reductions fp32; master/original parameter and optimizer-state storage are not established here. FlashAttention 2. Float8 disabled pre/mid and enabled in long-context script." /></label>
                       <label class="ledger-field wide"><span>Schedule as a numeric function <span class="required-flag">required</span></span><textarea name="recipe_schedule" data-report-field data-required>Pretrain part 1 cosine + 2000 warmup steps; part 2 HalfCosWithWarmup continuation. Midtrain linear decay, warmup 0, α_f=0. Long-context linear, warmup 200, α_f=0. Exact runtime horizons must be reconciled with CSV endpoints.</textarea></label>
                       <label class="ledger-field"><span>Seeds / determinism <span class="required-flag">required</span></span><input type="text" name="recipe_seeds" data-report-field data-required value="Data seed 34521 pre/long; midtrain init/data seed 1337; source permutation seed 123 long-context; full RNG/environment digest [missing]" /></label>
                       <label class="ledger-field"><span>Checkpoint state load/reset <span class="required-flag">required</span></span><input type="text" name="recipe_state" data-report-field data-required value="Pretrain part 2 loads trainer+optimizer; mid/long load optimizer but reset trainer state. Dataloader/RNG exact handoff evidence [missing]." /></label>
@@ -825,7 +828,7 @@ Model-weight SHA-256: [not reconstructed]</textarea><span class="field-help">A m
                       <label class="ledger-field wide"><span>Artifact manifest + checksums <span class="required-flag">required</span></span><textarea name="release_manifest" data-report-field data-required>Public model and OLMo-core checkpoint locations are named. Required consolidated manifest: weights, tokenizer, configs, code, environment, data manifests, raw logs, profiler traces, eval outputs, checkpoint lineage, model card, hashes [incomplete].</textarea></label>
                       <label class="ledger-field"><span>Licenses / terms / data obligations <span class="required-flag">required</span></span><input type="text" name="release_licenses" data-report-field data-required value="[exact artifact-by-artifact license and source obligation ledger not reconstructed]" /></label>
                       <label class="ledger-field"><span>Conversion / compatibility tests <span class="required-flag">required</span></span><input type="text" name="release_compatibility" data-report-field data-required value="[OLMo-core ↔ HF conversion commit, hash mapping, logits parity, supported runtimes missing]" /></label>
-                      <label class="ledger-field wide"><span>Known gaps / negative results <span class="required-flag">required</span></span><textarea name="release_gaps" data-report-field data-required>Missing exact resolved config digest; realized data order and per-source counts; full scaling trial/failure ledger; immutable curves; complete phase/final eval provenance; topology/profiler/incidents; serving benchmark; signed security evidence; posttraining lineage and rollout ledger.</textarea></label>
+                      <label class="ledger-field wide"><span>Known gaps / negative results <span class="required-flag">required</span></span><textarea name="release_gaps" data-report-field data-required data-gap-inventory>Missing exact resolved config digest; realized data order and per-source counts; full scaling trial/failure ledger; immutable curves; complete phase/final eval provenance; topology/profiler/incidents; serving benchmark; signed security evidence; posttraining lineage and rollout ledger.</textarea></label>
                       <label class="ledger-field wide"><span>Claim-to-artifact index <span class="required-flag">required</span></span><textarea name="release_claim_index" data-report-field data-required>[incomplete] Map each table number and report claim to artifact path, hash, producing command/job, owner, and retention policy.</textarea></label>
                     </div>
                     <label class="ledger-field proof-field"><span>Release proof reference <span class="required-flag">proof</span></span><input type="text" name="proof_release" data-proof="release" value="OLMo 3 paper + README + public HF/checkpoint locations; consolidated signed manifest missing" /></label>
@@ -867,16 +870,43 @@ Model-weight SHA-256: [not reconstructed]</textarea><span class="field-help">A m
           "identity", "architecture", "data", "mixture", "scaling", "recipe", "phases",
           "losses", "evaluation", "infrastructure", "inference", "security", "release"
         ];
+        const nonOptionalSections = new Set(["identity", "release"]);
         const evidenceRank = { intended: 0, configured: 1, executed: 2, verified: 3, released: 4 };
         const evidenceWeight = { intended: 0, configured: 0.25, executed: 0.62, verified: 0.84, released: 1 };
-        const emptyMarker = /^\s*(?:\[?(?:missing|unknown|not reconstructed|not published|not provided|incomplete|n\/a|none)\]?|—|-)(?:\b|\s|$)/i;
+        const placeholderMarker = /\[[^\]]*(?:missing|unknown|not reconstructed|not published|not provided|not independently verified|incomplete|n\/a|none)[^\]]*\]|\b(?:missing|unknown|not reconstructed|not published|not provided|not independently verified|incomplete|n\/a|none)\b/i;
+        const wholeValuePlaceholder = /^\s*(?:missing|unknown|not reconstructed|not published|not provided|not independently verified|incomplete|n\/a|none|—|-)\s*[.!]?\s*$/i;
+        const artifactLocationPattern = /(?:https?|s3|gs|hf):\/\/\S+|(?:^|[\s(])(?:\.{0,2}\/|\/|src\/|papers\/|artifacts?\/|checkpoints?\/|runs?\/)[^\s,;)]+|(?:artifact|location|path|uri|url)\s*[:=]\s*\S+/i;
+        const immutableIdentifierPattern = /\b(?:sha(?:-?256)?|digest)\s*[:=@]\s*[a-f0-9]{32,128}\b|\b(?:commit|git(?:_sha)?)\s*[:=@]\s*[a-f0-9]{7,40}\b|\/(?:commit|tree)\/[a-f0-9]{7,40}\b|\b(?:checkpoint(?:_id)?|ckpt(?:_id)?|run(?:_id)?|job(?:_id)?|artifact(?:_id)?)\s*[:=@#]\s*[a-z0-9][a-z0-9._/-]{2,}\b|\bstep[-_:/=@#]?\d+\b|\/runs?\/[a-z0-9][a-z0-9._-]{3,}\b|\b[a-f0-9]{64}\b/i;
         let saveTimer = 0;
         let currentAudit = null;
 
         function isSubstantive(control) {
           if (control.type === "checkbox" || control.type === "radio") return control.checked;
           const value = String(control.value || "").trim();
-          return Boolean(value) && !emptyMarker.test(value);
+          if (!value) return false;
+          if (control.hasAttribute("data-gap-inventory")) return !wholeValuePlaceholder.test(value);
+          return !placeholderMarker.test(value) && !wholeValuePlaceholder.test(value);
+        }
+
+        function proofReferenceStatus(control) {
+          const value = control ? String(control.value || "").trim() : "";
+          const substantive = Boolean(control) && isSubstantive(control);
+          const hasLocation = substantive && artifactLocationPattern.test(value);
+          const hasImmutableIdentifier = substantive && immutableIdentifierPattern.test(value);
+          return {
+            substantive,
+            has_location: hasLocation,
+            has_immutable_identifier: hasImmutableIdentifier,
+            valid: substantive && hasLocation && hasImmutableIdentifier
+          };
+        }
+
+        function normalizedSeverity(sectionId, control) {
+          const validValues = new Set(["required", "conditional", "not_applicable"]);
+          if (!validValues.has(control.value) || (nonOptionalSections.has(sectionId) && control.value !== "required")) {
+            control.value = "required";
+          }
+          return control.value;
         }
 
         function controlsFor(sectionId) {
@@ -936,25 +966,25 @@ Model-weight SHA-256: [not reconstructed]</textarea><span class="field-help">A m
             const proofControl = document.querySelector('[data-proof="' + sectionId + '"]');
             const row = document.querySelector('[data-matrix-row="' + sectionId + '"]');
             const rowStatus = row.querySelector("[data-row-status]");
-            const severity = severityControl.value;
+            const severity = normalizedSeverity(sectionId, severityControl);
             const evidence = evidenceControl.value;
             const requiredFields = controlsFor(sectionId);
             const completeFields = requiredFields.filter(isSubstantive).length;
             const fieldRatio = requiredFields.length ? completeFields / requiredFields.length : 1;
-            const proofPresent = proofControl ? isSubstantive(proofControl) : false;
+            const proofStatus = proofReferenceStatus(proofControl);
             const proofNeeded = evidenceRank[evidence] >= evidenceRank.executed;
 
             if (severity === "not_applicable") {
               rowStatus.textContent = "N/A by scope";
               rowStatus.classList.remove("is-blocked");
-              sections[sectionId] = { severity, evidence, field_ratio: fieldRatio, proof_present: proofPresent, score: null };
+              sections[sectionId] = { severity, evidence, field_ratio: fieldRatio, proof_present: proofStatus.substantive, proof: proofStatus, score: null };
               return;
             }
 
             const sectionWeight = severity === "required" ? 1 : 0.5;
             let sectionScore = 0.72 * fieldRatio + 0.28 * evidenceWeight[evidence];
-            const missingProof = proofNeeded && !proofPresent;
-            if (missingProof) sectionScore = Math.min(sectionScore, 0.72);
+            const invalidProof = proofNeeded && !proofStatus.valid;
+            if (invalidProof) sectionScore = Math.min(sectionScore, 0.72);
 
             weightedScore += sectionScore * sectionWeight;
             weightTotal += sectionWeight;
@@ -964,44 +994,50 @@ Model-weight SHA-256: [not reconstructed]</textarea><span class="field-help">A m
             if (severity === "required" && missingFieldCount > 0) {
               blocking.push(sectionId + ": " + missingFieldCount + " required field" + (missingFieldCount === 1 ? "" : "s") + " lack substantive evidence");
             }
-            if (severity === "required" && missingProof) {
-              blocking.push(sectionId + ": " + evidence + " claim has no executed/released proof reference");
+            if (severity === "required" && invalidProof) {
+              blocking.push(sectionId + ": " + evidence + " claim needs an artifact location plus a digest, commit, checkpoint, or run identifier");
             }
             if (severity === "required" && evidence !== "released") {
               blocking.push(sectionId + ": evidence state is " + evidence + ", not released");
             }
 
-            rowStatus.textContent = Math.round(sectionScore * 100) + "% · " + completeFields + "/" + requiredFields.length + " fields" + (missingProof ? " · proof blocked" : "");
-            rowStatus.classList.toggle("is-blocked", missingProof || (severity === "required" && missingFieldCount > 0));
+            rowStatus.textContent = Math.round(sectionScore * 100) + "% · " + completeFields + "/" + requiredFields.length + " fields" + (invalidProof ? " · proof shape blocked" : "");
+            rowStatus.classList.toggle("is-blocked", invalidProof || (severity === "required" && missingFieldCount > 0));
             sections[sectionId] = {
               severity,
               evidence,
               fields_complete: completeFields,
               fields_total: requiredFields.length,
               field_ratio: fieldRatio,
-              proof_present: proofPresent,
+              proof_present: proofStatus.substantive,
+              proof: proofStatus,
               score: Math.round(sectionScore * 100)
             };
           });
 
+          if (activeRequired === 0) {
+            blocking.push("scope: at least one ledger must remain required before the form can be complete");
+          }
+
           let score = weightTotal ? Math.round((weightedScore / weightTotal) * 100) : 0;
-          const requiredReleasedWithProof = sectionIds.every((sectionId) => {
+          const requiredReleasedWithProof = activeRequired > 0 && sectionIds.every((sectionId) => {
             const severity = document.querySelector('[data-severity="' + sectionId + '"]').value;
             if (severity !== "required") return true;
             const evidence = document.querySelector('[data-evidence="' + sectionId + '"]').value;
             const proof = document.querySelector('[data-proof="' + sectionId + '"]');
-            return evidence === "released" && proof && isSubstantive(proof) && controlsFor(sectionId).every(isSubstantive);
+            return evidence === "released" && proofReferenceStatus(proof).valid && controlsFor(sectionId).every(isSubstantive);
           });
           if (!requiredReleasedWithProof) score = Math.min(score, 99);
 
           scoreValue.textContent = score + "%";
           scoreProgress.setAttribute("stroke-dashoffset", String(100 - score));
-          scoreSummary.textContent = activeRequired + " required ledgers · " + blocking.length + " blocking conditions. 100% requires every required ledger to be released with substantive fields and immutable proof.";
-          matrixAlert.textContent = blocking.length ? blocking.length + " blockers" : "release-ready";
-          matrixAlert.className = "status " + (blocking.length ? "status-contradiction" : "status-pass");
-          verdictCopy.textContent = blocking.length
-            ? "This is not yet a fully transparent technical report. The public reconstruction is useful, but its evidence boundary remains explicit."
-            : "Every required ledger is released with a proof reference. Re-run artifact checks before publication.";
+          scoreSummary.textContent = score + "% form-complete · " + activeRequired + " required ledgers · " + blocking.length + " blocking conditions. Browser-local self-attestation only; artifacts are not externally verified.";
+          const formComplete = blocking.length === 0 && requiredReleasedWithProof;
+          matrixAlert.textContent = formComplete ? "required form-complete" : blocking.length + " blockers";
+          matrixAlert.className = "status " + (formComplete ? "status-pass" : "status-contradiction");
+          verdictCopy.textContent = formComplete
+            ? "Every required ledger is form-complete with an immutable-reference-shaped proof. Independently resolve and verify every artifact before publication."
+            : "This is not yet a form-complete technical report. The public reconstruction is useful, but its evidence boundary remains explicit.";
           blockingList.innerHTML = "";
           blocking.slice(0, 12).forEach((item) => {
             const li = document.createElement("li");
@@ -1014,7 +1050,13 @@ Model-weight SHA-256: [not reconstructed]</textarea><span class="field-help">A m
             blockingList.appendChild(li);
           }
 
-          currentAudit = { score, blocking, sections };
+          currentAudit = {
+            score,
+            score_percent: score + "%",
+            scoring_scope: "browser-local form-completeness self-attestation; no external artifact verification",
+            blocking,
+            sections
+          };
           return currentAudit;
         }
 
@@ -1035,6 +1077,9 @@ Model-weight SHA-256: [not reconstructed]</textarea><span class="field-help">A m
             exported_at: new Date().toISOString(),
             example_status: "partially reconstructed from public artifacts",
             completeness_score: currentAudit.score,
+            form_completeness_percent: currentAudit.score,
+            scoring_scope: currentAudit.scoring_scope,
+            external_verification_status: "not performed by this browser-local scoring tool",
             blocking_conditions: currentAudit.blocking,
             sections
           };
@@ -1060,7 +1105,8 @@ Model-weight SHA-256: [not reconstructed]</textarea><span class="field-help">A m
             "# Transparent LLM technical report",
             "",
             "Status: partially reconstructed from public artifacts",
-            "Completeness: " + currentAudit.score + "%",
+            "Form completeness (self-attested): " + currentAudit.score_percent,
+            "External verification: not performed by this browser-local scoring tool",
             ""
           ];
           sectionIds.forEach((sectionId, index) => {

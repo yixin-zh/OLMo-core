@@ -83,7 +83,7 @@
         border: 1px solid var(--rule-strong);
         background: var(--surface);
         white-space: nowrap;
-        font-size: 0.82rem;
+        font-size: 0.9rem;
         font-weight: 700;
       }
 
@@ -121,7 +121,7 @@
 
       .lab-brief p {
         margin: 0;
-        font-size: 0.86rem;
+        font-size: 0.9rem;
       }
 
       .hypothesis {
@@ -175,13 +175,13 @@
 
       .lab-trail h3 {
         margin-bottom: 0.35rem;
-        font-size: 0.92rem;
+        font-size: 1.1rem;
       }
 
       .lab-trail p,
       .lab-trail ul {
         margin-bottom: 0;
-        font-size: 0.84rem;
+        font-size: 0.9rem;
       }
 
       .lab-actions {
@@ -194,7 +194,7 @@
 
       .snapshot-status {
         color: var(--muted);
-        font-size: 0.8rem;
+        font-size: 0.9rem;
       }
 
       .output-table-wrap {
@@ -219,7 +219,7 @@
         display: inline-flex;
         gap: 0.45rem;
         align-items: center;
-        font-size: 0.84rem;
+        font-size: 0.9rem;
       }
 
       .lab-code {
@@ -259,8 +259,8 @@
       }
 
       .capability-tag.guided {
-        border-color: #a27c00;
-        color: #6f5600;
+        border-color: var(--amber-deep);
+        color: var(--amber-deep);
       }
 
       .capability-tag.external {
@@ -340,8 +340,8 @@
       <aside class="lifecycle-rail" aria-label="Learning lifecycle">
         <p class="rail-heading">Lab path</p>
         <ol class="rail-list">
-          <li class="is-complete"><a href="#foundations"><span class="rail-dot"></span><span class="rail-label"><strong>Foundations</strong><small>shapes · tokens</small></span></a></li>
-          <li><a href="#model-labs" aria-current="step"><span class="rail-dot"></span><span class="rail-label"><strong>Model</strong><small>activate · rotate · route</small></span></a></li>
+          <li class="is-complete"><a href="#foundations" aria-current="step"><span class="rail-dot"></span><span class="rail-label"><strong>Foundations</strong><small>shapes · tokens</small></span></a></li>
+          <li><a href="#model-labs"><span class="rail-dot"></span><span class="rail-label"><strong>Model</strong><small>activate · rotate · route</small></span></a></li>
           <li><a href="#training-labs"><span class="rail-dot"></span><span class="rail-label"><strong>Train</strong><small>fit · phase · evaluate</small></span></a></li>
           <li><a href="#systems-labs"><span class="rail-dot"></span><span class="rail-label"><strong>Systems</strong><small>profile · secure · roll out</small></span></a></li>
           <li><a href="#capstone"><span class="rail-dot"></span><span class="rail-label"><strong>Release</strong><small>export · report</small></span></a></li>
@@ -352,7 +352,7 @@
       <main class="page-main" id="main">
         <section class="page-lede" aria-labelledby="page-title">
           <div><h1 id="page-title">Turn every blue dot into a falsifiable probe.</h1><p>These exercises run deterministic arithmetic in this browser and preserve your hypotheses, snapshots, and completion ledger locally. The guided checks and external extensions are clearly marked because a browser simulation cannot stand in for an OLMo run, serving trace, attack exercise, or policy rollout.</p></div>
-          <div class="lede-controls"><strong>Five-step protocol</strong><p>Predict → perturb → compute → explain the invariant → save the evidence. “It looks right” is not a pass condition.</p><div class="button-row"><a class="button button-primary" href="#lab-shapes">Start lab 01</a><a class="button" href="#capstone">Jump to capstone</a></div></div>
+          <div class="lede-controls"><strong>Two valid routes</strong><p><b>Foundation track:</b> lab 01 shapes → lab 06 tokens → labs 02–05 model internals → training and systems. <b>Gap-driven track:</b> select any photographed notebook probe, then return for its prerequisites. Both use Predict → perturb → compute → explain → save.</p><div class="button-row"><a class="button button-primary" href="#lab-shapes">Start foundation track</a><a class="button" href="notebook.html">Start gap-driven track</a></div></div>
         </section>
 
         <section id="foundations" class="section-band" aria-labelledby="ledger-title">
@@ -393,7 +393,7 @@
               <label class="control">Gated FFN hidden h<sub>ff</sub> <input id="shape-ff" type="number" min="8" value="1365" step="1" /></label>
               <label class="control">Word embeddings <select id="shape-tied"><option value="tied">tied to LM head</option><option value="untied">untied</option></select></label>
             </div></section>
-            <section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Computed ledger</h3><span class="source-chip is-caution">biases omitted</span></div><div class="panel-body"><div class="lab-output" id="shape-output" role="status" aria-live="polite"></div></div></section>
+            <section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Computed ledger</h3><span class="source-chip is-caution">biases omitted</span></div><div class="panel-body"><div class="lab-output" id="shape-output" role="region" aria-label="Computed shape and parameter ledger"></div></div></section>
           </div>
           <div class="lab-trail"><div><h3>Evidence to save</h3><p>Input tuple; every boundary shape; per-layer attention/FFN terms; embedding/LM-head policy; invalid divisibility cases; written explanation of the dominant term.</p></div><div><h3>Exact trail</h3><p><a href="../../src/olmo_core/nn/transformer/model.py"><code>nn/transformer/model.py</code></a> owns embedding, blocks, final norm, and LM head; <a href="../../src/olmo_core/nn/transformer/config.py"><code>transformer/config.py</code></a> builds the architecture. Read <a href="papers/attention-is-all-you-need.pdf">Attention Is All You Need</a>. Guided parity: <code>pytest -v src/test/nn/transformer/model_test.py</code>.</p></div></div>
           <div class="lab-actions"><button class="button" type="button" data-save-snapshot="lab-shapes" data-output="#shape-output">Save current ledger</button><span class="snapshot-status" data-snapshot-status="lab-shapes" role="status"></span></div>
@@ -409,7 +409,7 @@
             <label class="control">Model width d <input id="act-d" type="number" min="8" value="512" step="8" /></label>
             <label class="control">Plain hidden h <input id="act-h" type="number" min="8" value="2048" step="8" /></label>
           </div><div class="canvas-frame"><canvas id="activation-canvas" width="900" height="300" role="img" aria-label="ReLU, GELU, and SiLU curves from negative five to five"></canvas></div></div></section>
-          <section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Fair-comparison readout</h3></div><div class="panel-body"><div class="lab-output" id="activation-output" role="status" aria-live="polite"></div><div class="caution-box" style="margin-top:0.8rem"><strong>Motivation is a hypothesis, not proof</strong><p>Smooth nonzero negative outputs and multiplicative gating may improve optimization/expressivity. Only matched architecture, data, compute, and repeated trials can establish a model-quality advantage.</p></div></div></section></div>
+          <section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Fair-comparison readout</h3></div><div class="panel-body"><div class="lab-output" id="activation-output" role="region" aria-label="Activation and parameter comparison readout"></div><div class="caution-box" style="margin-top:0.8rem"><strong>Motivation is a hypothesis, not proof</strong><p>Smooth nonzero negative outputs and multiplicative gating may improve optimization/expressivity. Only matched architecture, data, compute, and repeated trials can establish a model-quality advantage.</p></div></div></section></div>
           <div class="lab-trail"><div><h3>Evidence to save</h3><p>Probe values at −1, 0, and 1; screenshot or numeric curve sample; plain/gated hidden widths and exact counts; matched-run requirements.</p></div><div><h3>Exact trail</h3><p><a href="../../src/olmo_core/nn/feed_forward.py"><code>nn/feed_forward.py</code></a> implements the gated OLMo FFN; OLMo config choices are <code>silu</code> or <code>gelu_tanh</code>. Read <a href="papers/glu-variants.pdf">GLU Variants Improve Transformer</a> and <a href="papers/llama-2.pdf">Llama 2</a>. Guided extension: benchmark the built module; do not compare unmatched hidden widths.</p></div></div>
           <div class="lab-actions"><button class="button" type="button" data-save-snapshot="lab-activations" data-output="#activation-output">Save current ledger</button><span class="snapshot-status" data-snapshot-status="lab-activations" role="status"></span></div>
         </section>
@@ -420,9 +420,9 @@
           <label class="hypothesis">Hypothesis prompt: If both token positions shift by +100, what happens to the attention dot? What information is lost if a flattened image uses only one index?<textarea id="hyp-rope" data-hypothesis="lab-rope" placeholder="Predict before changing m, n, row, or column…"></textarea></label>
           <div class="workbench-grid"><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>1D relative-position probe</h3></div><div class="panel-body control-grid">
             <label class="control">Query position m <input id="rope-m" type="number" value="3" step="1" /></label><label class="control">Key position n <input id="rope-n" type="number" value="8" step="1" /></label><label class="control">Frequency θ (radians/step) <input id="rope-theta" type="range" min="0.01" max="1" value="0.35" step="0.01" /><span id="rope-theta-out">0.35</span></label><label class="control">Shift both positions <input id="rope-shift" type="number" value="0" step="1" /></label>
-            <div class="lab-output" id="rope-output" role="status" aria-live="polite" style="grid-column:1/-1"></div>
+            <div class="lab-output" id="rope-output" role="region" aria-label="RoPE relative-position verification" style="grid-column:1/-1"></div>
           </div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>2D coordinate allocation</h3><span class="source-chip is-caution">conceptual extension</span></div><div class="panel-body control-grid">
-            <label class="control">Query patch row <input id="rope-r1" type="number" value="2" /></label><label class="control">Query patch column <input id="rope-c1" type="number" value="1" /></label><label class="control">Key patch row <input id="rope-r2" type="number" value="5" /></label><label class="control">Key patch column <input id="rope-c2" type="number" value="4" /></label><div class="lab-output" id="rope-2d-output" role="status" aria-live="polite" style="grid-column:1/-1"></div>
+            <label class="control">Query patch row <input id="rope-r1" type="number" value="2" /></label><label class="control">Query patch column <input id="rope-c1" type="number" value="1" /></label><label class="control">Key patch row <input id="rope-r2" type="number" value="5" /></label><label class="control">Key patch column <input id="rope-c2" type="number" value="4" /></label><div class="lab-output" id="rope-2d-output" role="region" aria-label="Two-dimensional RoPE coordinate readout" style="grid-column:1/-1"></div>
           </div></section></div>
           <div class="lab-trail"><div><h3>Evidence to save</h3><p>m, n, θ, common shift, both computed dots, absolute error, 2D displacement, and a sentence distinguishing feature pairs from spatial axes.</p></div><div><h3>Exact trail</h3><p><a href="../../src/olmo_core/nn/rope.py"><code>nn/rope.py</code></a> implements text RoPE and context scaling variants; parity tests are in <a href="../../src/test/nn/rope_test.py"><code>rope_test.py</code></a>. Read <a href="papers/roformer.pdf">RoFormer</a>, <a href="papers/yarn.pdf">YaRN</a>, and <a href="papers/qwen2-vl.pdf">Qwen2-VL</a>. Vision/M-RoPE is external here.</p></div></div>
           <div class="lab-actions"><button class="button" type="button" data-save-snapshot="lab-rope" data-output="#rope-output, #rope-2d-output">Save current ledger</button><span class="snapshot-status" data-snapshot-status="lab-rope" role="status"></span></div>
@@ -434,18 +434,18 @@
           <label class="hypothesis">Hypothesis prompt: At fixed Hq, how much cache does GQA Hkv=8 save versus MHA Hkv=32? What quality or kernel trade-offs are not represented?<textarea id="hyp-kv" data-hypothesis="lab-kv" placeholder="Write the expected ratio before calculating…"></textarea></label>
           <div class="workbench-grid"><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Topology and workload</h3></div><div class="panel-body control-grid">
             <label class="control">Query heads Hq <input id="kv-hq" type="number" min="1" value="32" /></label><label class="control">KV heads Hkv <input id="kv-hkv" type="number" min="1" value="8" /></label><label class="control">Head dimension dh <input id="kv-dh" type="number" min="1" value="128" /></label><label class="control">Layers L <input id="kv-layers" type="number" min="1" value="32" /></label><label class="control">Cached sequence S <input id="kv-seq" type="number" min="1" value="4096" /></label><label class="control">Batch B <input id="kv-batch" type="number" min="1" value="1" /></label><label class="control">Scalar storage <select id="kv-bytes"><option value="2">2 bytes (BF16/FP16)</option><option value="1">1 byte (quantized ideal)</option><option value="4">4 bytes (FP32)</option></select></label>
-          </div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Cache readout</h3></div><div class="panel-body"><div class="lab-output" id="kv-output" role="status" aria-live="polite"></div></div></section></div>
+          </div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Cache readout</h3></div><div class="panel-body"><div class="lab-output" id="kv-output" role="region" aria-label="KV-cache calculation readout"></div></div></section></div>
           <div class="lab-trail"><div><h3>Evidence to save</h3><p>Hq/Hkv/dh/L/S/B/dtype, topology label, ideal bytes, MHA baseline, savings ratio, and engine-specific measured allocated/resident bytes.</p></div><div><h3>Exact trail</h3><p><a href="../../src/olmo_core/nn/attention/__init__.py"><code>nn/attention/__init__.py</code></a> defines query and KV projections; <a href="../../src/olmo_core/nn/attention/kv_cache.py"><code>attention/kv_cache.py</code></a> stores <code>(B,S,Hkv,dh)</code> K and V. Read <a href="papers/grouped-query-attention.pdf">GQA</a> and <a href="papers/pagedattention-vllm.pdf">PagedAttention</a>.</p></div></div>
           <div class="lab-actions"><button class="button" type="button" data-save-snapshot="lab-kv" data-output="#kv-output">Save current ledger</button><span class="snapshot-status" data-snapshot-status="lab-kv" role="status"></span></div>
         </section>
 
         <section id="lab-moe" class="section-band lab-sheet" aria-labelledby="lab-moe-title">
           <div class="lab-heading"><span class="lab-number">05</span><div><h2 id="lab-moe-title">MoE routing, collapse, balancing, and z-loss</h2><span class="capability-tag browser">browser-local math</span> <span class="capability-tag guided">distributed extension</span></div><div class="completion-control"><input id="complete-moe" type="checkbox" data-lab-complete="lab-moe" /><label for="complete-moe">Complete lab 05</label></div></div>
-          <div class="lab-brief"><div><strong>Objective</strong><p>Route four tokens, compute expert fractions/probabilities, verify load-balance and router z-loss, then induce and counter collapse.</p></div><div><strong>Prerequisites</strong><p>Softmax, top-1 selection, frequency vectors, log-sum-exp.</p></div><div><strong>Expected invariant</strong><p><code>Lbal=NΣe fₑPₑ</code> uses hard assignment fractions and mean soft probabilities; <code>Lz=mean(logsumexp(logits)²)</code> limits logit scale. They address different failures.</p></div><div><strong>Execution class</strong><p>Single-batch math runs here. Capacity drops, all-to-all, expert parallelism, gradients, and convergence need an OLMo run.</p></div></div>
+          <div class="lab-brief"><div><strong>Objective</strong><p>Route four tokens, compute expert fractions/probabilities, verify load-balance and router z-loss, then induce and counter collapse.</p></div><div><strong>Prerequisites</strong><p>Softmax, top-1 selection, frequency vectors, log-sum-exp.</p></div><div><strong>Expected invariant</strong><p>The toy selects top-1 from <code>p + bias</code> but keeps the original <code>p</code> as the routed weight and in <code>Lbal=NΣe fₑPₑ</code>. <code>Lz=mean(logsumexp(logits)²)</code> separately limits raw-logit scale.</p></div><div><strong>Execution class</strong><p>Single-batch math runs here. Capacity drops, all-to-all, expert parallelism, gradients, and convergence need an OLMo run.</p></div></div>
           <label class="hypothesis">Hypothesis prompt: Which metric moves first as E0 receives a positive logit offset? Can a selection bias rebalance assignments without shrinking raw logits?<textarea id="hyp-moe" data-hypothesis="lab-moe" placeholder="Predict f, P, Lbal, and Lz before adding collapse…"></textarea></label>
           <div class="workbench-grid"><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Router controls</h3><span class="source-chip is-caution">top-1 toy batch</span></div><div class="panel-body control-grid">
             <label class="control">Collapse offset on E0 <input id="moe-collapse" type="range" min="0" max="6" value="0" step="0.1" /><span id="moe-collapse-out">0.0</span></label><label class="control">Assignment bias away from E0 <input id="moe-bias" type="range" min="0" max="4" value="0" step="0.1" /><span id="moe-bias-out">0.0</span></label><label class="control">Auxiliary loss weight α <input id="moe-alpha" type="number" min="0" max="1" value="0.01" step="0.001" /></label><label class="control">Router z weight β <input id="moe-beta" type="number" min="0" max="1" value="0.001" step="0.001" /></label>
-          </div><div class="output-table-wrap" id="moe-table-wrap"></div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Loss verification</h3></div><div class="panel-body"><div class="lab-output" id="moe-output" role="status" aria-live="polite"></div><div class="caution-box" style="margin-top:0.8rem"><strong>DeepSeek-V3 nuance</strong><p>Its main device-level balancing uses an auxiliary-loss-free selection bias, yet it retains a tiny sequence-wise auxiliary loss. “Aux-loss-free” does not mean no routing controls or no auxiliary term anywhere.</p></div></div></section></div>
+          </div><div class="output-table-wrap" id="moe-table-wrap"></div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Loss verification</h3></div><div class="panel-body"><div class="lab-output" id="moe-output" role="region" aria-label="MoE routing and auxiliary-loss verification"></div><div class="caution-box" style="margin-top:0.8rem"><strong>DeepSeek-V3 nuance</strong><p>Its main device-level balancing uses an auxiliary-loss-free selection bias, yet it retains a tiny sequence-wise auxiliary loss. “Aux-loss-free” does not mean no routing controls or no auxiliary term anywhere.</p></div></div></section></div>
           <div class="lab-trail"><div><h3>Evidence to save</h3><p>Raw logits, selection bias, probabilities, chosen experts, f and P vectors, unscaled/scaled Lbal and Lz, capacity/drop policy, and expert-parallel topology.</p></div><div><h3>Exact trail</h3><p><a href="../../src/olmo_core/nn/moe/router.py"><code>nn/moe/router.py</code></a> routes and can apply load-balancing bias; <a href="../../src/olmo_core/nn/moe/loss.py"><code>nn/moe/loss.py</code></a> defines both losses. Guided parity: <code>pytest -v src/test/nn/moe/router_test.py</code>. Read <a href="papers/switch-transformer.pdf">Switch Transformer</a>, <a href="papers/deepseek-moe.pdf">DeepSeekMoE</a>, and <a href="papers/deepseek-v3.pdf">DeepSeek-V3</a>.</p></div></div>
           <div class="lab-actions"><button class="button" type="button" data-save-snapshot="lab-moe" data-output="#moe-output">Save current ledger</button><span class="snapshot-status" data-snapshot-status="lab-moe" role="status"></span></div>
         </section>
@@ -457,7 +457,7 @@
           <div class="workbench-grid"><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Toy record and packer</h3></div><div class="panel-body control-grid">
             <label class="control" style="grid-column:1/-1">Raw text <input id="token-text" type="text" value="Blue dot learns rope." /></label><label class="control">Packed length S <input id="token-length" type="number" min="2" max="16" value="8" /></label><label class="control">Embedding width d <input id="token-d" type="number" min="2" max="8" value="4" /></label>
             <div class="lab-code" style="grid-column:1/-1"><strong>Fixed vocabulary</strong><br /><code>&lt;pad&gt;:0 · &lt;unk&gt;:1 · blue:2 · dot:3 · learns:4 · rope:5 · attention:6 · systems:7 · .:8</code></div>
-          </div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Boundary trace</h3></div><div class="panel-body"><div class="lab-output" id="token-output" role="status" aria-live="polite"></div></div></section></div>
+          </div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Boundary trace</h3></div><div class="panel-body"><div class="lab-output" id="token-output" role="region" aria-label="Tokenization, packing, masking, and embedding trace"></div></div></section></div>
           <div class="lab-trail"><div><h3>Evidence to save</h3><p>Raw record/source ID, tokenizer name/hash and normalization, tokens, IDs, special IDs, truncation, pack length, attention/loss masks, label shift, embedding checkpoint/hash and output shape.</p></div><div><h3>Exact trail</h3><p><a href="../../src/olmo_core/data/tokenizer.py"><code>data/tokenizer.py</code></a> stores tokenizer metadata; <a href="../../src/olmo_core/data/composable/packing_instance_source.py"><code>packing_instance_source.py</code></a> packs instances; <a href="../../src/olmo_core/nn/transformer/model.py"><code>transformer/model.py</code></a> owns <code>nn.Embedding</code>. Guided packing check: <code>pytest -v src/test/data/composable/packing_instance_source_test.py</code>. Raw curation trail: <a href="papers/dolma.pdf">Dolma</a>.</p></div></div>
           <div class="lab-actions"><button class="button" type="button" data-save-snapshot="lab-tokens" data-output="#token-output">Save current ledger</button><span class="snapshot-status" data-snapshot-status="lab-tokens" role="status"></span></div>
         </section>
@@ -470,7 +470,7 @@
           <div class="workbench-grid"><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Synthetic IsoFLOP sweep</h3><span class="source-chip is-caution">not empirical</span></div><div class="panel-body control-grid">
             <label class="control">Compute budget log₁₀ FLOPs <input id="scale-c" type="range" min="19" max="23" value="21" step="0.25" /><span id="scale-c-out">21.00</span></label><label class="control">Trials per point <input id="scale-trials" type="range" min="1" max="5" value="3" step="1" /><span id="scale-trials-out">3</span></label><label class="control">Synthetic noise amplitude <input id="scale-noise" type="range" min="0" max="0.1" value="0.03" step="0.005" /><span id="scale-noise-out">0.030</span></label>
             <div class="canvas-frame" style="grid-column:1/-1"><canvas id="scaling-canvas" width="900" height="300" role="img" aria-label="Synthetic validation losses with repeated trials, means, and quadratic fit"></canvas></div>
-          </div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Fit and trial ledger</h3></div><div class="panel-body"><div class="lab-output compact-output" id="scaling-output" role="status" aria-live="polite"></div><div class="output-table-wrap" id="scaling-table-wrap"></div></div></section></div>
+          </div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Fit and trial ledger</h3></div><div class="panel-body"><div class="lab-output compact-output" id="scaling-output" role="region" aria-label="Scaling fit and trial ledger"></div><div class="output-table-wrap" id="scaling-table-wrap"></div></div></section></div>
           <div class="lab-trail"><div><h3>Evidence to save</h3><p>Compute definition, total/active/non-embedding N, D and TPP convention, data/recipe hash, every seed/status/loss, discarded runs, fit form/range/residuals, uncertainty, and held-out forecast error.</p></div><div><h3>Exact trail</h3><p><a href="../../src/olmo_core/model_ladder/base.py"><code>model_ladder/base.py</code></a> configures sizes/runs and gathers metrics; it does not supply a multiseed uncertainty fit. Read <a href="papers/chinchilla.pdf">Chinchilla</a> and <a href="papers/olmo.pdf">OLMo</a>. Real execution needs the training environment and compute.</p></div></div>
           <div class="lab-actions"><button class="button" type="button" data-save-snapshot="lab-scaling" data-output="#scaling-output">Save current ledger</button><span class="snapshot-status" data-snapshot-status="lab-scaling" role="status"></span></div>
         </section>
@@ -480,8 +480,8 @@
           <div class="lab-brief"><div><strong>Objective</strong><p>Describe a stage as an explicit state transition and assign every evaluation a decision role.</p></div><div><strong>Prerequisites</strong><p>Pretrain/midtrain/long-context/SFT vocabulary, checkpoints, optimizer state, selection bias.</p></div><div><strong>Expected invariant</strong><p>A phase record names its parent and all deltas. A repeatedly inspected selection eval cannot also be an untouched final-claim eval.</p></div><div><strong>Execution class</strong><p>The diff/audit runs here. Loading checkpoints, resetting state, and executing callbacks require OLMo-core; DPO/RLVR orchestration is adjacent.</p></div></div>
           <label class="hypothesis">Hypothesis prompt: Which fields must change from broad pretraining to long context, and which state should load versus reset? Where can an eval influence a decision?<textarea id="hyp-phases" data-hypothesis="lab-phases" placeholder="Write the expected config and evaluation deltas…"></textarea></label>
           <div class="workbench-grid"><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Stage transition</h3></div><div class="panel-body control-grid">
-            <label class="control">From phase <select id="phase-from"><option value="broad">broad pretrain</option><option value="mid">midtrain</option><option value="long">long context</option><option value="sft">SFT</option></select></label><label class="control">To phase <select id="phase-to"><option value="mid">midtrain</option><option value="long" selected>long context</option><option value="sft">SFT</option><option value="broad">broad pretrain</option></select></label><div class="lab-output" id="phase-output" role="status" aria-live="polite" style="grid-column:1/-1"></div>
-          </div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Evaluation role audit</h3></div><div class="panel-body"><div class="inline-checks" id="phase-evals"><label><input type="checkbox" value="entry" checked /> entry regression</label><label><input type="checkbox" value="loop" checked /> in-loop monitor</label><label><input type="checkbox" value="exit" checked /> exit/selection gate</label><label><input type="checkbox" value="final" /> untouched final claim</label><label><input type="checkbox" value="reuse" /> reuse selection suite as final</label></div><div class="lab-output compact-output" id="phase-eval-output" role="status" aria-live="polite" style="margin-top:0.8rem"></div></div></section></div>
+            <label class="control">From phase <select id="phase-from"><option value="broad">broad pretrain</option><option value="mid">midtrain</option><option value="long">long context</option><option value="sft">SFT</option></select></label><label class="control">To phase <select id="phase-to"><option value="mid">midtrain</option><option value="long" selected>long context</option><option value="sft">SFT</option><option value="broad">broad pretrain</option></select></label><div class="lab-output" id="phase-output" role="region" aria-label="Training phase configuration difference" style="grid-column:1/-1"></div>
+          </div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Evaluation role audit</h3></div><div class="panel-body"><div class="inline-checks" id="phase-evals"><label><input type="checkbox" value="entry" checked /> entry regression</label><label><input type="checkbox" value="loop" checked /> in-loop monitor</label><label><input type="checkbox" value="exit" checked /> exit/selection gate</label><label><input type="checkbox" value="final" /> untouched final claim</label><label><input type="checkbox" value="reuse" /> reuse selection suite as final</label></div><div class="lab-output compact-output" id="phase-eval-output" role="region" aria-label="Evaluation-role audit result" style="margin-top:0.8rem"></div></div></section></div>
           <div class="lab-trail"><div><h3>Evidence to save</h3><p>Parent checkpoint/config/code hashes; data and mix delta; context/RoPE and trainable-module delta; optimizer/trainer/dataloader load/reset policy; phase tokens/examples; entry/exit evaluations and decision log.</p></div><div><h3>Exact trail</h3><p>Compare <a href="../../src/scripts/official/OLMo3/OLMo-3-1025-7B-pretrain-1.py">pretrain</a>, <a href="../../src/scripts/official/OLMo3/OLMo-3-1025-7B-midtrain.py">midtrain</a>, and <a href="../../src/scripts/official/OLMo3/OLMo-3-1025-7B-long-context.py">long-context</a>; callback policy lives in <a href="../../src/olmo_core/train/callbacks/evaluator_callback.py"><code>evaluator_callback.py</code></a>. Read <a href="papers/olmo-3.pdf">OLMo 3</a>.</p></div></div>
           <div class="lab-actions"><button class="button" type="button" data-save-snapshot="lab-phases" data-output="#phase-output, #phase-eval-output">Save current ledger</button><span class="snapshot-status" data-snapshot-status="lab-phases" role="status"></span></div>
         </section>
@@ -489,11 +489,11 @@
         <div id="systems-labs" aria-hidden="true"></div>
         <section id="lab-inference" class="section-band lab-sheet" aria-labelledby="lab-inference-title">
           <div class="lab-heading"><span class="lab-number">09</span><div><h2 id="lab-inference-title">Inference prefill/decode profile</h2><span class="capability-tag browser">compute-only model</span> <span class="capability-tag external">serving trace</span></div><div class="completion-control"><input id="complete-inference" type="checkbox" data-lab-complete="lab-inference" /><label for="complete-inference">Complete lab 09</label></div></div>
-          <div class="lab-brief"><div><strong>Objective</strong><p>Separate prefill from autoregressive decode and distinguish compute time from end-to-end serving latency.</p></div><div><strong>Prerequisites</strong><p>Prompt/output tokens, throughput, TTFT, TPOT, KV-cache bytes.</p></div><div><strong>Expected invariant</strong><p>Prefill processes P tokens together; decode adds one token/sequence/step. End-to-end TTFT includes arrival, queue, scheduling, transfer, and compute—not just model forward time.</p></div><div><strong>Execution class</strong><p>This is a deterministic arithmetic model. Continuous batching, paging, prefix caching, quantization, and goodput require an engine/workload trace.</p></div></div>
+          <div class="lab-brief"><div><strong>Objective</strong><p>Separate prefill from autoregressive decode and distinguish compute time from end-to-end serving latency.</p></div><div><strong>Prerequisites</strong><p>Prompt/output tokens, throughput, TTFT, TPOT, KV-cache bytes.</p></div><div><strong>Expected invariant</strong><p>Prefill produces the first output token, so <code>decode_steps=max(O−1,0)</code> and toy TTFT is queue plus prefill. Allocation reserves <code>S+O</code> positions while the final live cache needs <code>S+O−1</code>.</p></div><div><strong>Execution class</strong><p>This is a deterministic arithmetic model. Continuous batching, paging, prefix caching, quantization, and goodput require an engine/workload trace.</p></div></div>
           <label class="hypothesis">Hypothesis prompt: For a long prompt and short output, which stage dominates? Which optimization improves TTFT but not necessarily TPOT or goodput?<textarea id="hyp-inference" data-hypothesis="lab-inference" placeholder="Predict stage shares and cache size…"></textarea></label>
           <div class="workbench-grid"><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Workload and ideal rates</h3></div><div class="panel-body control-grid">
-            <label class="control">Prompt tokens P <input id="inf-prompt" type="number" min="1" value="4096" /></label><label class="control">Output tokens O <input id="inf-output-tokens" type="number" min="1" value="256" /></label><label class="control">Prefill throughput (tok/s) <input id="inf-prefill-rate" type="number" min="1" value="40000" /></label><label class="control">Decode rate (tok/s/request) <input id="inf-decode-rate" type="number" min="0.1" value="80" step="0.1" /></label><label class="control">Queue + scheduling (ms) <input id="inf-queue" type="number" min="0" value="25" step="1" /></label><label class="control">KV heads Hkv <input id="inf-hkv" type="number" min="1" value="8" /></label><label class="control">Layers L <input id="inf-layers" type="number" min="1" value="32" /></label><label class="control">Head dim dh <input id="inf-dh" type="number" min="1" value="128" /></label>
-          </div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Stage profile</h3><span class="source-chip is-caution">idealized</span></div><div class="panel-body"><div class="lab-output" id="inference-output" role="status" aria-live="polite"></div></div></section></div>
+            <label class="control">Prompt tokens S <input id="inf-prompt" type="number" min="1" value="4096" /></label><label class="control">Output tokens O <input id="inf-output-tokens" type="number" min="1" value="256" /></label><label class="control">Prefill throughput (tok/s) <input id="inf-prefill-rate" type="number" min="1" value="40000" /></label><label class="control">Decode rate (tok/s/request) <input id="inf-decode-rate" type="number" min="0.1" value="80" step="0.1" /></label><label class="control">Queue + scheduling (ms) <input id="inf-queue" type="number" min="0" value="25" step="1" /></label><label class="control">KV heads Hkv <input id="inf-hkv" type="number" min="1" value="8" /></label><label class="control">Layers L <input id="inf-layers" type="number" min="1" value="32" /></label><label class="control">Head dim dh <input id="inf-dh" type="number" min="1" value="128" /></label>
+          </div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Stage profile</h3><span class="source-chip is-caution">idealized</span></div><div class="panel-body"><div class="lab-output" id="inference-output" role="region" aria-label="Inference prefill, decode, latency, and cache profile"></div></div></section></div>
           <div class="lab-trail"><div><h3>Evidence to save</h3><p>Model/checkpoint, engine/commit/config, hardware/topology, dtype/quantization, request arrival trace, prompt/output distributions, concurrency, warmup, TTFT/TPOT/E2E percentiles, throughput/goodput, memory, quality parity.</p></div><div><h3>Exact trail</h3><p><a href="../../src/olmo_core/nn/attention/kv_cache.py"><code>attention/kv_cache.py</code></a> exposes cache shape and <a href="../../src/olmo_core/generate/"><code>generate/</code></a> covers local generation. Training profiling lives in <a href="../../src/olmo_core/train/callbacks/profiler.py"><code>callbacks/profiler.py</code></a>; it is not a production serving profiler. Read <a href="papers/pagedattention-vllm.pdf">PagedAttention</a>.</p></div></div>
           <div class="lab-actions"><button class="button" type="button" data-save-snapshot="lab-inference" data-output="#inference-output">Save current ledger</button><span class="snapshot-status" data-snapshot-status="lab-inference" role="status"></span></div>
         </section>
@@ -502,19 +502,19 @@
           <div class="lab-heading"><span class="lab-number">10</span><div><h2 id="lab-security-title">Securing T and D: threat/control ledger</h2><span class="capability-tag browser">browser-local worksheet</span> <span class="capability-tag external">security exercise</span></div><div class="completion-control"><input id="complete-security" type="checkbox" data-lab-complete="lab-security" /><label for="complete-security">Complete lab 10</label></div></div>
           <div class="lab-brief"><div><strong>Objective</strong><p>Make the ambiguous note operational by threat-modeling training/model artifacts (T) and data (D) separately.</p></div><div><strong>Prerequisites</strong><p>Assets, trust boundaries, attacker capabilities, prevention/detection/response.</p></div><div><strong>Expected invariant</strong><p>A path/size fingerprint is not a content security hash. Controls map to named threats and owners; unchecked assumptions remain visible.</p></div><div><strong>Execution class</strong><p>This worksheet does not audit a deployment, process private data, certify compliance, or safely simulate attacks.</p></div></div>
           <label class="hypothesis">Hypothesis prompt: If an attacker can change one dataset shard after curation, which controls prevent, detect, and recover? Repeat for a checkpoint artifact.<textarea id="hyp-security" data-hypothesis="lab-security" placeholder="Name the asset, actor, trust boundary, failure, and evidence…"></textarea></label>
-          <div class="workbench-grid"><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Threats in scope</h3></div><div class="panel-body"><div class="inline-checks" id="security-threats"><label><input type="checkbox" value="poison" checked /> D: source/shard poisoning</label><label><input type="checkbox" value="pii" checked /> D: PII/license leakage</label><label><input type="checkbox" value="artifact" checked /> T: checkpoint/config tamper</label><label><input type="checkbox" value="supply" /> T: dependency/supply-chain compromise</label><label><input type="checkbox" value="access" /> T+D: unauthorized read</label></div><h3 style="margin-top:1rem">Candidate controls</h3><div class="inline-checks" id="security-controls"><label><input type="checkbox" value="manifest" /> source manifest + approval</label><label><input type="checkbox" value="hash" /> content digests + signatures</label><label><input type="checkbox" value="pii" /> PII/license filter + audit</label><label><input type="checkbox" value="access" /> least privilege + logs</label><label><input type="checkbox" value="sandbox" /> pinned builds + sandbox</label><label><input type="checkbox" value="backup" /> immutable rollback copy</label></div></div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Coverage report</h3></div><div class="panel-body"><div class="lab-output" id="security-output" role="status" aria-live="polite"></div></div></section></div>
+          <div class="workbench-grid"><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Threats in scope</h3></div><div class="panel-body"><div class="inline-checks" id="security-threats"><label><input type="checkbox" value="poison" checked /> D: source/shard poisoning</label><label><input type="checkbox" value="pii" checked /> D: PII/license leakage</label><label><input type="checkbox" value="artifact" checked /> T: checkpoint/config tamper</label><label><input type="checkbox" value="supply" /> T: dependency/supply-chain compromise</label><label><input type="checkbox" value="access" /> T+D: unauthorized read</label></div><h3 style="margin-top:1rem">Candidate controls</h3><div class="inline-checks" id="security-controls"><label><input type="checkbox" value="manifest" /> source manifest + approval</label><label><input type="checkbox" value="hash" /> content digests + signatures</label><label><input type="checkbox" value="pii" /> PII/license filter + audit</label><label><input type="checkbox" value="access" /> least privilege + logs</label><label><input type="checkbox" value="sandbox" /> pinned builds + sandbox</label><label><input type="checkbox" value="backup" /> immutable rollback copy</label></div></div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Coverage report</h3></div><div class="panel-body"><div class="lab-output" id="security-output" role="region" aria-label="Security threat-control coverage report"></div></div></section></div>
           <div class="lab-trail"><div><h3>Evidence to save</h3><p>T/D definitions; asset inventory; data flow and trust boundaries; threat/actor/capability; preventive/detective/recovery controls; owner; test frequency; residual risk; incident and revocation procedure.</p></div><div><h3>Exact trail</h3><p><a href="../../src/olmo_core/data/numpy_dataset.py"><code>data/numpy_dataset.py</code></a> fingerprints paths/sizes for dataset identity; add content digests for security claims. <a href="../../src/olmo_core/distributed/checkpoint/"><code>distributed/checkpoint/</code></a> handles artifacts, not a full signing/governance program. Open the Systems/posttraining/security tab in the <a href="sources.html#paper-registry">Evidence registry</a> for the NIST adversarial-ML taxonomy.</p></div></div>
           <div class="lab-actions"><button class="button" type="button" data-save-snapshot="lab-security" data-output="#security-output">Save current ledger</button><span class="snapshot-status" data-snapshot-status="lab-security" role="status"></span></div>
         </section>
 
         <section id="lab-rl" class="section-band lab-sheet" aria-labelledby="lab-rl-title">
           <div class="lab-heading"><span class="lab-number">11</span><div><h2 id="lab-rl-title">Online-RL rollout ledger</h2><span class="capability-tag browser">browser-local accounting</span> <span class="capability-tag external">rollout orchestrator</span></div><div class="completion-control"><input id="complete-rl" type="checkbox" data-lab-complete="lab-rl" /><label for="complete-rl">Complete lab 11</label></div></div>
-          <div class="lab-brief"><div><strong>Objective</strong><p>Account for prompts, policy versions, grouped samples, tokens, rewards/verifiers, filtering, updates, and eval snapshots.</p></div><div><strong>Prerequisites</strong><p>Policy/reference/reward models, trajectories, group sampling, KL, online versus offline preference data.</p></div><div><strong>Expected invariant</strong><p><code>rollouts=prompts×samples/prompt</code>. Every trajectory binds prompt, policy, sampling config, output, reward/verifier, and disposition. DPO alone is offline preference optimization, not online rollout collection.</p></div><div><strong>Execution class</strong><p>This page only budgets synthetic trajectories. OLMo-core does not orchestrate online RL; use an adjacent stack such as Open Instruct.</p></div></div>
-          <label class="hypothesis">Hypothesis prompt: If group size doubles at fixed prompt count, what grows linearly and what grows quadratically? Which version hashes prevent stale rewards?<textarea id="hyp-rl" data-hypothesis="lab-rl" placeholder="Predict rollout, token, and comparison counts…"></textarea></label>
+          <div class="lab-brief"><div><strong>Objective</strong><p>Account for prompts, policy versions, grouped samples, tokens, rewards/verifiers, filtering, updates, and eval snapshots.</p></div><div><strong>Prerequisites</strong><p>Policy/reference/reward models, trajectories, group sampling, KL, online versus offline preference data.</p></div><div><strong>Expected invariant</strong><p><code>rollouts=prompts×samples/prompt</code>. Group-statistic advantage computation is <code>O(G)</code> per prompt; <code>G(G−1)/2</code> is only an optional pairwise preference or diagnostic construction.</p></div><div><strong>Execution class</strong><p>This page only budgets synthetic trajectories. OLMo-core does not orchestrate online RL; use an adjacent stack such as Open Instruct.</p></div></div>
+          <label class="hypothesis">Hypothesis prompt: If group size doubles at fixed prompt count, what grows linearly for group-statistic advantages? What grows quadratically only if you optionally construct every preference/diagnostic pair? Which version hashes prevent stale rewards?<textarea id="hyp-rl" data-hypothesis="lab-rl" placeholder="Predict rollout, token, group-statistic, and optional pair counts…"></textarea></label>
           <div class="workbench-grid"><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Rollout batch budget</h3></div><div class="panel-body control-grid">
             <label class="control">Prompts <input id="rl-prompts" type="number" min="1" value="8" /></label><label class="control">Samples per prompt G <input id="rl-group" type="number" min="1" value="4" /></label><label class="control">Mean output tokens <input id="rl-tokens" type="number" min="1" value="256" /></label><label class="control">Accepted fraction <input id="rl-keep" type="range" min="0" max="1" value="0.75" step="0.05" /><span id="rl-keep-out">0.75</span></label><label class="control">Policy version <input id="rl-policy" type="text" value="policy@step-1200" /></label><label class="control">Reward/verifier version <input id="rl-reward" type="text" value="verifier@sha256-demo" /></label>
-          </div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Trajectory ledger</h3><span class="source-chip is-caution">synthetic counts</span></div><div class="panel-body"><div class="lab-output" id="rl-output" role="status" aria-live="polite"></div></div></section></div>
-          <div class="lab-trail"><div><h3>Evidence to save</h3><p>Prompt dataset/version/split; policy/reference/reward/verifier hashes; engine and sampling parameters; seed; full outputs/token counts/logprobs/rewards/KL; filter/disposition; update checkpoint; rejected/failure rows; eval snapshot.</p></div><div><h3>Exact trail</h3><p><a href="../../src/olmo_core/train/train_module/transformer/train_module.py"><code>TransformerTrainModule</code></a> trains next-token objectives but does not own an online-RL actor/rollout loop. OLMo 3’s posttraining execution boundary points to <a href="https://github.com/allenai/open-instruct">Open Instruct</a>. Distinguish offline DPO from online RL/RLVR in the report.</p></div></div>
+          </div></section><section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Trajectory ledger</h3><span class="source-chip is-caution">synthetic counts</span></div><div class="panel-body"><div class="lab-output" id="rl-output" role="region" aria-label="Online-RL rollout accounting ledger"></div></div></section></div>
+          <div class="lab-trail"><div><h3>Evidence to save</h3><p>Prompt dataset/version/split; policy/reference/reward/verifier hashes; engine and sampling parameters; seed; full outputs/token counts/logprobs/rewards/KL; group-statistic advantage definition and normalization; whether optional pair construction ran; filter/disposition; update checkpoint; rejected/failure rows; eval snapshot.</p></div><div><h3>Exact trail</h3><p><a href="../../src/olmo_core/train/train_module/transformer/train_module.py"><code>TransformerTrainModule</code></a> trains next-token objectives but does not own an online-RL actor/rollout loop. OLMo 3’s posttraining execution boundary points to <a href="https://github.com/allenai/open-instruct">Open Instruct</a>. Distinguish offline DPO from online RL/RLVR in the report.</p></div></div>
           <div class="lab-actions"><button class="button" type="button" data-save-snapshot="lab-rl" data-output="#rl-output">Save current ledger</button><span class="snapshot-status" data-snapshot-status="lab-rl" role="status"></span></div>
         </section>
 
@@ -533,16 +533,22 @@
         'use strict';
 
         const $ = (id) => document.getElementById(id);
-        const STORAGE_KEY = 'mlsys-field-guide.labs.v1';
+        const STORAGE_KEY = 'mlsys-field-guide.labs.v2';
+        const LEGACY_STORAGE_KEY = 'mlsys-field-guide.labs.v1';
+        const SNAPSHOT_SCHEMA = 2;
+        const SNAPSHOT_REVISION = 1;
         const LAB_IDS = ['lab-shapes', 'lab-activations', 'lab-rope', 'lab-kv', 'lab-moe', 'lab-tokens', 'lab-scaling', 'lab-phases', 'lab-inference', 'lab-security', 'lab-rl'];
-        let state = { completed: {}, hypotheses: {}, snapshots: {} };
+        let state = { completed: {}, hypotheses: {}, explanations: {}, snapshots: {} };
 
         try {
-          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+          const currentStorage = localStorage.getItem(STORAGE_KEY);
+          const legacyStorage = currentStorage === null ? localStorage.getItem(LEGACY_STORAGE_KEY) : null;
+          const saved = JSON.parse(currentStorage ?? legacyStorage ?? 'null');
           if (saved && typeof saved === 'object') {
             state = {
               completed: saved.completed || {},
               hypotheses: saved.hypotheses || {},
+              explanations: saved.explanations || {},
               snapshots: saved.snapshots || {}
             };
           }
@@ -566,6 +572,80 @@
           });
         }
 
+        document.querySelectorAll('.lab-sheet').forEach((section) => {
+          const id = section.id;
+          const actions = section.querySelector('.lab-actions');
+          const label = document.createElement('label');
+          label.className = 'hypothesis invariant-reflection';
+          label.textContent = 'Invariant explanation: What stayed true after your perturbation, what changed, and why?';
+          const field = document.createElement('textarea');
+          field.dataset.invariant = id;
+          field.placeholder = 'Explain the invariant using the changed control and the computed output…';
+          label.appendChild(field);
+          section.insertBefore(label, actions);
+        });
+
+        function controlsFor(id) {
+          const section = document.getElementById(id);
+          return Array.from(section.querySelectorAll('input, select, textarea')).filter((control) =>
+            !control.matches('[data-lab-complete], [data-hypothesis], [data-invariant]')
+          );
+        }
+
+        function valueFor(control, useDefault = false) {
+          if (control.type === 'checkbox' || control.type === 'radio') {
+            return useDefault ? control.defaultChecked : control.checked;
+          }
+          if (useDefault && control.tagName === 'SELECT') {
+            const option = Array.from(control.options).find((candidate) => candidate.defaultSelected) || control.options[0];
+            return option ? option.value : '';
+          }
+          return useDefault ? control.defaultValue : control.value;
+        }
+
+        function controlValues(id, useDefault = false) {
+          return Object.fromEntries(controlsFor(id).map((control, index) => [
+            control.id || control.name || `control-${index}`,
+            valueFor(control, useDefault)
+          ]));
+        }
+
+        function applyControlValues(id, values) {
+          if (!values) return;
+          controlsFor(id).forEach((control, index) => {
+            const key = control.id || control.name || `control-${index}`;
+            if (!(key in values)) return;
+            if (control.type === 'checkbox' || control.type === 'radio') control.checked = Boolean(values[key]);
+            else control.value = values[key];
+          });
+        }
+
+        const baselineControls = Object.fromEntries(LAB_IDS.map((id) => [id, controlValues(id, true)]));
+        const hasPerturbation = (id) => JSON.stringify(controlValues(id)) !== JSON.stringify(baselineControls[id]);
+        const snapshotFingerprint = (id) => JSON.stringify({
+          controls: controlValues(id),
+          hypothesis: (state.hypotheses[id] || '').trim(),
+          explanation: (state.explanations[id] || '').trim()
+        });
+        const snapshotIsCurrent = (id, snapshot) => Boolean(
+          snapshot &&
+          snapshot.schema === SNAPSHOT_SCHEMA &&
+          snapshot.revision === SNAPSHOT_REVISION &&
+          snapshot.fingerprint === snapshotFingerprint(id)
+        );
+
+        function markSnapshotStale(id) {
+          const snapshot = state.snapshots[id];
+          if (!snapshot || snapshotIsCurrent(id, snapshot)) return;
+          state.completed[id] = false;
+          const completion = document.querySelector(`[data-lab-complete="${id}"]`);
+          if (completion) completion.checked = false;
+          const status = document.querySelector(`[data-snapshot-status="${id}"]`);
+          if (status) status.textContent = 'Snapshot stale: explain and save the changed state again.';
+          persist();
+          updateProgress();
+        }
+
         document.querySelectorAll('[data-lab-complete]').forEach((input) => {
           const id = input.dataset.labComplete;
           input.checked = Boolean(state.completed[id]);
@@ -573,12 +653,20 @@
             if (input.checked) {
               const hypothesis = (state.hypotheses[id] || '').trim();
               const snapshot = state.snapshots[id];
-              if (!hypothesis || !snapshot) {
+              const explanation = (state.explanations[id] || '').trim();
+              const snapshotCurrent = snapshotIsCurrent(id, snapshot);
+              const perturbed = hasPerturbation(id);
+              if (!hypothesis || !explanation || !snapshotCurrent || !perturbed) {
                 input.checked = false;
                 state.completed[id] = false;
                 persist();
                 updateProgress();
-                const missing = [!hypothesis ? 'a written hypothesis' : '', !snapshot ? 'a saved snapshot' : ''].filter(Boolean).join(' and ');
+                const missing = [
+                  !hypothesis ? 'a written hypothesis' : '',
+                  !explanation ? 'an invariant explanation' : '',
+                  !snapshotCurrent ? 'a current saved snapshot' : '',
+                  snapshotCurrent && !perturbed ? 'a control perturbation' : ''
+                ].filter(Boolean).join(', ');
                 const status = document.querySelector(`[data-snapshot-status="${id}"]`);
                 if (status) status.textContent = `Completion blocked: add ${missing}.`;
                 return;
@@ -596,24 +684,73 @@
           field.addEventListener('input', () => {
             state.hypotheses[id] = field.value;
             persist();
+            markSnapshotStale(id);
           });
         });
+
+        document.querySelectorAll('[data-invariant]').forEach((field) => {
+          const id = field.dataset.invariant;
+          field.value = state.explanations[id] || '';
+          field.addEventListener('input', () => {
+            state.explanations[id] = field.value;
+            persist();
+            markSnapshotStale(id);
+          });
+        });
+
+        let repairedStoredState = false;
+        LAB_IDS.forEach((id) => {
+          const snapshot = state.snapshots[id];
+          if (snapshot && snapshot.controls) applyControlValues(id, snapshot.controls);
+          controlsFor(id).forEach((control) => {
+            control.addEventListener('input', () => markSnapshotStale(id));
+            control.addEventListener('change', () => markSnapshotStale(id));
+          });
+          if (state.completed[id] && (!snapshotIsCurrent(id, snapshot) || !hasPerturbation(id))) {
+            state.completed[id] = false;
+            const completion = document.querySelector(`[data-lab-complete="${id}"]`);
+            if (completion) completion.checked = false;
+            const status = document.querySelector(`[data-snapshot-status="${id}"]`);
+            if (status) status.textContent = 'Previous completion cleared: save a current schema-v2 experiment snapshot.';
+            repairedStoredState = true;
+          }
+        });
+        if (repairedStoredState) persist();
 
         document.querySelectorAll('[data-save-snapshot]').forEach((button) => {
           button.addEventListener('click', () => {
             const id = button.dataset.saveSnapshot;
             const selector = button.dataset.output;
-            const text = Array.from(document.querySelectorAll(selector)).map((node) => node.textContent.trim()).join('\n\n');
-            state.snapshots[id] = { output: text, savedAt: new Date().toISOString() };
-            persist();
+            const hypothesis = (state.hypotheses[id] || '').trim();
+            const explanation = (state.explanations[id] || '').trim();
+            const perturbed = hasPerturbation(id);
             const status = document.querySelector(`[data-snapshot-status="${id}"]`);
-            if (status) status.textContent = 'Snapshot saved in this browser.';
+            if (!hypothesis || !explanation || !perturbed) {
+              const missing = [!hypothesis ? 'write a hypothesis' : '', !perturbed ? 'perturb at least one control' : '', !explanation ? 'explain the invariant' : ''].filter(Boolean).join(', ');
+              if (status) status.textContent = `Snapshot blocked: ${missing}.`;
+              return;
+            }
+            const text = Array.from(document.querySelectorAll(selector)).map((node) => node.textContent.trim()).join('\n\n');
+            const controls = controlValues(id);
+            state.snapshots[id] = {
+              schema: SNAPSHOT_SCHEMA,
+              revision: SNAPSHOT_REVISION,
+              controls,
+              hypothesis,
+              explanation,
+              output: text,
+              perturbed,
+              fingerprint: snapshotFingerprint(id),
+              savedAt: new Date().toISOString()
+            };
+            persist();
+            if (status) status.textContent = 'Snapshot saved with inputs, prediction, explanation, and output.';
           });
         });
 
         $('export-ledger').addEventListener('click', () => {
           const packet = {
-            schema: 'mlsys-field-guide-lab-ledger/v1',
+            schema: 'mlsys-field-guide-lab-ledger/v2',
             exportedAt: new Date().toISOString(),
             page: 'labs.html',
             warning: 'Browser-local teaching evidence; not model-run evidence.',
@@ -630,10 +767,11 @@
 
         $('reset-ledger').addEventListener('click', () => {
           if (!window.confirm('Reset all local lab completion, hypotheses, and snapshots for this page?')) return;
-          state = { completed: {}, hypotheses: {}, snapshots: {} };
+          state = { completed: {}, hypotheses: {}, explanations: {}, snapshots: {} };
           persist();
           document.querySelectorAll('[data-lab-complete]').forEach((input) => { input.checked = false; });
           document.querySelectorAll('[data-hypothesis]').forEach((field) => { field.value = ''; });
+          document.querySelectorAll('[data-invariant]').forEach((field) => { field.value = ''; });
           document.querySelectorAll('[data-snapshot-status]').forEach((node) => { node.textContent = ''; });
           updateProgress();
           $('ledger-status').textContent = 'Local lab ledger reset.';
@@ -850,28 +988,30 @@
           const logits = base.map((row) => row.map((value, index) => value + (index === 0 ? collapse : 0)));
           const probabilities = logits.map(softmax);
           const selectionBias = [-balance, balance / 3, balance / 3, balance / 3];
-          const assignments = logits.map((row) => {
-            const selectionScores = row.map((value, index) => value + selectionBias[index]);
-            return selectionScores.indexOf(Math.max(...selectionScores));
-          });
+          const selectionScores = probabilities.map((row) =>
+            row.map((probability, index) => probability + selectionBias[index])
+          );
+          const assignments = selectionScores.map((row) => row.indexOf(Math.max(...row)));
+          const routedWeights = assignments.map((expert, token) => probabilities[token][expert]);
           const N = 4;
           const f = Array.from({ length: N }, (_, expert) => assignments.filter((index) => index === expert).length / assignments.length);
           const P = Array.from({ length: N }, (_, expert) => probabilities.reduce((sum, row) => sum + row[expert], 0) / probabilities.length);
           const lb = N * f.reduce((sum, value, expert) => sum + value * P[expert], 0);
           const z = logits.reduce((sum, row) => sum + logsumexp(row) ** 2, 0) / logits.length;
           const totalAux = alpha * lb + beta * z;
-          const rows = logits.map((row, token) => `<tr><th>T${token}</th>${row.map((value, expert) => `<td>${value.toFixed(2)}<br /><small>p=${probabilities[token][expert].toFixed(3)}${assignments[token] === expert ? ' · selected' : ''}</small></td>`).join('')}</tr>`).join('');
+          const rows = logits.map((row, token) => `<tr><th>T${token}</th>${row.map((value, expert) => `<td>${value.toFixed(2)}<br /><small>p=${probabilities[token][expert].toFixed(3)} · score=${selectionScores[token][expert].toFixed(3)}${assignments[token] === expert ? ' · selected; weight=p' : ''}</small></td>`).join('')}</tr>`).join('');
           $('moe-table-wrap').innerHTML = `<table class="evidence-table"><thead><tr><th>Token</th><th>E0</th><th>E1</th><th>E2</th><th>E3</th></tr></thead><tbody>${rows}</tbody></table>`;
           $('moe-output').textContent = [
-            `selection bias = [${selectionBias.map((v) => v.toFixed(2)).join(', ')}] (selection only)`,
+            `top-1 selection score = original p + bias; bias = [${selectionBias.map((v) => v.toFixed(2)).join(', ')}]`,
             `chosen experts = [${assignments.join(', ')}]`,
+            `routed weights = original selected p = [${routedWeights.map((v) => v.toFixed(3)).join(', ')}]`,
             `f = hard assignment fractions = [${f.map((v) => v.toFixed(3)).join(', ')}]`,
             `P = mean raw soft probabilities = [${P.map((v) => v.toFixed(3)).join(', ')}]`,
             `Lbal = 4·Σ fₑPₑ = ${lb.toFixed(6)}; αLbal = ${(alpha * lb).toFixed(6)}`,
             `Lz = mean(logsumexp(logits)²) = ${z.toFixed(6)}; βLz = ${(beta * z).toFixed(6)}`,
             `combined toy auxiliary = ${totalAux.toFixed(6)}`,
             `assignment spread max(f)−min(f) = ${(Math.max(...f) - Math.min(...f)).toFixed(3)}`,
-            `Bias can change selections without changing P or shrinking raw logits; z-loss targets scale.`
+            `Bias can change membership but never modifies p; the selected expert keeps its original p as weight. z-loss targets raw-logit scale.`
           ].join('\n');
         }
         listen(['moe-collapse', 'moe-bias', 'moe-alpha', 'moe-beta'], updateMoe);
@@ -1024,20 +1164,24 @@
           const dh = integer('inf-dh');
           const prefillMs = prompt / prefillRate * 1000;
           const tpotMs = 1000 / decodeRate;
-          const decodeMs = output * tpotMs;
-          const computeTtft = prefillMs + tpotMs;
-          const e2eTtft = queue + computeTtft;
-          const totalSeq = prompt + output;
-          const cache = 2 * layers * totalSeq * hkv * dh * 2;
-          const total = queue + prefillMs + decodeMs;
+          const decodeSteps = Math.max(output - 1, 0);
+          const decodeMs = decodeSteps * tpotMs;
+          const ttft = queue + prefillMs;
+          const allocatedTokens = prompt + output;
+          const finalLiveTokens = prompt + decodeSteps;
+          const bytesPerCachedToken = 2 * layers * hkv * dh * 2;
+          const allocatedCache = allocatedTokens * bytesPerCachedToken;
+          const finalLiveCache = finalLiveTokens * bytesPerCachedToken;
+          const total = ttft + decodeMs;
           $('inference-output').textContent = [
-            `prefill compute ≈ P/rate = ${prefillMs.toFixed(2)} ms`,
+            `prefill compute ≈ S/rate = ${prefillMs.toFixed(2)} ms and produces output token 1`,
             `decode TPOT ideal = 1/rate = ${tpotMs.toFixed(2)} ms/token`,
-            `decode stage ≈ O·TPOT = ${decodeMs.toFixed(2)} ms`,
-            `compute-only TTFT ≈ prefill + first decode = ${computeTtft.toFixed(2)} ms`,
-            `toy end-to-end TTFT = queue/schedule + compute = ${e2eTtft.toFixed(2)} ms`,
-            `toy request total = queue + prefill + all decode = ${total.toFixed(2)} ms`,
-            `ideal final KV cache (BF16) = ${mib(cache).toFixed(2)} MiB`,
+            `decode steps = max(O−1, 0) = max(${output}−1, 0) = ${decodeSteps}`,
+            `decode stage ≈ decode_steps·TPOT = ${decodeMs.toFixed(2)} ms`,
+            `toy TTFT = queue/schedule + prefill = ${ttft.toFixed(2)} ms`,
+            `toy request total = TTFT + remaining decode = ${total.toFixed(2)} ms`,
+            `allocated KV horizon S+O = ${allocatedTokens} tokens = ${mib(allocatedCache).toFixed(2)} MiB (BF16)`,
+            `final live KV S+O−1 = ${finalLiveTokens} tokens = ${mib(finalLiveCache).toFixed(2)} MiB (BF16)`,
             `stage share: prefill ${(100 * prefillMs / Math.max(1e-9, prefillMs + decodeMs)).toFixed(1)}% · decode ${(100 * decodeMs / Math.max(1e-9, prefillMs + decodeMs)).toFixed(1)}% (queue excluded)`,
             `Rates are inputs, not measurements. No batching, contention, paging, transfer, compilation, or tail latency is modeled.`
           ].join('\n');
@@ -1086,6 +1230,7 @@
           const generated = rollouts * tokens;
           const accepted = Math.round(rollouts * keep);
           const acceptedTokens = accepted * tokens;
+          const groupStatisticRows = prompts * group;
           const pairs = prompts * group * (group - 1) / 2;
           $('rl-keep-out').textContent = keep.toFixed(2);
           $('rl-output').textContent = [
@@ -1095,8 +1240,9 @@
             `generated output tokens ≈ ${rollouts}·${tokens} = ${fmt(generated, 0)}`,
             `accepted trajectories ≈ round(${rollouts}·${keep.toFixed(2)}) = ${accepted}`,
             `accepted output tokens ≈ ${fmt(acceptedTokens, 0)}`,
-            `all within-group unordered pairs = prompts·G(G−1)/2 = ${fmt(pairs, 0)}`,
-            `Doubling G doubles rollouts/tokens but roughly quadruples all-pairs comparisons.`,
+            `group-statistic advantage inputs = prompts·G = ${groupStatisticRows}; mean/std or baseline work is O(G) per prompt`,
+            `optional all-pairs preference/diagnostic construction = prompts·G(G−1)/2 = ${fmt(pairs, 0)}`,
+            `Doubling G doubles rollouts, tokens, and group-statistic work; only optional all-pairs construction grows roughly fourfold.`,
             `Required row key: prompt_id + policy_hash + sampling_hash + seed + output_id + reward_hash + disposition.`
           ].join('\n');
         }
