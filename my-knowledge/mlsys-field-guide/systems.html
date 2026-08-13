@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Interactive systems workbench for distributed training, inference profiling, artifact and data security, and reinforcement-learning rollouts."
+    />
+    <title>ML Systems Field Guide — Systems and rollout</title>
+    <link rel="stylesheet" href="assets/css/site.css" />
+    <script src="assets/js/site.js" defer></script>
+    <style>
+      .systems-five-choice {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .systems-inspector-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.85rem;
+      }
+
+      .systems-signal {
+        min-height: 7.4rem;
+        padding: 0.85rem;
+        border: 1px solid var(--rule);
+        background: var(--surface-2);
+      }
+
+      .systems-signal strong,
+      .systems-signal span {
+        display: block;
+      }
+
+      .systems-signal strong {
+        margin-bottom: 0.35rem;
+        font-size: 0.75rem;
+      }
+
+      .systems-signal span {
+        color: var(--muted);
+        font-size: 0.76rem;
+      }
+
+      .systems-profiler-grid {
+        display: grid;
+        grid-template-columns: minmax(20rem, 0.72fr) minmax(0, 1.28fr);
+        border-top: 1px solid var(--rule);
+      }
+
+      .systems-profiler-grid > * {
+        min-width: 0;
+      }
+
+      .systems-profiler-grid > :first-child {
+        border-right: 1px solid var(--rule);
+      }
+
+      .systems-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1px;
+        background: var(--rule);
+      }
+
+      .systems-metrics .metric {
+        min-height: 6rem;
+        margin: 0;
+        padding: 0.85rem;
+        border: 0;
+        background: var(--surface);
+      }
+
+      .systems-flow .lane {
+        min-height: 19rem;
+      }
+
+      .systems-flow .lane-visual {
+        min-height: 5.8rem;
+      }
+
+      .systems-threat-choice {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .systems-citation-list {
+        margin-bottom: 0;
+        padding-left: 1.2rem;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .systems-citation-list li + li {
+        margin-top: 0.45rem;
+      }
+
+      .systems-table-scroll {
+        max-width: 100%;
+        overflow-x: auto;
+      }
+
+      .section-band.is-dark .instrument-panel,
+      .section-band.is-dark .proof-inspector {
+        color: var(--ink);
+      }
+
+      @media (max-width: 1180px) {
+        .systems-profiler-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .systems-profiler-grid > :first-child {
+          border-right: 0;
+          border-bottom: 1px solid var(--rule);
+        }
+      }
+
+      @media (max-width: 880px) {
+        .systems-five-choice,
+        .systems-threat-choice {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .systems-five-choice button:nth-child(3),
+        .systems-threat-choice button:nth-child(3) {
+          border-left: 0;
+        }
+
+        .systems-five-choice button:nth-child(n + 3),
+        .systems-threat-choice button:nth-child(n + 3) {
+          border-top: 1px solid var(--rule);
+        }
+
+        .systems-inspector-grid,
+        .systems-metrics {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .systems-five-choice,
+        .systems-threat-choice,
+        .control-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .systems-five-choice button,
+        .systems-threat-choice button {
+          border-left: 0;
+        }
+
+        .systems-five-choice button + button,
+        .systems-threat-choice button + button {
+          border-top: 1px solid var(--rule);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+    THESIS: Systems work is the accounting of movement, waiting, and trust boundaries; a model FLOP count alone cannot explain a training run, a serving SLO, or an RL rollout.
+    OWN-WORLD: A pipeline debugger spanning device meshes, arrival-to-token latency, artifact/data trust, and actor-learner queues.
+    STORY: Select a parallel axis, profile prefill and decode, audit serving mechanisms, secure T and D, then trace one rollout back to the learner.
+    FIRST VIEWPORT: The user sees the systems claim and a five-axis parallelism probe, with repo boundaries visible before any estimator.
+    FORM: Pipeline Debugger lifecycle workspace, approved task-led hybrid, seed f328a503.
+    FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+    -->
+    <a class="skip-link" href="#main">Skip to systems workbench</a>
+    <header class="utility-bar">
+      <a class="brand" href="index.html" aria-label="ML Systems Field Guide home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+        <span class="brand-copy"><strong>ML Systems Field Guide</strong><span>From blue dot to evidence</span></span>
+      </a>
+      <nav class="primary-nav" data-primary-nav aria-label="Primary navigation">
+        <a href="index.html">Study console</a><a href="notebook.html">Notebook</a><a href="model.html">Model</a><a href="training.html">Training</a><a href="systems.html" aria-current="page">Systems</a><a href="labs.html">Labs</a><a href="report.html">Report</a><a href="sources.html">Evidence</a>
+      </nav>
+      <div class="utility-actions">
+        <button class="utility-button" type="button" data-print>Print</button>
+        <button class="utility-button nav-toggle" type="button" data-nav-toggle aria-expanded="false">Menu</button>
+      </div>
+    </header>
+
+    <div class="evidence-ribbon">
+      <strong>Systems workspace</strong>
+      <span class="status-key status-repo">OLMo paths verified</span>
+      <span class="status-key status-caution">profiler is illustrative</span>
+      <span class="status-key status-primary">boundaries explicit</span>
+      <span class="status-key status-contradiction">end-to-end TTFT ≠ first forward</span>
+    </div>
+
+    <div class="app-shell">
+      <aside class="lifecycle-rail" aria-label="Learning lifecycle">
+        <p class="rail-heading">Lifecycle</p>
+        <ol class="rail-list">
+          <li class="is-complete"><a href="notebook.html"><span class="rail-dot"></span><span class="rail-label"><strong>Sources</strong><small>decode · verify · route</small></span></a></li>
+          <li class="is-complete"><a href="training.html#tokens"><span class="rail-dot"></span><span class="rail-label"><strong>Tokens</strong><small>curate · tokenize · pack</small></span></a></li>
+          <li class="is-complete"><a href="model.html"><span class="rail-dot"></span><span class="rail-label"><strong>Model</strong><small>attend · route · predict</small></span></a></li>
+          <li class="is-complete"><a href="training.html#scaling"><span class="rail-dot"></span><span class="rail-label"><strong>Train</strong><small>scale · optimize · checkpoint</small></span></a></li>
+          <li class="is-complete"><a href="training.html#eval-gates"><span class="rail-dot"></span><span class="rail-label"><strong>Eval</strong><small>monitor · select · claim</small></span></a></li>
+          <li><a href="#inference" aria-current="step"><span class="rail-dot"></span><span class="rail-label"><strong>Serve</strong><small>prefill · decode · schedule</small></span></a></li>
+          <li><a href="report.html"><span class="rail-dot"></span><span class="rail-label"><strong>Release</strong><small>artifacts · evidence · risk</small></span></a></li>
+        </ol>
+        <div class="rail-block"><strong>Systems rule</strong><p>Name what moves, over which link, how often, and who waits. Then attach a trace—not just a peak-hardware number.</p></div>
+      </aside>
+
+      <main class="page-main" id="main">
+        <section class="page-lede">
+          <div>
+            <h1>Latency is a path. Throughput is a workload.</h1>
+            <p>Parallelism changes which bytes move during training. Serving changes when requests wait. Online RL couples an inference fleet to a learner. Profile each boundary with an explicit workload, version, and trust model.</p>
+          </div>
+          <div class="lede-controls">
+            <strong>Boundary before benchmark</strong>
+            <p>OLMo-core trains and can run a beta autoregressive generation loop. It is not a production request scheduler or the OlmoRL orchestration stack.</p>
+            <a class="button button-primary" href="#parallelism">Probe the device mesh</a>
+          </div>
+        </section>
+
+        <section id="parallelism" class="section-band" aria-labelledby="parallelism-title">
+          <div class="section-heading">
+            <h2 id="parallelism-title">Five axes split different state.</h2>
+            <p>“Distributed” does not identify the algorithm. Select an axis to see its shard target, dominant communication, memory win, and characteristic stall. Real runs compose axes in a named device mesh and validate divisibility and compatibility.</p>
+          </div>
+
+          <div class="workbench-grid">
+            <section class="instrument-panel" aria-labelledby="parallel-selector-title">
+              <div class="panel-toolbar inspector-section">
+                <h3 id="parallel-selector-title">Parallelism probe</h3>
+                <span class="source-chip is-repo">repo implementation</span>
+              </div>
+              <div class="choice-strip systems-five-choice" id="parallel-choices" role="group" aria-label="Choose a parallelism axis">
+                <button type="button" data-parallel="dp" aria-pressed="true"><strong>DP</strong><small>batch / state</small></button>
+                <button type="button" data-parallel="tp" aria-pressed="false"><strong>TP</strong><small>matrix dimensions</small></button>
+                <button type="button" data-parallel="pp" aria-pressed="false"><strong>PP</strong><small>layer stages</small></button>
+                <button type="button" data-parallel="cp" aria-pressed="false"><strong>CP</strong><small>sequence positions</small></button>
+                <button type="button" data-parallel="ep" aria-pressed="false"><strong>EP</strong><small>experts / tokens</small></button>
+              </div>
+              <div class="panel-body">
+                <div class="systems-inspector-grid" aria-live="polite">
+                  <div class="systems-signal"><strong>What is split</strong><span id="parallel-split">Input batches; DDP replicates model state, while FSDP/HSDP shard parameter, gradient, and optimizer state.</span></div>
+                  <div class="systems-signal"><strong>Dominant movement</strong><span id="parallel-communication">Gradient all-reduce for DDP; parameter all-gather and gradient reduce-scatter for FSDP.</span></div>
+                  <div class="systems-signal"><strong>Memory effect</strong><span id="parallel-memory">FSDP reduces sharded model-state memory per rank; activations still follow the local microbatch and sequence.</span></div>
+                  <div class="systems-signal"><strong>Failure signature</strong><span id="parallel-failure">Slow or imbalanced ranks stretch collectives; too-small local batches underfill kernels.</span></div>
+                </div>
+              </div>
+              <div class="live-conclusion" id="parallel-conclusion" aria-live="polite">DP asks: can independent examples keep replicas busy, and does model-state sharding fit the optimizer? Inspect collective time and per-rank batch balance.</div>
+            </section>
+
+            <aside class="instrument-panel" aria-labelledby="parallel-code-title">
+              <div class="panel-toolbar inspector-section"><h3 id="parallel-code-title">Code and constraint inspector</h3></div>
+              <div class="inspector-section">
+                <h3 id="parallel-name">Data parallelism</h3>
+                <p id="parallel-repo-note"><code>DataParallelConfig</code> selects DDP, FSDP, or HSDP. Transformer wrapping is applied after context, tensor, and expert transformations.</p>
+                <p><a id="parallel-code-link" href="../../src/olmo_core/distributed/parallel/data_parallel.py"><code id="parallel-code-path">distributed/parallel/data_parallel.py</code></a></p>
+              </div>
+              <div class="inspector-section">
+                <h3>Composition is code, not multiplication alone</h3>
+                <p><a href="../../src/olmo_core/distributed/parallel/__init__.py"><code>build_world_mesh()</code></a> orders PP, DP/HSDP, CP, and TP dimensions. At this snapshot, TP and EP are mutually exclusive; EP requires HSDP and reuses its shard dimension.</p>
+              </div>
+              <div class="inspector-section">
+                <h3>Transformer-specific application</h3>
+                <p><a href="../../src/olmo_core/train/train_module/transformer/common.py"><code>train_module/transformer/common.py</code></a> applies CP, TP, EP, activation checkpointing/compile, and DP. <a href="../../src/olmo_core/train/train_module/transformer/pipeline_train_module.py"><code>pipeline_train_module.py</code></a> owns PP stages and schedules.</p>
+              </div>
+            </aside>
+          </div>
+
+          <div class="lab-console">
+            <div><h3>Do not report “8-way parallel”</h3><p>Record the full mesh tuple, per-rank shapes, microbatches, schedule, activation checkpointing, collective volumes, topology, peak allocated memory, tokens/s/GPU, MFU, and straggler distribution.</p></div>
+            <a class="button button-primary" href="labs.html#lab-parallelism">Open mesh lab</a>
+          </div>
+        </section>
+
+        <section id="inference" class="section-band is-dark" aria-labelledby="inference-title">
+          <div class="section-heading">
+            <h2 id="inference-title">Prefill and decode stress different ceilings.</h2>
+            <p>Prefill processes the prompt in parallel and can reach high arithmetic intensity. Decode advances one position per active sequence, repeatedly reading weights and an expanding KV cache; at small batches it is commonly bandwidth-bound.</p>
+          </div>
+
+          <div class="study-path" role="group" aria-label="Request latency path">
+            <article class="path-stage"><strong>Arrival</strong><span>network · auth · tokenization · request shape</span></article><div class="path-connector">→</div>
+            <article class="path-stage"><strong>Queue + schedule</strong><span>admission · batching · preemption · prefix lookup</span></article><div class="path-connector">→</div>
+            <article class="path-stage"><strong>Prefill</strong><span>all prompt positions · first sampled token · KV creation</span></article><div class="path-connector">→</div>
+            <article class="path-stage"><strong>Decode + stream</strong><span>one step at a time · growing KV · client backpressure</span></article>
+          </div>
+
+          <div class="workbench-grid">
+            <section class="instrument-panel" aria-labelledby="metric-boundary-title">
+              <div class="panel-toolbar inspector-section"><h3 id="metric-boundary-title">Metric boundary</h3><span class="source-chip is-caution">workload required</span></div>
+              <div class="panel-body">
+                <table class="evidence-table">
+                  <tbody>
+                    <tr><th>User-visible TTFT</th><td>arrival → first byte/token received: network + auth/tokenization + queue/scheduler + prefill/sampling + stream.</td></tr>
+                    <tr><th>OLMo-core “TTFT”</th><td>The beta generation loop times its first model-forward interval after setup; it excludes an external request queue, network path, and production scheduler.</td></tr>
+                    <tr><th>TPOT / ITL</th><td>time per output token / inter-token latency; report a distribution, not only a mean.</td></tr>
+                    <tr><th>Throughput</th><td>aggregate prompt/output tokens per second at a declared concurrency and input/output-length distribution.</td></tr>
+                    <tr><th>Goodput</th><td>requests or tokens meeting the latency-and-quality SLO; capacity outside the SLO is not useful throughput.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+            <aside class="instrument-panel" aria-labelledby="repo-timing-title">
+              <div class="panel-toolbar inspector-section"><h3 id="repo-timing-title">Repository timing boundary</h3><span class="status status-repo">exact path</span></div>
+              <div class="inspector-section"><p><a href="../../src/olmo_core/generate/generation_module/transformer/generation_module.py"><code>generate/.../transformer/generation_module.py:193–318</code></a> initializes the cache, performs a full-prompt first forward, then feeds the last token on decode steps. Its printed timing is a useful compute-loop probe—not an HTTP serving SLO.</p></div>
+              <div class="inspector-section"><div class="equation"><strong>KV cache at sequence length S</strong>M<sub>KV</sub> = 2 · B · L · S · H<sub>kv</sub> · d<sub>head</sub> · bytes</div></div>
+              <div class="inspector-section"><p>GQA/MQA reduce <code>Hkv</code>, which lowers both cache capacity and bytes read during decode. The quality tradeoff is architectural and must be evaluated, not assumed.</p></div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="profiler" class="section-band" aria-labelledby="profiler-title">
+          <div class="section-heading">
+            <h2 id="profiler-title">Sweep the workload before choosing the engine.</h2>
+            <p>This calculator is an explanatory roofline, not a benchmark. It estimates cache size and lower-bound compute/bandwidth times from simple formulas, then scales them by an explicit efficiency factor. It omits attention FLOPs in prefill, kernel launch costs, collectives, fragmentation, and queuing.</p>
+          </div>
+
+          <section class="instrument-panel" aria-labelledby="profiler-panel-title">
+            <div class="panel-toolbar inspector-section"><h3 id="profiler-panel-title">Serving roofline scratchpad</h3><span class="source-chip is-caution">illustrative estimates</span></div>
+            <div class="systems-profiler-grid">
+              <div class="panel-body control-grid">
+                <div class="control"><label for="serve-batch">Batch / active sequences</label><input id="serve-batch" type="range" min="1" max="64" step="1" value="8" /><output id="serve-batch-out" for="serve-batch">8</output></div>
+                <div class="control"><label for="serve-context">Prompt context S</label><input id="serve-context" type="range" min="256" max="32768" step="256" value="4096" /><output id="serve-context-out" for="serve-context">4,096</output></div>
+                <div class="control"><label for="serve-output">Output tokens O</label><input id="serve-output" type="range" min="16" max="2048" step="16" value="512" /><output id="serve-output-out" for="serve-output">512</output></div>
+                <div class="control"><label for="serve-kv-heads">KV heads H<sub>kv</sub></label><input id="serve-kv-heads" type="range" min="1" max="32" step="1" value="8" /><output id="serve-kv-heads-out" for="serve-kv-heads">8</output></div>
+                <label class="control">Layers L <input id="serve-layers" type="number" min="1" max="160" step="1" value="32" /></label>
+                <label class="control">Head dimension d<sub>head</sub> <input id="serve-head-dim" type="number" min="16" max="512" step="16" value="128" /></label>
+                <label class="control">Model parameters (billions) <input id="serve-params" type="number" min="0.1" max="1000" step="0.1" value="7" /></label>
+                <label class="control">Weight format <select id="serve-weight-bytes"><option value="2">16-bit · 2 bytes</option><option value="1">8-bit · 1 byte</option><option value="0.5">4-bit · 0.5 byte</option></select></label>
+                <label class="control">KV element format <select id="serve-kv-bytes"><option value="2">16-bit · 2 bytes</option><option value="1">8-bit · 1 byte</option></select></label>
+                <label class="control">Memory bandwidth (TB/s) <input id="serve-bandwidth" type="number" min="0.1" max="20" step="0.05" value="3.35" /></label>
+                <label class="control">Peak compute (TFLOP/s) <input id="serve-compute" type="number" min="1" max="10000" step="1" value="989" /></label>
+                <div class="control"><label for="serve-efficiency">Effective roofline fraction</label><input id="serve-efficiency" type="range" min="0.1" max="0.9" step="0.05" value="0.4" /><output id="serve-efficiency-out" for="serve-efficiency">40%</output></div>
+                <label class="control">Non-compute TTFT overhead (ms) <input id="serve-overhead" type="number" min="0" max="60000" step="1" value="25" /></label>
+              </div>
+              <div>
+                <div class="systems-metrics metric-stack">
+                  <div class="metric"><span>Peak KV cache</span><strong id="serve-kv">—</strong></div>
+                  <div class="metric"><span>Illustrative TTFT</span><strong id="serve-ttft">—</strong></div>
+                  <div class="metric"><span>Decode TPOT</span><strong id="serve-tpot">—</strong></div>
+                  <div class="metric"><span>Aggregate output throughput</span><strong id="serve-throughput">—</strong></div>
+                  <div class="metric"><span>Output phase duration</span><strong id="serve-duration">—</strong></div>
+                  <div class="metric"><span>Roofline limiter</span><strong id="serve-limiter">—</strong></div>
+                </div>
+                <div class="plot-wrap"><canvas id="serve-plot" width="960" height="320" role="img" aria-label="Illustrative prefill and decode lower-bound timing bars"></canvas></div>
+                <div class="live-conclusion" id="serve-conclusion" aria-live="polite"></div>
+              </div>
+            </div>
+          </section>
+
+          <div class="workbench-grid">
+            <section class="instrument-panel" aria-labelledby="scratchpad-formulas-title"><div class="panel-toolbar inspector-section"><h3 id="scratchpad-formulas-title">What the scratchpad computes</h3></div><div class="panel-body formula-stack">
+              <div class="formula-line"><strong>Peak KV</strong><code>2BL(S+O)Hkv·dhead·bKV</code></div>
+              <div class="formula-line"><strong>Decode traffic / step</strong><code>≈ P·bw + 2BL(S+(O−1)/2)Hkv·dhead·bKV</code></div>
+              <div class="formula-line"><strong>Bandwidth floor</strong><code>traffic / memory_bandwidth</code></div>
+              <div class="formula-line"><strong>Decode compute floor</strong><code>2PB / peak_FLOP/s</code></div>
+              <div class="formula-line"><strong>Step estimate</strong><code>max(floors) / efficiency</code></div>
+            </div></section>
+            <aside class="instrument-panel" aria-labelledby="scratchpad-reading-title"><div class="panel-toolbar inspector-section"><h3 id="scratchpad-reading-title">Read the result correctly</h3></div><div class="panel-body"><p>The weight-stream term assumes one pass over quantized weights per batch step and perfect reuse across the batch. The KV term assumes the full average cache is read. Real kernels tile, fuse, shard, and overlap work; TP/PP add communication. Measure the exact engine on a prompt/output-length distribution and report p50/p95/p99.</p><div class="caution-box"><strong>A larger batch can raise throughput while worsening latency.</strong><p>The numerator gains more active sequences per weight stream, but queueing and per-step KV traffic grow. Capacity planning is an SLO optimization, not “maximize tokens/s.”</p></div></div></aside>
+          </div>
+
+          <div class="lab-console"><div><h3>Profiler handoff</h3><p>Export a workload matrix over batch, prompt length, output length, KV heads, dtype, engine commit, GPU/topology, and scheduler policy. Compare calculator expectations to traces and explain residuals.</p></div><a class="button button-primary" href="labs.html#lab-inference">Open inference lab</a></div>
+        </section>
+
+        <section id="serving" class="section-band" aria-labelledby="serving-title">
+          <div class="section-heading"><h2 id="serving-title">Serving infrastructure manages variance.</h2><p>These mechanisms change request scheduling or memory layout around the model. They are common in external serving engines; none is implemented here as a production OLMo-core request-serving subsystem.</p></div>
+          <div class="instrument-panel">
+            <div class="panel-body"><div class="systems-table-scroll"><table class="comparison-table">
+              <thead><tr><th>Mechanism</th><th>Motivation</th><th>What changes</th><th>Cost / failure mode</th><th>OLMo-core boundary</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Continuous batching</strong></td><td>Finished sequences leave holes in a static batch.</td><td>Admit and retire sequences between decode steps.</td><td>Scheduler complexity, fairness, preemption, reproducibility.</td><td>No production request scheduler. The README recommends external <a href="https://docs.vllm.ai/">vLLM</a>.</td></tr>
+                <tr><td><strong>PagedAttention</strong></td><td>Contiguous KV reservations cause fragmentation and over-reservation.</td><td>Map logical KV blocks to non-contiguous physical blocks.</td><td>Block-table overhead and paging policy; still bounded by physical memory.</td><td>Not present. See the primary <a href="https://arxiv.org/abs/2309.06180">vLLM/PagedAttention paper</a>.</td></tr>
+                <tr><td><strong>Prefix caching</strong></td><td>Shared system prompts and documents repeat prefill work.</td><td>Reuse KV blocks for byte/token-identical prefixes.</td><td>Hash correctness, tenant isolation, eviction, cache poisoning.</td><td>No cross-request prefix cache in the beta generation loop.</td></tr>
+                <tr><td><strong>Speculative decode</strong></td><td>One target-model step emits only one accepted token.</td><td>A draft proposes several tokens; the target verifies in parallel without changing the target distribution when implemented exactly.</td><td>Draft/verify mismatch can erase speedup; rejection adds work. See <a href="https://arxiv.org/abs/2211.17192">Leviathan et al.</a></td><td>No draft-target scheduler in OLMo-core generation.</td></tr>
+                <tr><td><strong>Serving quantization</strong></td><td>Weights/KV consume bandwidth and capacity.</td><td>Use lower-bit weight/activation/KV formats with calibrated kernels.</td><td>Quality drift, outliers, kernel coverage, mixed-format overhead.</td><td>No serving quantizer/scheduler. <a href="../../src/olmo_core/float8/__init__.py"><code>float8/</code></a> contains training/linear conversion utilities—a different boundary.</td></tr>
+              </tbody>
+            </table></div></div>
+          </div>
+          <div class="caution-box"><strong>Absence is scoped to this checkout.</strong><p>OLMo model weights can be served by external frameworks that implement these features. “Not in OLMo-core” does not mean “not available for OLMo.”</p></div>
+        </section>
+
+        <section id="security" class="section-band is-dark" aria-labelledby="security-title">
+          <div class="section-heading"><h2 id="security-title">Secure both T and D across the lineage.</h2><p><strong>Visible assumption:</strong> the note’s “T and D” is interpreted here as <em>T = training/model artifacts</em> and <em>D = data</em>. If T meant a different object, revise the threat model before using this checklist.</p></div>
+
+          <div class="workbench-grid">
+            <section class="instrument-panel" aria-labelledby="threat-probe-title">
+              <div class="panel-toolbar inspector-section"><h3 id="threat-probe-title">Threat-boundary probe</h3><span class="source-chip is-caution">assumption-led</span></div>
+              <div class="choice-strip systems-threat-choice" id="threat-choices" role="group" aria-label="Choose a security boundary">
+                <button type="button" data-threat="ingest" aria-pressed="true"><strong>D · ingest</strong><small>supplier → corpus</small></button>
+                <button type="button" data-threat="run" aria-pressed="false"><strong>T · train</strong><small>job → checkpoint</small></button>
+                <button type="button" data-threat="release" aria-pressed="false"><strong>T+D · release</strong><small>artifact → public</small></button>
+                <button type="button" data-threat="serve" aria-pressed="false"><strong>T · serve</strong><small>weight → endpoint</small></button>
+              </div>
+              <div class="panel-body systems-inspector-grid" aria-live="polite">
+                <div class="systems-signal"><strong>Adversary action</strong><span id="threat-action">Inject poisoned, unlicensed, benchmark-contaminated, or privacy-sensitive records through an upstream source.</span></div>
+                <div class="systems-signal"><strong>Prevent</strong><span id="threat-prevent">Allowlisted suppliers, immutable snapshots, sandboxed parsers, license/PII policy, deduplication, decontamination, and human escalation.</span></div>
+                <div class="systems-signal"><strong>Detect</strong><span id="threat-detect">Digest and count deltas, provenance gaps, distribution shifts, canary records, rejection audits, and benchmark-overlap reports.</span></div>
+                <div class="systems-signal"><strong>Evidence</strong><span id="threat-evidence">Source manifest, content hashes, transformation code/commit, rule versions, pre/post counts, sampled audit, and signed approval.</span></div>
+              </div>
+            </section>
+            <aside class="instrument-panel" aria-labelledby="security-repo-title">
+              <div class="panel-toolbar inspector-section"><h3 id="security-repo-title">Repository boundary</h3><span class="status status-repo">limited controls</span></div>
+              <div class="inspector-section"><p><a href="../../src/olmo_core/utils.py"><code>utils.py:set_env_var(..., secret=True)</code></a> masks a value in logs. <a href="../../src/olmo_core/launch/beaker.py"><code>launch/beaker.py</code></a> references Beaker-managed environment/file secrets rather than hardcoding their values.</p></div>
+              <div class="inspector-section"><div class="correction-box"><strong>This is not comprehensive model/data security.</strong><p>Secret injection and masked printing do not provide dataset governance, malware scanning, tenant isolation, checkpoint signing, access review, exfiltration detection, privacy testing, or incident response.</p></div></div>
+              <div class="inspector-section"><p>Use least-privilege service identities, short-lived credentials, network/storage segmentation, deny-by-default release buckets, immutable logs, separate train/read/publish roles, and a two-person release gate.</p></div>
+            </aside>
+          </div>
+
+          <div class="instrument-panel">
+            <div class="panel-body"><div class="systems-table-scroll"><table class="comparison-table">
+              <thead><tr><th>Asset / threat</th><th>Preventive control</th><th>Detective control</th><th>Release evidence</th></tr></thead>
+              <tbody>
+                <tr><td>D · provenance / substitution</td><td>source allowlist, TLS, content-addressed immutable snapshots</td><td>digest mismatch, lineage gaps, unexpected count/type changes</td><td>source ID, URI/date, license, SHA-256, acquisition tool version</td></tr>
+                <tr><td>D · poisoning</td><td>sandbox extraction, anomaly rules, trust-weighted mixtures, review high-impact sources</td><td>semantic/lexical outliers, canaries, source-sliced loss/eval regressions</td><td>rejection reasons, quarantine manifest, signed rule set</td></tr>
+                <tr><td>D · PII / license</td><td>collection policy, PII detection/redaction, license compatibility gate</td><td>sampled privacy audit, memorization probes, rights-request tracing</td><td>policy version, per-source decision, exceptions and owner</td></tr>
+                <tr><td>D · benchmark contamination</td><td>versioned n-gram/semantic decontamination before selection</td><td>overlap report by benchmark and source; suspicious score jumps</td><td>benchmark hash, rule/threshold, match counts, removal action</td></tr>
+                <tr><td>T · checkpoint tampering</td><td>write-once artifact store, isolated writers, signed manifests</td><td>hash/signature verification at load and release</td><td>weights/config/tokenizer/code hashes plus parent checkpoint</td></tr>
+                <tr><td>T · model theft / exfiltration</td><td>least privilege, egress limits, encrypted stores, short-lived access</td><td>download/egress anomalies, honey tokens, access review</td><td>access-policy snapshot, approvers, audit-log retention</td></tr>
+                <tr><td>Operations · secrets</td><td>secret manager injection, scoped credentials, no plaintext config</td><td>secret scanning, auth failures, unusual token use</td><td>secret names/scopes only—never secret values</td></tr>
+              </tbody>
+            </table></div></div>
+          </div>
+
+          <div class="lab-console"><div><h3>Threat-model deliverable</h3><p>For each boundary, write asset, actor, action, impact, preventive control, detection signal, response owner, residual risk, and an evidence pointer. Keep private samples out of public reports.</p></div><a class="button button-primary" href="labs.html#lab-security">Open security lab</a></div>
+        </section>
+
+        <section id="rollout" class="section-band" aria-labelledby="rollout-title">
+          <div class="section-heading"><h2 id="rollout-title">An RL rollout is a versioned distributed trace.</h2><p>Online RL alternates generation and learning. Every trajectory must retain the prompt/data version, actor policy version, generation settings, token IDs, behavior log-probabilities, reward/verifier version, advantage rule, learner update, and weight-sync event.</p></div>
+
+          <div class="trace-workspace">
+            <div class="trace-stage systems-flow">
+              <div class="trace-toolbar"><h3>Actor → learner loop</h3><span class="source-chip is-caution">conceptual; orchestration external</span></div>
+              <div class="execution-lanes">
+                <article class="lane"><h3>Prompt queue</h3><span class="shape">x + source/version</span><div class="lane-visual mono">task<br />ground truth<br />sampling group</div><p class="lane-note">Admission and active sampling determine what reaches actors.</p><span class="lane-arrow">→</span></article>
+                <article class="lane"><h3>Actor / vLLM</h3><span class="shape">π<sub>behavior</sub> version v</span><div class="lane-visual mono">sample G<br />responses<br />temperature</div><p class="lane-note">Inference capacity and policy freshness are separate resources.</p><span class="lane-arrow">→</span></article>
+                <article class="lane"><h3>Trajectories</h3><span class="shape">(x, y, tokens, stops)</span><div class="lane-visual mono">lengths<br />EOS<br />engine metadata</div><p class="lane-note">Preserve behavior outputs before filtering.</p><span class="lane-arrow">→</span></article>
+                <article class="lane"><h3>Logprobs + reward</h3><span class="shape">log π<sub>behavior</sub> · r<sub>verifier</sub></span><div class="lane-visual mono">train-engine logp<br />actor logp<br />reward components</div><p class="lane-note">Engine mismatch and verifier drift are measurable.</p><span class="lane-arrow">→</span></article>
+                <article class="lane"><h3>Advantage</h3><span class="shape">A = r − baseline</span><div class="lane-visual mono">same-prompt group<br />mask zero-signal<br />normalize?</div><p class="lane-note">Name whether standard deviation normalization is used.</p><span class="lane-arrow">→</span></article>
+                <article class="lane"><h3>Learner</h3><span class="shape">π<sub>θ</sub> update</span><div class="lane-visual mono">ratio / clip<br />loss masks<br />grad step</div><p class="lane-note">Log the exact behavior-to-learner policy ratio.</p><span class="lane-arrow">→</span></article>
+                <article class="lane"><h3>Weight sync</h3><span class="shape">v → v+1</span><div class="lane-visual mono">broadcast<br />pause / inflight<br />ack version</div><p class="lane-note">Actor lag changes the estimator’s off-policy correction burden.</p><span class="lane-arrow">→</span></article>
+                <article class="lane"><h3>Eval + next queue</h3><span class="shape">quality · safety · SLO</span><div class="lane-visual mono">held-out reward<br />capability<br />lag/backlog</div><p class="lane-note">A higher reward is not sufficient release evidence.</p></article>
+              </div>
+            </div>
+            <aside class="proof-inspector" aria-labelledby="policy-freshness-title">
+              <div class="panel-toolbar inspector-section"><h3 id="policy-freshness-title">Policy-freshness inspector</h3></div>
+              <div class="inspector-section"><div class="equation"><strong>Version lag</strong>lag(τ) = v<sub>learner, consume</sub> − v<sub>actor, generate</sub></div></div>
+              <div class="inspector-section"><h3>On-policy ideal</h3><p>Generate with the current policy and update promptly. This reduces distribution mismatch but creates synchronization barriers and idle hardware.</p></div>
+              <div class="inspector-section"><h3>Asynchronous reality</h3><p>Actors and learner overlap, so trajectories can be stale. Bound lag, record both policies’ log-probabilities, monitor importance ratios, and define when stale samples are dropped.</p></div>
+              <div class="inspector-section"><h3>Backpressure</h3><p>A bounded queue should slow prompt admission when learner consumption or verifier capacity falls behind. Watch queue age, actor utilization, effective batch, zero-advantage rate, lag percentiles, and weight-sync time.</p></div>
+            </aside>
+          </div>
+
+          <div class="workbench-grid">
+            <section class="instrument-panel" aria-labelledby="olmorl-example-title">
+              <div class="panel-toolbar inspector-section"><h3 id="olmorl-example-title">OlmoRL: an exact published systems example</h3><span class="source-chip is-primary">external primary report</span></div>
+              <div class="panel-body">
+                <p>The Olmo 3 report describes an <strong>off-policy asynchronous</strong> actor–learner setup with continuous batching and inflight actor-weight updates. For same-prompt groups, its advantage removes the group mean without dividing by the reward standard deviation; training also corrects mismatch between vLLM behavior log-probabilities and the learner.</p>
+                <div class="equation"><strong>Static-batch idle fraction</strong>waste = (L<sub>max</sub> − mean(L)) / L<sub>max</sub> = 1 − mean(L) / L<sub>max</sub></div>
+                <p>The report gives <strong>14,628 mean</strong> versus <strong>32,000 maximum</strong> generation length; the static formula gives about <strong>54.3% waste</strong>. This is a workload-specific upper-bound comparison, not a universal serving constant.</p>
+                <table class="evidence-table">
+                  <tbody>
+                    <tr><th>Benchmark workload</th><td>Qwen 2.5 7B; 16 prompts × 4 samples; max 32k output and 2k prompt; 2 × 8-H100 nodes; 8 one-GPU actors; 2 hours.</td></tr>
+                    <tr><th>Measured sequence</th><td>881 tokens/s baseline → 975 with continuous batching → 1,358 with threading changes → 2,949 with inflight updates.</td></tr>
+                    <tr><th>Resource split</th><td>32B: 8 H100 nodes for the learner and 20 for inference; the learner waited about 75% for data, with roughly 5× inference compute. 7B: 2 learner nodes and 7 inference nodes, roughly 14× inference compute.</td></tr>
+                    <tr><th>Reported headline</th><td>Inflight weight updates avoided actor pauses and KV-cache dumps; the report states up to 4× throughput at the same resources.</td></tr>
+                    <tr><th>Interpretation</th><td>A queue/synchronization redesign changed utilization by more than an architecture-only view would predict. These are that setup’s measurements, not universal speedups.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+            <aside class="instrument-panel" aria-labelledby="rl-code-boundary-title">
+              <div class="panel-toolbar inspector-section"><h3 id="rl-code-boundary-title">Code ownership boundary</h3><span class="status status-caution">external stack</span></div>
+              <div class="inspector-section"><p>This OLMo-core checkout has no PPO, DPO, GRPO, reward/verifier, actor fleet, rollout queue, or RL weight-synchronization orchestration. Its trainer/FSDP components can be reused by another project; reuse does not move orchestration into this repository.</p></div>
+              <div class="inspector-section"><p><a href="https://allenai.github.io/open-instruct/algorithms/grpo/">Open Instruct’s GRPO documentation</a> is the adjacent implementation boundary: it uses Ray and vLLM and describes implementations built on OLMo-core’s native training infrastructure.</p></div>
+              <div class="inspector-section"><ul class="systems-citation-list"><li><a href="https://arxiv.org/pdf/2512.13961">Olmo 3 technical report</a> — algorithm and asynchronous infrastructure.</li><li><a href="https://finbarr.ca/making-rl-fast/">Making RL Fast</a> — author’s exact workload and throughput table.</li><li><a href="../../src/olmo_core/train/train_module/transformer/train_module.py"><code>TransformerTrainModule</code></a> — reusable learner-side training substrate in this checkout.</li></ul></div>
+            </aside>
+          </div>
+
+          <div class="caution-box"><strong>Online versus offline is a data-generation distinction.</strong><p>PPO/GRPO-style online methods repeatedly sample from a behavior policy and must manage policy lag. DPO trains from an existing preference dataset and has no online actor loop in the optimization step, though the preference data still has a generation provenance.</p></div>
+
+          <div class="lab-console"><div><h3>Rollout trace lab</h3><p>Simulate variable completion lengths, a bounded queue, actor versions, learner steps, and weight sync. Plot utilization and lag; then decide where to apply backpressure or discard stale trajectories.</p></div><a class="button button-primary" href="labs.html#lab-rollout">Open rollout lab</a></div>
+        </section>
+
+        <section id="systems-handoff" class="section-band" aria-labelledby="handoff-title">
+          <div class="section-heading"><h2 id="handoff-title">A systems claim needs a trace packet.</h2><p>Keep the model, data, execution, workload, and security boundary in the same evidence chain. Otherwise the “fast” or “secure” configuration cannot be reproduced or audited.</p></div>
+          <div class="source-boundary">
+            <article class="source-level"><span class="status status-repo">mesh</span><h3>Training trace</h3><p>code/config hash, mesh, topology, shapes, collective time, memory, throughput, MFU, failures</p></article>
+            <article class="source-level"><span class="status status-primary">serve</span><h3>Request trace</h3><p>arrival, queue, prefill, first byte, inter-token times, engine/version, workload, quality</p></article>
+            <article class="source-level"><span class="status status-caution">trust</span><h3>T + D lineage</h3><p>source/artifact digests, access boundary, policy versions, scans, approvals, residual risks</p></article>
+            <article class="source-level"><span class="status status-contradiction">RL</span><h3>Rollout trace</h3><p>prompt/actor/reward versions, logprobs, advantage, learner step, lag, queue age, sync</p></article>
+          </div>
+          <div class="lab-console"><div><h3>Convert traces into disclosure</h3><p>The report builder asks which numbers are measurements, estimates, rounded report values, or unknowns—and refuses to silently fill missing serving and rollout provenance.</p></div><a class="button button-primary" href="report.html">Open report builder</a></div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="site-footer"><p>Profiler outputs are illustrative estimates. Published OlmoRL measurements remain scoped to their cited workload and external stack.</p><p><a href="labs.html">Continue to hands-on labs</a></p></footer>
+
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const $ = (id) => document.getElementById(id);
+
+        const parallelModes = {
+          dp: {
+            name: "Data parallelism",
+            split: "Input batches; DDP replicates model state, while FSDP/HSDP shard parameter, gradient, and optimizer state.",
+            communication: "Gradient all-reduce for DDP; parameter all-gather and gradient reduce-scatter for FSDP.",
+            memory: "FSDP reduces sharded model-state memory per rank; activations still follow the local microbatch and sequence.",
+            failure: "Slow or imbalanced ranks stretch collectives; too-small local batches underfill kernels.",
+            note: "DataParallelConfig selects DDP, FSDP, or HSDP. Transformer wrapping is applied after context, tensor, and expert transformations.",
+            conclusion: "DP asks: can independent examples keep replicas busy, and does model-state sharding fit the optimizer? Inspect collective time and per-rank batch balance.",
+            href: "../../src/olmo_core/distributed/parallel/data_parallel.py",
+            path: "distributed/parallel/data_parallel.py"
+          },
+          tp: {
+            name: "Tensor parallelism",
+            split: "Linear and attention tensor dimensions within each layer; ranks cooperate on every transformed block.",
+            communication: "Layer-local all-gather, reduce-scatter, or all-reduce patterns, often several times per block.",
+            memory: "Parameters and selected activations are partitioned by tensor layout; savings depend on the module plan.",
+            failure: "Small matrix shards and slow interconnect make collective latency dominate; cross-node TP is especially costly.",
+            note: "TensorParallelConfig sets a degree and optional experimental async mode. Transformer modules supply their own parallelization plans.",
+            conclusion: "TP trades frequent, latency-sensitive communication for smaller layer shards. Keep it near high-bandwidth links and profile every collective boundary.",
+            href: "../../src/olmo_core/distributed/parallel/tensor_parallel.py",
+            path: "distributed/parallel/tensor_parallel.py"
+          },
+          pp: {
+            name: "Pipeline parallelism",
+            split: "Contiguous or interleaved layer stages; microbatches flow through ranks in a chosen schedule.",
+            communication: "Point-to-point activation sends forward and activation-gradient sends backward at stage boundaries.",
+            memory: "Each stage holds a fraction of layers, but in-flight microbatches and schedules determine activation memory.",
+            failure: "Pipeline bubbles, stage imbalance, and too few microbatches leave ranks idle.",
+            note: "PipelineParallelConfig supports GPipe, 1F1B, interleaved, and zero-bubble variants; the source warns that zero-bubble variants have current limitations.",
+            conclusion: "PP asks whether layers can be balanced across stages and whether enough microbatches amortize fill/drain bubbles. Report the exact split and schedule.",
+            href: "../../src/olmo_core/distributed/parallel/pipeline_parallel.py",
+            path: "distributed/parallel/pipeline_parallel.py"
+          },
+          cp: {
+            name: "Context parallelism",
+            split: "Sequence positions across ranks while model parameters remain replicated across the CP group.",
+            communication: "Ring attention exchanges KV blocks, or Ulysses-style all-to-all converts sequence sharding to head sharding and back.",
+            memory: "Reduces local long-sequence activation and attention-state pressure; communication grows with sequence work.",
+            failure: "Causal load imbalance, head/degree divisibility, and ring or all-to-all link contention stall long-context runs.",
+            note: "TransformerContextParallelConfig requires one of ring or Ulysses; helper constructors expose zig-zag, Llama-3-style, and Ulysses layouts.",
+            conclusion: "CP is a long-context axis, not a synonym for sequence parallelism in TP. Verify causal balancing, head divisibility, and per-rank sequence shapes.",
+            href: "../../src/olmo_core/distributed/parallel/context_parallel.py",
+            path: "distributed/parallel/context_parallel.py"
+          },
+          ep: {
+            name: "Expert parallelism",
+            split: "MoE expert parameters across ranks; token representations travel to the selected experts and return.",
+            communication: "Token dispatch/combine all-to-all, with volume and imbalance determined by routing and capacity behavior.",
+            memory: "Spreads expert weights, while shared/dense parameters and token buffers follow their own sharding rules.",
+            failure: "Hot experts, dropped/padded capacity, poor overlap, or network contention create skew and tail stalls.",
+            note: "ExpertParallelConfig sets the degree. In build_world_mesh at this snapshot, EP requires HSDP, reuses its shard dimension, and cannot be combined with TP.",
+            conclusion: "EP makes routing a systems problem. Plot tokens per expert, dispatch bytes, all-to-all time, capacity events, and expert utilization—not only average throughput.",
+            href: "../../src/olmo_core/distributed/parallel/expert_parallel.py",
+            path: "distributed/parallel/expert_parallel.py"
+          }
+        };
+
+        document.querySelectorAll("[data-parallel]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const mode = parallelModes[button.dataset.parallel];
+            document.querySelectorAll("[data-parallel]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+            $("parallel-name").textContent = mode.name;
+            $("parallel-split").textContent = mode.split;
+            $("parallel-communication").textContent = mode.communication;
+            $("parallel-memory").textContent = mode.memory;
+            $("parallel-failure").textContent = mode.failure;
+            $("parallel-repo-note").textContent = mode.note;
+            $("parallel-conclusion").textContent = mode.conclusion;
+            $("parallel-code-link").href = mode.href;
+            $("parallel-code-path").textContent = mode.path;
+          });
+        });
+
+        const threatModes = {
+          ingest: {
+            action: "Inject poisoned, unlicensed, benchmark-contaminated, or privacy-sensitive records through an upstream source.",
+            prevent: "Allowlisted suppliers, immutable snapshots, sandboxed parsers, license/PII policy, deduplication, decontamination, and human escalation.",
+            detect: "Digest and count deltas, provenance gaps, distribution shifts, canary records, rejection audits, and benchmark-overlap reports.",
+            evidence: "Source manifest, content hashes, transformation code/commit, rule versions, pre/post counts, sampled audit, and signed approval."
+          },
+          run: {
+            action: "Steal credentials, alter code/config/data order, inject a malicious checkpoint, or exfiltrate weights from a training job.",
+            prevent: "Ephemeral least-privilege jobs, pinned images/code, isolated storage/network, signed parents, and separate checkpoint writers/readers.",
+            detect: "Config/code/hash drift, unexpected egress, access anomalies, training/eval canaries, and parent-child checkpoint mismatch.",
+            evidence: "Launch identity, image/code/config/data hashes, secret scopes, checkpoint digest, logs, parent ID, and incident disposition."
+          },
+          release: {
+            action: "Publish the wrong weights, leak private raw data or secrets, omit license obligations, or attach scores from a different checkpoint.",
+            prevent: "Staged release bucket, artifact allowlist, automated secret/PII scan, two-person gate, and immutable report manifest.",
+            detect: "Recompute digests, resolve every report link, compare model/eval IDs, inspect package contents, and dry-run a clean download.",
+            evidence: "Signed release manifest, approvals, hashes, SBOM/dependencies, model/data cards, eval harness/output IDs, and rollback pointer."
+          },
+          serve: {
+            action: "Exfiltrate weights or prompts, cross tenant cache boundaries, tamper with a loaded model, or abuse an endpoint to extract memorized data.",
+            prevent: "Tenant isolation, authenticated admission, encrypted stores/links, signed load, egress controls, rate limits, and cache namespace separation.",
+            detect: "Signature/load checks, anomalous downloads/queries, cache-key audits, privacy probes, output policy signals, and SLO/security alerts.",
+            evidence: "Serving image/model/config hashes, access policy, tenant/cache design, audit retention, red-team results, and incident runbook."
+          }
+        };
+
+        document.querySelectorAll("[data-threat]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const mode = threatModes[button.dataset.threat];
+            document.querySelectorAll("[data-threat]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+            $("threat-action").textContent = mode.action;
+            $("threat-prevent").textContent = mode.prevent;
+            $("threat-detect").textContent = mode.detect;
+            $("threat-evidence").textContent = mode.evidence;
+          });
+        });
+
+        const profilerIds = [
+          "serve-batch", "serve-context", "serve-output", "serve-kv-heads", "serve-layers",
+          "serve-head-dim", "serve-params", "serve-weight-bytes", "serve-kv-bytes",
+          "serve-bandwidth", "serve-compute", "serve-efficiency", "serve-overhead"
+        ];
+        const plot = $("serve-plot");
+        const ctx = plot.getContext("2d");
+
+        function formatBytes(bytes) {
+          if (bytes >= 1024 ** 4) return (bytes / 1024 ** 4).toFixed(2) + " TiB";
+          if (bytes >= 1024 ** 3) return (bytes / 1024 ** 3).toFixed(2) + " GiB";
+          if (bytes >= 1024 ** 2) return (bytes / 1024 ** 2).toFixed(1) + " MiB";
+          return bytes.toFixed(0) + " B";
+        }
+
+        function formatDuration(ms) {
+          if (!Number.isFinite(ms)) return "—";
+          if (ms >= 60000) return (ms / 60000).toFixed(1) + " min";
+          if (ms >= 1000) return (ms / 1000).toFixed(2) + " s";
+          return ms.toFixed(2) + " ms";
+        }
+
+        function drawProfiler(prefillMs, bandwidthMs, computeMs) {
+          const width = plot.width;
+          const height = plot.height;
+          const left = 210;
+          const right = 36;
+          const top = 44;
+          const row = 76;
+          const values = [prefillMs, bandwidthMs, computeMs];
+          const labels = ["Prefill compute estimate", "Decode bandwidth floor", "Decode compute floor"];
+          const colors = ["#1557d6", "#b28c00", "#087a50"];
+          const maximum = Math.max(...values, 0.001);
+          ctx.clearRect(0, 0, width, height);
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, width, height);
+          ctx.font = "16px Avenir Next, sans-serif";
+          labels.forEach((label, index) => {
+            const y = top + index * row;
+            const barWidth = Math.max(2, values[index] / maximum * (width - left - right));
+            ctx.fillStyle = "#4f5b66";
+            ctx.fillText(label, 18, y + 19);
+            ctx.fillStyle = "#e9edeb";
+            ctx.fillRect(left, y, width - left - right, 27);
+            ctx.fillStyle = colors[index];
+            ctx.fillRect(left, y, barWidth, 27);
+            ctx.fillStyle = "#111418";
+            ctx.fillText(formatDuration(values[index]), left, y + 51);
+          });
+          ctx.fillStyle = "#77838d";
+          ctx.font = "14px Avenir Next, sans-serif";
+          ctx.fillText("Bars are normalized within this scenario; compare labels, not pixel length across sweeps.", 18, height - 18);
+          plot.setAttribute("aria-label", "Illustrative bars: prefill " + formatDuration(prefillMs) + ", decode bandwidth floor " + formatDuration(bandwidthMs) + ", decode compute floor " + formatDuration(computeMs) + ".");
+        }
+
+        function updateProfiler() {
+          const batch = Math.max(1, Number($("serve-batch").value));
+          const context = Math.max(1, Number($("serve-context").value));
+          const output = Math.max(1, Number($("serve-output").value));
+          const kvHeads = Math.max(1, Number($("serve-kv-heads").value));
+          const layers = Math.max(1, Number($("serve-layers").value));
+          const headDim = Math.max(1, Number($("serve-head-dim").value));
+          const params = Math.max(0.001, Number($("serve-params").value)) * 1e9;
+          const weightBytes = Math.max(0.125, Number($("serve-weight-bytes").value));
+          const kvBytes = Math.max(0.125, Number($("serve-kv-bytes").value));
+          const bandwidth = Math.max(0.001, Number($("serve-bandwidth").value)) * 1e12;
+          const compute = Math.max(0.001, Number($("serve-compute").value)) * 1e12;
+          const efficiency = Math.max(0.01, Number($("serve-efficiency").value));
+          const overhead = Math.max(0, Number($("serve-overhead").value));
+
+          $("serve-batch-out").textContent = batch.toLocaleString();
+          $("serve-context-out").textContent = context.toLocaleString();
+          $("serve-output-out").textContent = output.toLocaleString();
+          $("serve-kv-heads-out").textContent = kvHeads.toLocaleString();
+          $("serve-efficiency-out").textContent = Math.round(efficiency * 100) + "%";
+
+          const kvPerSequenceToken = 2 * layers * kvHeads * headDim * kvBytes;
+          const peakKv = batch * (context + output) * kvPerSequenceToken;
+          const averageContext = context + (output - 1) / 2;
+          const averageKvRead = batch * averageContext * kvPerSequenceToken;
+          const weightStream = params * weightBytes;
+          const bandwidthFloorMs = (weightStream + averageKvRead) / bandwidth * 1000;
+          const computeFloorMs = (2 * params * batch) / compute * 1000;
+          const decodeStepMs = Math.max(bandwidthFloorMs, computeFloorMs) / efficiency;
+          const prefillComputeMs = (2 * params * batch * context) / compute * 1000 / efficiency;
+          const illustrativeTtft = overhead + prefillComputeMs;
+          const throughput = batch / (decodeStepMs / 1000);
+          const duration = output * decodeStepMs;
+          const limiter = bandwidthFloorMs >= computeFloorMs ? "bandwidth / bytes" : "compute / FLOPs";
+          const modelShare = weightStream / Math.max(weightStream + averageKvRead, 1);
+
+          $("serve-kv").textContent = formatBytes(peakKv);
+          $("serve-ttft").textContent = formatDuration(illustrativeTtft);
+          $("serve-tpot").textContent = formatDuration(decodeStepMs) + " / step";
+          $("serve-throughput").textContent = throughput.toFixed(1) + " tok/s";
+          $("serve-duration").textContent = formatDuration(duration);
+          $("serve-limiter").textContent = limiter;
+
+          const gqaLabel = kvHeads === 1 ? "MQA-like" : (kvHeads < 16 ? "GQA-like" : "many-KV-head");
+          $("serve-conclusion").textContent = "At batch " + batch + ", " + context.toLocaleString() + " prompt tokens, and " + output.toLocaleString() + " output tokens, this " + gqaLabel + " setup allocates about " + formatBytes(peakKv) + " of KV cache. The simplified decode roofline is " + limiter + "-limited; approximately " + (modelShare * 100).toFixed(0) + "% of modeled decode bytes are the weight stream and " + ((1 - modelShare) * 100).toFixed(0) + "% are KV reads. The TTFT number adds your " + overhead.toFixed(0) + " ms overhead assumption to a compute-only prefill estimate and is not a measured SLO.";
+          drawProfiler(prefillComputeMs, bandwidthFloorMs, computeFloorMs);
+        }
+
+        profilerIds.forEach((id) => $(id).addEventListener("input", updateProfiler));
+        profilerIds.forEach((id) => $(id).addEventListener("change", updateProfiler));
+        updateProfiler();
+      });
+    </script>
+  </body>
+</html>

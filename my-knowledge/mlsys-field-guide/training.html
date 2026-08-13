@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Interactive training lifecycle: tokenization, curation, data mixtures, scaling trials, recipes, phases, and evaluation gates." />
+    <title>ML Systems Field Guide — Training lifecycle</title>
+    <link rel="stylesheet" href="assets/css/site.css" />
+    <script src="assets/js/site.js" defer></script>
+  </head>
+  <body>
+    <!--
+    THESIS: Training is an evidence-bearing sequence of data and state transitions, not a YAML file; refuse the single smooth loss curve with no trials, lineage, or eval gates.
+    OWN-WORLD: A pipeline debugger for corpora, token counts, scaling trials, optimizer state, phase gates, and checkpoint lineage, using cobalt probes and amber omissions.
+    STORY: Separate tokenizer from embedding, curate and mix data, design scaling points with repeated trials, freeze a recipe, cross phase gates, and reserve final claims.
+    FIRST VIEWPORT: Training pipeline at left and normalized mixture instrument at right; the selected stage exposes exact artifacts and OLMo-core support.
+    FORM: Pipeline Debugger lifecycle workspace, approved task-led hybrid, seed f328a503.
+    FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+    -->
+    <a class="skip-link" href="#main">Skip to training lifecycle</a>
+    <header class="utility-bar">
+      <a class="brand" href="index.html" aria-label="ML Systems Field Guide home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="brand-copy"><strong>ML Systems Field Guide</strong><span>From blue dot to evidence</span></span></a>
+      <nav class="primary-nav" data-primary-nav aria-label="Primary navigation"><a href="index.html">Study console</a><a href="notebook.html">Notebook</a><a href="model.html">Model</a><a href="training.html" aria-current="page">Training</a><a href="systems.html">Systems</a><a href="labs.html">Labs</a><a href="report.html">Report</a><a href="sources.html">Evidence</a></nav>
+      <div class="utility-actions"><button class="utility-button" type="button" data-print>Print</button><button class="utility-button nav-toggle" type="button" data-nav-toggle aria-expanded="false">Menu</button></div>
+    </header>
+    <div class="evidence-ribbon"><strong>Training workspace</strong><span class="status-key status-primary">equations sourced</span><span class="status-key status-repo">OLMo paths verified</span><span class="status-key status-caution">plots are illustrative</span><span class="status-key status-contradiction">single-run certainty refused</span></div>
+
+    <div class="app-shell">
+      <aside class="lifecycle-rail" aria-label="Learning lifecycle">
+        <p class="rail-heading">Lifecycle</p>
+        <ol class="rail-list">
+          <li class="is-complete"><a href="notebook.html"><span class="rail-dot"></span><span class="rail-label"><strong>Sources</strong><small>decode · verify · route</small></span></a></li>
+          <li class="is-complete"><a href="#tokens"><span class="rail-dot"></span><span class="rail-label"><strong>Tokens</strong><small>curate · tokenize · pack</small></span></a></li>
+          <li class="is-complete"><a href="model.html"><span class="rail-dot"></span><span class="rail-label"><strong>Model</strong><small>attend · route · predict</small></span></a></li>
+          <li><a href="#scaling" aria-current="step"><span class="rail-dot"></span><span class="rail-label"><strong>Train</strong><small>scale · optimize · checkpoint</small></span></a></li>
+          <li><a href="#eval-gates"><span class="rail-dot"></span><span class="rail-label"><strong>Eval</strong><small>monitor · select · claim</small></span></a></li>
+          <li><a href="systems.html#inference"><span class="rail-dot"></span><span class="rail-label"><strong>Serve</strong><small>prefill · decode · schedule</small></span></a></li>
+          <li><a href="report.html"><span class="rail-dot"></span><span class="rail-label"><strong>Release</strong><small>artifacts · evidence · risk</small></span></a></li>
+        </ol>
+        <div class="rail-block"><strong>Accounting rule</strong><p>Always distinguish unique eligible tokens, tokens seen, padding, and loss-bearing tokens. “Training tokens” without scope is ambiguous.</p></div>
+      </aside>
+
+      <main class="page-main" id="main">
+        <section class="page-lede">
+          <div><h1>A recipe is a hypothesis. A run is evidence.</h1><p>Trace raw sources into token batches, choose scaling points with repeated trials, freeze the optimizer and schedule, cross explicit phase gates, and keep selection evaluation separate from untouched final claims.</p></div>
+          <div class="lede-controls"><strong>Core distinction</strong><p>A config records intended behavior. Exact data order, optimizer/dataloader state, logs, discarded trials, restarts, checkpoints, and hashes record execution.</p><a class="button button-primary" href="report.html">Open the execution ledger</a></div>
+        </section>
+
+        <section id="tokens" class="section-band" aria-labelledby="tokens-title">
+          <div class="section-heading"><h2 id="tokens-title">Tokenizer → IDs → learned embedding</h2><p>In these OLMo recipes, corpus tokenization occurs before training-data loading: <code>τ</code> maps normalized text or bytes to integer IDs. <code>TokenizerConfig</code> records vocabulary metadata and special IDs; it neither trains nor cryptographically pins the tokenizer artifact. The model then performs a trainable embedding lookup. RoPE later modifies Q and K.</p></div>
+          <div class="trace-workspace" style="grid-template-columns:minmax(0,1fr) 22rem">
+            <div class="trace-stage">
+              <div class="execution-lanes" style="grid-template-columns:repeat(7,minmax(8.2rem,1fr))">
+                <article class="lane"><h3>Raw records</h3><span class="shape">bytes + provenance</span><div class="lane-visual mono">source_id<br />license<br />snapshot</div><p class="lane-note">Do not let the filename stand in for a content digest.</p><span class="lane-arrow">→</span></article>
+                <article class="lane"><h3>Curate</h3><span class="shape">accept / reject</span><div class="lane-visual mono">extract<br />filter<br />dedup<br />decontaminate</div><p class="lane-note">Raw crawl curation is a Dolma concern, not implemented end-to-end in OLMo-core.</p><span class="lane-arrow">→</span></article>
+                <article class="lane"><h3>Tokenizer</h3><span class="shape">τ(text) → IDs</span><div class="lane-visual mono">illustrative IDs<br />[50256, 318, 2830]</div><p class="lane-note">Freeze the actual tokenizer artifact hash, normalization, special tokens, and truncation—not only its identifier.</p><span class="lane-arrow">→</span></article>
+                <article class="lane"><h3>Token source</h3><span class="shape">pre-tokenized arrays</span><div class="lane-visual mono">.npy<br />doc offsets<br />source label</div><p class="lane-note">This is where the composable OLMo data path begins.</p><span class="lane-arrow">→</span></article>
+                <article class="lane"><h3>Mix + pack</h3><span class="shape">[B,S] + masks</span><div class="lane-visual mono">slice<br />sample<br />mix<br />pack</div><p class="lane-note">Report requested and realized ratios after repetition, truncation, and packing.</p><span class="lane-arrow">→</span></article>
+                <article class="lane"><h3>Embedding</h3><span class="shape">E ∈ ℝ<sup>Vmodel×d</sup></span><div class="lane-visual mono">H₀ = E[input_ids]</div><p class="lane-note"><code>Vmodel</code> may exceed tokenizer <code>V</code> after padding; the lookup is optionally tied to the LM head.</p><span class="lane-arrow">→</span></article>
+                <article class="lane"><h3>Next-token loss</h3><span class="shape">labels = IDs shifted left</span><div class="lane-visual mono">−log p(yₜ|x≤t)</div><p class="lane-note">Ignored/padded labels do not bear loss; count them separately.</p></article>
+              </div>
+            </div>
+            <aside class="proof-inspector" aria-label="Tokenization and embedding boundary inspector">
+              <div class="panel-toolbar inspector-section"><h2>Boundary inspector</h2><span class="status status-repo">repo verified</span></div>
+              <div class="inspector-section"><h3>What OLMo-core does</h3><p><a href="../../src/olmo_core/data/tokenizer.py"><code>data/tokenizer.py</code></a> stores tokenizer metadata and special IDs. <a href="../../src/olmo_core/data/composable/"><code>data/composable</code></a> consumes token/document sources and mixes/packs them. <a href="../../src/olmo_core/nn/transformer/model.py"><code>nn/transformer/model.py</code></a> owns the learned <code>nn.Embedding</code>.</p></div>
+              <div class="inspector-section"><h3>What it does not do</h3><p>It does not train BPE/Unigram tokenizers or provide the whole raw crawl → license/PII/quality/dedup pipeline.</p><a class="source-chip is-caution" href="https://arxiv.org/abs/2402.00159">external: Dolma</a></div>
+              <div class="inspector-section"><div class="equation"><strong>Masked next-token CE</strong>L<sub>CE</sub> = −|M|<sup>−1</sup> Σ<sub>t∈M</sub> log softmax(z<sub>t</sub>)<sub>x<sub>t+1</sub></sub></div></div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="data" class="section-band is-dark" aria-labelledby="data-title">
+          <div class="section-heading"><h2 id="data-title">Data curation is an experiment pipeline.</h2><p>Every transformation changes the population the model sees. Keep counts before and after each stage, make rules executable, and preserve rejected-sample audits without republishing private content.</p></div>
+          <div class="study-path" role="list" aria-label="Data curation pipeline">
+            <article class="path-stage"><strong>Acquire</strong><span>source · date · license · hash</span></article><div class="path-connector">→</div>
+            <article class="path-stage"><strong>Extract + filter</strong><span>safe parsers · language · quality · PII</span></article><div class="path-connector">→</div>
+            <article class="path-stage"><strong>Deduplicate</strong><span>exact · MinHash fuzzy · substring</span></article><div class="path-connector">→</div>
+            <article class="path-stage"><strong>Decontaminate</strong><span>benchmark windows · versioned rules · audit set</span></article>
+          </div>
+          <div class="workbench-grid" style="margin-top:1rem;color:var(--ink)">
+            <section class="instrument-panel">
+              <div class="panel-toolbar" style="padding:1rem"><h3>Mixture normalizer</h3><span class="source-chip is-caution">illustrative</span></div>
+              <div class="panel-body control-grid">
+                <div class="control"><label for="mix-web">Web weight</label><input id="mix-web" type="range" min="0" max="100" value="55" /><output id="mix-web-out" for="mix-web">55</output></div>
+                <div class="control"><label for="mix-code">Code weight</label><input id="mix-code" type="range" min="0" max="100" value="25" /><output id="mix-code-out" for="mix-code">25</output></div>
+                <div class="control"><label for="mix-academic">Academic weight</label><input id="mix-academic" type="range" min="0" max="100" value="12" /><output id="mix-academic-out" for="mix-academic">12</output></div>
+                <div class="control"><label for="mix-books">Books weight</label><input id="mix-books" type="range" min="0" max="100" value="8" /><output id="mix-books-out" for="mix-books">8</output></div>
+                <label class="control">Training tokens D (billions) <input id="mix-tokens" type="number" min="1" step="10" value="1000" /></label>
+                <label class="control">Unique code tokens (billions) <input id="mix-code-unique" type="number" min="1" step="1" value="80" /></label>
+                <label class="control">Code exposure cap r<sub>max</sub> <input id="mix-code-cap" type="number" min="0.1" max="20" step="0.1" value="1" /></label>
+              </div>
+              <div class="live-conclusion" id="mix-conclusion" aria-live="polite"></div>
+            </section>
+            <section class="instrument-panel">
+              <div class="panel-toolbar" style="padding:1rem"><h3>Mixture artifacts</h3></div>
+              <div class="panel-body">
+                <div class="formula-stack">
+                  <div class="formula-line"><strong>Normalize</strong><code>pᵢ = wᵢ / Σⱼwⱼ</code></div>
+                  <div class="formula-line"><strong>Requested seen tokens</strong><code>Dᵢ ≈ pᵢD</code></div>
+                  <div class="formula-line"><strong>Mean exposure</strong><code>eᵢ = Dᵢ,realized / Uᵢ</code></div>
+                  <div class="formula-line"><strong>Feasibility</strong><code>Dᵢ,target ≤ rᵢ,max Uᵢ</code></div>
+                  <div class="formula-line"><strong>Hierarchical mix</strong><code>p(leaf) = Πnodes wchild / Σsiblings w</code></div>
+                </div>
+                <p style="margin-top:1rem">Release the source manifest, unique eligible counts, requested weights, realized post-packing proportions, repetition limits, sampler seed, and order/checkpoint semantics.</p>
+                <div class="caution-box"><strong>Feasibility and fingerprint warning</strong><p>Composable mixtures can reject a target whose source exposure exceeds its cap; a normalized request is not automatically feasible. The legacy OLMo NumPy source fingerprint uses basenames and sizes, not content bytes. A transparent release needs separate content digests. <a href="../../src/olmo_core/data/numpy_dataset.py">Inspect the fingerprint</a> and <a href="../../src/olmo_core/data/composable/">composable sources.</a></p></div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section id="scaling" class="section-band" aria-labelledby="scaling-title">
+          <div class="section-heading"><h2 id="scaling-title">A scaling point needs trials, not a dot.</h2><p>Fix a compute budget, sweep model sizes, derive the token budget for each, tune batch/LR/schedule honestly, repeat seeds, and hold out at least one scale for prediction. The canvas below is only an illustrative trace-shape sketch; it is not fit from these controls and does not estimate seed variance.</p></div>
+          <div class="workbench-grid">
+            <section class="instrument-panel">
+              <div class="panel-toolbar" style="padding:1rem"><h3>Scaling-point planner</h3><span class="source-chip is-caution">illustrative trace sketch</span></div>
+              <div class="panel-body control-grid">
+                <div class="control"><label for="scale-compute">Compute budget log₁₀ FLOPs</label><input id="scale-compute" type="range" min="18" max="23" value="21" step="0.25" /><output id="scale-compute-out" for="scale-compute">10²¹</output></div>
+                <div class="control"><label for="scale-params">Candidate model N (billions)</label><input id="scale-params" type="range" min="0.1" max="20" value="3" step="0.1" /><output id="scale-params-out" for="scale-params">3.0B</output></div>
+                <div class="control"><label for="scale-active">Active non-embedding N for 6ND (billions)</label><input id="scale-active" type="range" min="0.1" max="20" value="3" step="0.1" /><output id="scale-active-out" for="scale-active">3.0B</output></div>
+                <div class="control"><label for="scale-trials">Trials per point</label><input id="scale-trials" type="range" min="1" max="7" value="3" step="1" /><output id="scale-trials-out" for="scale-trials">3</output></div>
+              </div>
+              <div class="plot-wrap"><canvas id="scaling-plot" width="900" height="320" role="img" aria-label="Illustrative decreasing training-loss trace shapes, not computed from the planner controls" aria-describedby="scaling-conclusion scaling-equation"></canvas></div>
+              <div class="live-conclusion" id="scaling-conclusion" aria-live="polite"></div>
+            </section>
+            <aside class="instrument-panel" aria-label="Scaling point inspector">
+              <div class="panel-toolbar" style="padding:1rem"><h3>Point inspector</h3></div>
+              <div class="panel-body metric-stack">
+                <div class="metric"><span>Active-path proxy</span><strong>C ≈ 6N<sub>active,nonemb</sub>D</strong></div>
+                <div class="metric"><span>Derived token budget D</span><strong id="derived-tokens">—</strong></div>
+                <div class="metric"><span>TPP total = D / N<sub>total</sub></span><strong id="tpp-total">—</strong></div>
+                <div class="metric"><span>TPP active = D / N<sub>active</sub></span><strong id="tpp-active">—</strong></div>
+                <div class="metric"><span>Replications</span><strong id="trial-count">—</strong></div>
+              </div>
+              <div class="inspector-section">
+                <h3>What the shorthand hides</h3><p id="scaling-equation"><code>Ctrain≈6Nactive,nonembDseen</code> is a first-order active-path proxy. Attention, routing, and communication need measured or model-specific FLOPs. <code>D/Ntotal</code> is a separate capacity ratio. Chinchilla’s roughly 20 TPP is an empirical regime, not a universal constant.</p>
+              </div>
+              <div class="inspector-section"><h3>OLMo-core boundary</h3><p><a href="../../src/olmo_core/model_ladder/base.py"><code>model_ladder</code></a> can configure sizes/runs and collect metrics. It does not fit scaling-law exponents, automate uncertainty, or supply multiple seeds per point.</p></div>
+            </aside>
+          </div>
+          <div class="lab-console"><div><h3>Evidence to save</h3><p>Every trial tuple <code>(point, N_total, N_active, D, C, B_tokens, LR, schedule, mix_hash, seed, status, checkpoint, val_loss)</code>, including failures and censored runs.</p></div><a class="button button-primary" href="labs.html#lab-scaling">Open scaling lab</a></div>
+        </section>
+
+        <section id="recipe" class="section-band" aria-labelledby="recipe-title">
+          <div class="section-heading"><h2 id="recipe-title">Optimizer, schedule, and batch are coupled.</h2><p>The handwritten page asks whether learning rate belongs to the optimizer or scheduler. In this checkout, <code>Scheduler.set_lr</code> reads either trainer step or cumulative train tokens, computes LR from the parameter group’s <code>initial_lr</code>, and writes the optimizer group’s mutable <code>lr</code>. Report the whole piecewise function.</p></div>
+          <div class="workbench-grid">
+            <section class="instrument-panel">
+              <div class="panel-toolbar" style="padding:1rem"><h3>Schedule oscilloscope</h3><span id="schedule-kind-label" class="source-chip is-repo">cosine</span></div>
+              <div class="panel-body">
+                <div class="choice-strip" id="schedule-choices" role="group" aria-label="Learning-rate schedule family">
+                  <button type="button" data-schedule="cosine" aria-pressed="true"><strong>Cosine</strong><small>decay across horizon</small></button>
+                  <button type="button" data-schedule="wsd" aria-pressed="false"><strong>WSD</strong><small>warmup · stable · decay</small></button>
+                  <button type="button" data-schedule="linear" aria-pressed="false"><strong>Linear</strong><small>warmup · ramp down</small></button>
+                  <button type="button" data-schedule="inverse" aria-pressed="false"><strong>Inverse √</strong><small>warmup · long tail</small></button>
+                </div>
+                <div class="control-grid" style="margin-top:1rem"><div class="control"><label for="schedule-warmup">Warmup fraction</label><input id="schedule-warmup" type="range" min="0" max="0.3" value="0.05" step="0.01" /><output id="schedule-warmup-out" for="schedule-warmup">5%</output></div><div class="control"><label for="schedule-alpha">α<sub>f</sub> or WSD decay floor</label><input id="schedule-alpha" type="range" min="0" max="0.5" value="0.1" step="0.01" /><output id="schedule-alpha-out" for="schedule-alpha">0.10</output></div></div>
+                <div class="plot-wrap"><canvas id="schedule-plot" width="900" height="320" role="img" aria-label="Learning-rate schedule curve" aria-describedby="schedule-conclusion schedule-equation"></canvas></div>
+                <div class="live-conclusion" id="schedule-conclusion" aria-live="polite"></div>
+                <p class="formula-note" id="schedule-equation"><code>αf</code> defines <code>ηmin=αfηinitial</code> for cosine, linear, and inverse-square-root. For inverse square root it is an asymptote, so <code>η(T)</code> can remain above it. WSD uses the same control here as a normalized teaching proxy for its absolute <code>decay_min_lr</code> and applies a linear terminal decay.</p>
+              </div>
+            </section>
+            <aside class="instrument-panel" aria-label="Optimizer and schedule recipe state">
+              <div class="panel-toolbar" style="padding:1rem"><h3>Recipe state</h3></div>
+              <div class="panel-body"><table class="evidence-table"><tbody>
+                <tr><th>Optimizer</th><td>AdamW/LionW type, LR, decay, eps, betas, exact parameter groups</td></tr>
+                <tr><th>Batch</th><td><code>global = micro × accumulation × DP world</code>, in sequences and tokens</td></tr>
+                <tr><th>Stability</th><td>grad norm scope, clip threshold/warmup, loss spike policy, precision</td></tr>
+                <tr><th>Compile</th><td>Boolean path plus graph breaks, recompiles, and parity tests</td></tr>
+                <tr><th>Checkpoint</th><td>model, optimizer, scheduler config/horizon, trainer step/token counters, RNG, dataloader state, sharding</td></tr>
+              </tbody></table></div>
+              <div class="inspector-section"><div class="caution-box"><strong><code>alpha_f</code> is numeric.</strong><p>For cosine, linear, and inverse-square-root it sets an LR floor/asymptote relative to <code>initial_lr</code>. WSD/WSDS instead expose absolute <code>decay_min_lr</code>. It is not a Boolean, even if the note uses a question mark.</p></div></div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="phases" class="section-band is-dark" aria-labelledby="phases-title">
+          <div class="section-heading"><h2 id="phases-title">Every phase is a state transition.</h2><p>Do not draw pretrain → posttrain as labels on one arrow. At each boundary, identify the parent checkpoint, data delta, context/RoPE change, trainable modules, objective, optimizer continuation/reset, tokens/examples, and entry/exit evaluation.</p></div>
+          <div class="study-path" role="list" aria-label="Training phase lineage">
+            <article class="path-stage"><strong>Broad pretrain</strong><span>next-token CE · broad mix · base context</span></article><div class="path-connector">→</div>
+            <article class="path-stage"><strong>Midtrain / anneal</strong><span>quality/domain mix · lower LR · exact parent</span></article><div class="path-connector">→</div>
+            <article class="path-stage"><strong>Long context</strong><span>sequence mix · RoPE scaling · memory shift</span></article><div class="path-connector">→</div>
+            <article class="path-stage"><strong>Posttrain</strong><span>SFT → DPO → online RL/RLVR, each separately evidenced</span></article>
+          </div>
+          <div class="workbench-grid" style="margin-top:1rem;color:var(--ink)">
+            <section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>OLMo 3 7B base path</h3><span class="status status-repo">artifact reconstruction</span></div><div class="panel-body"><p>OLMo-core includes official broad pretrain, midtrain, long-context recipes and local SFT scripts. DPO/RLVR artifacts are documented for OLMo 3, but their implementations live in the adjacent Open Instruct stack.</p><table class="evidence-table"><thead><tr><th>Stage</th><th>README rounded phase budget</th><th>CSV cumulative endpoint</th></tr></thead><tbody><tr><td>Broad pretrain</td><td>5.93T</td><td>5,929,965,715,456</td></tr><tr><td>Midtrain</td><td>100B</td><td>6,027,869,159,424</td></tr><tr><td>Long context</td><td>50B</td><td>6,073,675,153,408</td></tr></tbody></table><p class="formula-note">CSV deltas are 97,903,443,968 and 45,805,993,984 tokens for stages 2 and 3. They are near, but not identical to, the rounded README budgets.</p><div class="caution-box"><strong>Artifact conflict, not one recipe.</strong><p>Frozen artifacts have different scopes and some conflicting defaults. README values are rounded phase reports; CSV <code>Tokens Seen</code> is cumulative checkpoint accounting; the 7B long-context script still declares a <code>5e12</code> horizon, and the 32B long-context script defaults to a pretraining parent while commenting the merged midtraining parent. Reconstruct execution only from the launched config, parent checkpoint, logs, and checkpoint ledger together.</p></div></div></section>
+            <section class="instrument-panel"><div class="panel-toolbar" style="padding:1rem"><h3>Boundary record</h3></div><div class="panel-body formula-stack"><div class="formula-line"><strong>Parent</strong><code>checkpoint hash + code/config</code></div><div class="formula-line"><strong>Data delta</strong><code>mix hash + tokens/examples</code></div><div class="formula-line"><strong>Model delta</strong><code>context · RoPE · trainable modules</code></div><div class="formula-line"><strong>State policy</strong><code>optimizer · trainer · dataloader: load/reset</code></div><div class="formula-line"><strong>Gate</strong><code>entry regression + exit decision</code></div></div></section>
+          </div>
+        </section>
+
+        <section id="eval-gates" class="section-band" aria-labelledby="eval-title">
+          <div class="section-heading"><h2 id="eval-title">Eval runs wherever a decision can leak.</h2><p>The same benchmark cannot be both a repeatedly inspected selection signal and an untouched final claim. Label each evaluation by role, checkpoint, dataset version/hash, prompt template, decoding, contamination status, and uncertainty.</p></div>
+          <div style="overflow-x:auto"><table class="comparison-table">
+            <thead><tr><th>Gate</th><th>Purpose</th><th>Typical signal</th><th>Failure if omitted</th><th>Artifact</th></tr></thead>
+            <tbody>
+              <tr><td>Before training</td><td>validate data/tokenizer/packing</td><td>round-trip, provenance, decontamination, tiny overfit</td><td>train on corrupt or leaked inputs</td><td>data audit + unit results</td></tr>
+              <tr><td>Scaling proxy</td><td>choose law/recipe</td><td>held-out loss, residuals, forecast error</td><td>pick a noisy single winner</td><td>all trial rows + fit</td></tr>
+              <tr><td>In-loop</td><td>monitor regressions</td><td>LM loss/per-domain PPL, cheap capability probes</td><td>discover collapse after full compute</td><td>time-series + checkpoint IDs</td></tr>
+              <tr><td>Phase entry/exit</td><td>compare to exact parent</td><td>loss/capability/safety/context regression</td><td>lose causal stage lineage</td><td>immutable gate report</td></tr>
+              <tr><td>Posttraining dev</td><td>tune SFT/DPO/RL</td><td>instruction, reward, KL, safety, length</td><td>reward hacking or capability collapse</td><td>policy/reward snapshots</td></tr>
+              <tr><td>Final claim</td><td>estimate generalization</td><td>untouched suite + confidence interval</td><td>publish selection-biased scores</td><td>frozen harness and raw outputs</td></tr>
+              <tr><td>Serving gate</td><td>quality–SLO parity</td><td>accuracy, TTFT, TPOT, goodput, memory</td><td>fast but degraded deployment</td><td>workload + engine trace</td></tr>
+            </tbody>
+          </table></div>
+          <div class="lab-console"><div><h3>Concrete OLMo caveat · baseline <code>1e03ad1</code></h3><p><a href="../../src/olmo_core/train/callbacks/evaluator_callback.py"><code>EvaluatorCallback</code></a> supports startup, finish, step interval, and fixed-step evaluation. Both 7B stage-1 scripts attach LM and downstream evaluators every 10,000 steps; the 32B pretrain script uses 1,000. The 7B/32B midtrain and long-context scripts attach no evaluator callback. This establishes in-loop callback configuration—not an untouched final evaluation or a completed eval artifact.</p></div><a class="button button-primary" href="labs.html#lab-phases">Diff stage configs</a></div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="site-footer"><p>Interactive curves are explicitly synthetic teaching data; no learner or model result is claimed.</p><p><a href="systems.html">Continue to systems</a></p></footer>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const $ = (id) => document.getElementById(id);
+        const mixIds = ['web','code','academic','books'];
+        function updateMix() {
+          const values = Object.fromEntries(mixIds.map((id) => [id, Number($('mix-' + id).value)]));
+          mixIds.forEach((id) => $('mix-' + id + '-out').textContent = values[id]);
+          const sum = Object.values(values).reduce((a,b) => a+b, 0) || 1;
+          const D = Math.max(0, Number($('mix-tokens').value));
+          const codeUnique = Math.max(0.001, Number($('mix-code-unique').value));
+          const codeCap = Math.max(0.1, Number($('mix-code-cap').value));
+          const parts = mixIds.map((id) => id + ' ' + (values[id] / sum * 100).toFixed(1) + '%').join(' · ');
+          const codeSeen = D * values.code / sum;
+          const exposure = codeSeen / codeUnique;
+          const feasible = codeSeen <= codeCap * codeUnique;
+          $('mix-conclusion').textContent = 'Normalized request: ' + parts + '. At ' + D.toFixed(0) + 'B seen tokens, code requests ' + codeSeen.toFixed(1) + 'B; against ' + codeUnique.toFixed(1) + 'B unique eligible tokens, mean exposure is ' + exposure.toFixed(2) + '×. With cap ' + codeCap.toFixed(1) + '× this request is ' + (feasible ? 'feasible under the simplified source check' : 'infeasible unless the cap, target, or mixture changes') + '. Realized exposure still depends on the actual sampler, truncation, and packing.';
+        }
+        mixIds.forEach((id) => $('mix-' + id).addEventListener('input', updateMix));
+        ['mix-tokens','mix-code-unique','mix-code-cap'].forEach((id) => $(id).addEventListener('input', updateMix));
+
+        const scaleCanvas = $('scaling-plot'); const scaleCtx = scaleCanvas.getContext('2d');
+        function drawAxes(ctx, canvas, yLabel) {
+          const w = canvas.width, h = canvas.height; ctx.clearRect(0,0,w,h); ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.strokeStyle='#c7cfcb';ctx.lineWidth=1;
+          for(let i=0;i<7;i++){const x=70+i*(w-110)/6;ctx.beginPath();ctx.moveTo(x,24);ctx.lineTo(x,h-42);ctx.stroke();}
+          for(let i=0;i<5;i++){const y=24+i*(h-66)/4;ctx.beginPath();ctx.moveTo(70,y);ctx.lineTo(w-40,y);ctx.stroke();}
+          ctx.fillStyle='#4f5b66';ctx.font='16px Avenir Next, sans-serif';ctx.fillText(yLabel,14,30);ctx.fillText('training progress →',w-190,h-12);
+        }
+        function updateScaling() {
+          const logC=Number($('scale-compute').value), N=Number($('scale-params').value), active=Math.min(N,Number($('scale-active').value)), trials=Number($('scale-trials').value);
+          $('scale-compute-out').textContent='10^'+logC.toFixed(2);$('scale-params-out').textContent=N.toFixed(1)+'B';$('scale-active-out').textContent=active.toFixed(1)+'B';$('scale-trials-out').textContent=String(trials);
+          const C=Math.pow(10,logC), D=C/(6*active*1e9), tppTotal=D/(N*1e9), tppActive=D/(active*1e9);
+          const formatBillions=(value)=>value>=0.1?value.toFixed(1)+'B':(value*1000).toFixed(1)+'M';
+          const formatRatio=(value)=>value>=0.1?value.toFixed(1):value.toPrecision(2);
+          $('derived-tokens').textContent=formatBillions(D/1e9)+' tokens';$('tpp-total').textContent=formatRatio(tppTotal);$('tpp-active').textContent=formatRatio(tppActive);$('trial-count').textContent=trials+' planned trials / point';
+          $('scale-compute').setAttribute('aria-valuetext','10 to the '+logC.toFixed(2)+' FLOPs');$('scale-params').setAttribute('aria-valuetext',N.toFixed(1)+' billion total parameters');$('scale-active').setAttribute('aria-valuetext',active.toFixed(1)+' billion active non-embedding parameters');$('scale-trials').setAttribute('aria-valuetext',trials+' planned trials per point');
+          drawAxes(scaleCtx,scaleCanvas,'validation loss ↓'); const colors=['#1557d6','#087a50','#8156c2'];
+          colors.forEach((color,point)=>{for(let t=0;t<trials;t++){scaleCtx.beginPath();for(let i=0;i<=120;i++){const x=70+i*(scaleCanvas.width-110)/120;const progress=i/120;const noise=(t-(trials-1)/2)*0.004;const loss=1.15-0.48*(1-Math.exp(-3.2*progress))+point*0.075+Math.sin(progress*8+t)*0.008+noise;const py=35+(loss-0.55)*250;if(i===0)scaleCtx.moveTo(x,py);else scaleCtx.lineTo(x,py);}scaleCtx.strokeStyle=color;scaleCtx.globalAlpha=0.35+0.55/(t+1);scaleCtx.lineWidth=t===0?3:1.5;scaleCtx.stroke();}});scaleCtx.globalAlpha=1;
+          $('scaling-conclusion').textContent='Planner at 10^'+logC.toFixed(2)+' FLOPs: the active-path 6ND proxy derives '+formatBillions(D/1e9)+' seen tokens from '+active.toFixed(1)+'B active non-embedding parameters. Capacity ratio D/Ntotal='+formatRatio(tppTotal)+'; active TPP='+formatRatio(tppActive)+'. '+trials+' trials per point are planned. The drawn traces are decorative decreasing-loss shapes, not results, fits, or variance estimates.';
+        }
+        ['scale-compute','scale-params','scale-active','scale-trials'].forEach((id)=>$(id).addEventListener('input',updateScaling));
+
+        let scheduleKind='cosine'; const scheduleCanvas=$('schedule-plot'); const scheduleCtx=scheduleCanvas.getContext('2d');
+        function scheduleValue(kind,t,warm,alpha){if(t<=warm)return t/Math.max(warm,0.001);if(kind==='cosine')return alpha+(1-alpha)*0.5*(1+Math.cos(Math.PI*t));if(kind==='linear')return 1-(1-alpha)*t;if(kind==='inverse')return alpha+(1-alpha)*Math.sqrt(Math.max(warm,0.001)/Math.max(t,0.001));if(kind==='wsd'){const decay=0.28;if(t<1-decay)return 1;return alpha+(1-alpha)*(1-t)/decay;}return 1;}
+        function updateSchedule(){const warm=Number($('schedule-warmup').value),alpha=Number($('schedule-alpha').value);$('schedule-warmup-out').textContent=Math.round(warm*100)+'%';$('schedule-alpha-out').textContent=alpha.toFixed(2);$('schedule-kind-label').textContent=scheduleKind;$('schedule-warmup').setAttribute('aria-valuetext',Math.round(warm*100)+' percent of horizon');$('schedule-alpha').setAttribute('aria-valuetext',alpha.toFixed(2)+' relative LR floor');drawAxes(scheduleCtx,scheduleCanvas,'relative LR');scheduleCtx.beginPath();for(let i=0;i<=240;i++){const t=i/240,x=70+t*(scheduleCanvas.width-110),value=scheduleValue(scheduleKind,t,warm,alpha),y=24+(1-value)*(scheduleCanvas.height-66);if(i===0)scheduleCtx.moveTo(x,y);else scheduleCtx.lineTo(x,y);}scheduleCtx.strokeStyle='#1557d6';scheduleCtx.lineWidth=4;scheduleCtx.stroke();const end=scheduleValue(scheduleKind,1,warm,alpha);const detail=scheduleKind==='wsd'?'WSD holds the peak after warmup, then linearly decays over the last 28% to the displayed normalized floor; baseline WSD config names this absolute field decay_min_lr. ':scheduleKind==='inverse'?'Inverse square root approaches ηmin asymptotically, so η(T)='+end.toFixed(3)+'× peak even though αf='+alpha.toFixed(2)+'. ':scheduleKind+' reaches '+end.toFixed(3)+'× peak at this normalized horizon. ';$('schedule-conclusion').textContent=detail+'Warmup occupies '+Math.round(warm*100)+'%. This curve mirrors the frozen scheduler equations but is not evidence of an executed recipe.';}
+        document.querySelectorAll('[data-schedule]').forEach((button)=>button.addEventListener('click',()=>{scheduleKind=button.dataset.schedule;document.querySelectorAll('[data-schedule]').forEach((b)=>b.setAttribute('aria-pressed',String(b===button)));updateSchedule();}));['schedule-warmup','schedule-alpha'].forEach((id)=>$(id).addEventListener('input',updateSchedule));
+        updateMix();updateScaling();updateSchedule();
+      });
+    </script>
+  </body>
+</html>
