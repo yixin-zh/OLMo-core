@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="An evidence-traceable field guide from Transformer foundations through ML systems, training, inference, and transparent LLM reports." />
+    <title>ML Systems Field Guide — Study console</title>
+    <link rel="stylesheet" href="assets/css/site.css" />
+    <script src="assets/js/site.js" defer></script>
+  </head>
+  <body>
+    <!--
+    THESIS: Single-step the LLM lifecycle from a handwritten question to math, code, experiment, and evidence; refuse the generic course-homepage hero and card grid.
+    OWN-WORLD: Cool-white instrument panels, charcoal rules, cobalt probes, amber breakpoints, compact controls, and dense traces with written conclusions.
+    STORY: Establish source authority, bridge CS224N to CS336 and OLMo-core, inspect one end-to-end trace, then choose a hands-on path or report audit.
+    FIRST VIEWPORT: Sticky utility strip, lifecycle rail, dominant execution trace, right proof inspector, and bottom lab console; the trace carries the page.
+    FORM: Pipeline Debugger, grounded direction 4, seed f328a503; task-led hybrid approved by delegation after the decision server failed.
+    FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+    -->
+    <a class="skip-link" href="#main">Skip to the study console</a>
+    <header class="utility-bar">
+      <a class="brand" href="index.html" aria-label="ML Systems Field Guide home">
+        <span class="brand-mark" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </span>
+        <span class="brand-copy">
+          <strong>ML Systems Field Guide</strong>
+          <span>From blue dot to evidence</span>
+        </span>
+      </a>
+      <nav class="primary-nav" data-primary-nav aria-label="Primary navigation">
+        <a href="index.html" aria-current="page">Study console</a>
+        <a href="notebook.html">Notebook</a>
+        <a href="model.html">Model</a>
+        <a href="training.html">Training</a>
+        <a href="systems.html">Systems</a>
+        <a href="labs.html">Labs</a>
+        <a href="report.html">Report</a>
+        <a href="sources.html">Evidence</a>
+      </nav>
+      <div class="utility-actions">
+        <button class="utility-button" type="button" data-print>Print</button>
+        <button class="utility-button nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-label="Toggle navigation">Menu</button>
+      </div>
+    </header>
+
+    <div class="evidence-ribbon" role="note" aria-label="Evidence legend">
+      <strong>Evidence states</strong>
+      <span class="status-key status-primary">primary or official source</span>
+      <span class="status-key status-repo">verified in this checkout</span>
+      <span class="status-key status-caution">illustrative or needs verification</span>
+      <span class="status-key status-contradiction">correction required</span>
+    </div>
+
+    <div class="app-shell">
+      <aside class="lifecycle-rail" aria-label="Learning lifecycle">
+        <p class="rail-heading">Lifecycle</p>
+        <ol class="rail-list">
+          <li class="is-complete">
+            <a href="notebook.html">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Sources</strong><small>notes · authority · gaps</small></span>
+            </a>
+          </li>
+          <li>
+            <a href="training.html#tokens">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Tokens</strong><small>curate · tokenize · pack</small></span>
+            </a>
+          </li>
+          <li>
+            <a href="model.html">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Model</strong><small>attend · route · predict</small></span>
+            </a>
+          </li>
+          <li>
+            <a href="training.html">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Train</strong><small>scale · optimize · checkpoint</small></span>
+            </a>
+          </li>
+          <li>
+            <a href="training.html#eval-gates">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Eval</strong><small>monitor · select · claim</small></span>
+            </a>
+          </li>
+          <li>
+            <a href="systems.html#inference">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Serve</strong><small>prefill · decode · schedule</small></span>
+            </a>
+          </li>
+          <li>
+            <a href="report.html" aria-current="step">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Release</strong><small>artifacts · evidence · risk</small></span>
+            </a>
+          </li>
+        </ol>
+        <div class="rail-block">
+          <strong>Local boundaries</strong>
+          <p>OLMo-core is the executable anchor. Vision RoPE, production serving, raw-crawl curation, complete security, and online RL are adjacent systems—not hidden features here.</p>
+        </div>
+      </aside>
+
+      <main class="page-main" id="main">
+        <section class="page-lede" aria-labelledby="page-title">
+          <div>
+            <h1 id="page-title">Single-step the whole LLM lifecycle.</h1>
+            <p>
+              Start with a term you underlined. Establish its equation, follow its tensors into
+              OLMo-core, perturb one choice, profile the consequence, and record the artifact a
+              transparent technical report would need.
+            </p>
+          </div>
+          <div class="lede-controls">
+            <strong>Your first probe</strong>
+            <p>RoPE is ideal: one derivation, one tensor transform, one context-extension trade-off, and a clear repository boundary for images.</p>
+            <div class="button-row">
+              <a class="button button-primary" href="model.html#rope">Open RoPE lab</a>
+              <a class="button" href="notebook.html">Decode the photos</a>
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="trace-title">
+          <div class="trace-workspace">
+            <div class="trace-stage">
+              <div class="trace-toolbar">
+                <h2 id="trace-title">Execution trace</h2>
+                <div class="tab-list" role="tablist" aria-label="Trace views" data-tabs>
+                  <button class="tab-button" type="button" role="tab" aria-selected="true" aria-controls="trace-flow" id="trace-tab-flow">Token flow</button>
+                  <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="trace-shapes" id="trace-tab-shapes" tabindex="-1">Shape ledger</button>
+                  <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="trace-evidence" id="trace-tab-evidence" tabindex="-1">Release evidence</button>
+                </div>
+              </div>
+
+              <div id="trace-flow" role="tabpanel" aria-labelledby="trace-tab-flow">
+                <div class="execution-lanes" role="group" aria-label="Illustrative token-to-release execution trace">
+                  <article class="lane">
+                    <h3>Token IDs</h3>
+                    <span class="shape">[B, S]</span>
+                    <div class="lane-visual mono" role="img" aria-label="Example token IDs">50256 318 2830 1467 287 3819</div>
+                    <p class="lane-note">A tokenizer maps bytes or text to discrete IDs. It does not produce semantic vectors.</p>
+                    <span class="lane-arrow" aria-hidden="true">→</span>
+                  </article>
+                  <article class="lane">
+                    <h3>Embedding</h3>
+                    <span class="shape">[B, S, d]</span>
+                    <div class="lane-visual" aria-hidden="true">
+                      <span class="tensor-row"><i class="tensor-cell"></i><i class="tensor-cell"></i><i class="tensor-cell"></i><i class="tensor-cell"></i><i class="tensor-cell"></i></span>
+                      <span class="tensor-row"><i class="tensor-cell"></i><i class="tensor-cell"></i><i class="tensor-cell"></i><i class="tensor-cell"></i><i class="tensor-cell"></i></span>
+                      <span class="tensor-row"><i class="tensor-cell"></i><i class="tensor-cell"></i><i class="tensor-cell"></i><i class="tensor-cell"></i><i class="tensor-cell"></i></span>
+                    </div>
+                    <p class="lane-note">A trainable lookup table inside the model: <code>nn.Embedding(V, d)</code>.</p>
+                    <span class="lane-arrow" aria-hidden="true">→</span>
+                  </article>
+                  <article class="lane">
+                    <h3>Q, K, V</h3>
+                    <span class="shape">Q:[B,S,Hq,dh]</span>
+                    <div class="lane-visual formula-stack">
+                      <code>Q = XWq</code><code>K = XWk</code><code>V = XWv</code>
+                    </div>
+                    <p class="lane-note">Query heads and KV heads may differ: MHA, GQA, or MQA.</p>
+                    <span class="lane-arrow" aria-hidden="true">→</span>
+                  </article>
+                  <article class="lane">
+                    <h3>RoPE</h3>
+                    <span class="shape">rotate Q, K</span>
+                    <div class="lane-visual">
+                      <svg viewBox="0 0 100 100" role="img" aria-label="Two position-dependent rotations in a coordinate plane">
+                        <line x1="50" y1="8" x2="50" y2="92" stroke="#8d9994" />
+                        <line x1="8" y1="50" x2="92" y2="50" stroke="#8d9994" />
+                        <line x1="50" y1="50" x2="78" y2="27" stroke="#1557d6" stroke-width="3" />
+                        <line x1="50" y1="50" x2="84" y2="64" stroke="#d0a600" stroke-width="3" />
+                        <circle cx="50" cy="50" r="3" fill="#111418" />
+                      </svg>
+                    </div>
+                    <p class="lane-note">Inner products become functions of relative displacement.</p>
+                    <span class="lane-arrow" aria-hidden="true">→</span>
+                  </article>
+                  <article class="lane">
+                    <h3>Attention</h3>
+                    <span class="shape">[B,Hq,S,S]</span>
+                    <div class="lane-visual mono">softmax(QKᵀ/√dh + M)V</div>
+                    <p class="lane-note">FlashAttention changes IO and tiling, not the exact mathematical result.</p>
+                    <span class="lane-arrow" aria-hidden="true">→</span>
+                  </article>
+                  <article class="lane">
+                    <h3>FFN or MoE</h3>
+                    <span class="shape">[B,S,d]</span>
+                    <div class="lane-visual mono">W₂[SiLU(W₁x) ⊙ W₃x]</div>
+                    <p class="lane-note">Dense gated FFN or sparse top-k experts; active compute and total capacity differ.</p>
+                    <span class="lane-arrow" aria-hidden="true">→</span>
+                  </article>
+                  <article class="lane">
+                    <h3>Loss + update</h3>
+                    <span class="shape">scalar → gradients</span>
+                    <div class="lane-visual mono">CE + αL<sub>bal</sub> + βL<sub>z</sub></div>
+                    <p class="lane-note">MoE auxiliary terms solve different router failures; they are not one generic loss.</p>
+                    <span class="lane-arrow" aria-hidden="true">→</span>
+                  </article>
+                  <article class="lane">
+                    <h3>Release gate</h3>
+                    <span class="shape">artifacts + claims</span>
+                    <div class="lane-visual">
+                      <span class="status status-primary">math sourced</span>
+                      <span class="status status-repo">code anchored</span>
+                      <span class="status status-caution">run missing</span>
+                    </div>
+                    <p class="lane-note">Architecture transparency alone cannot reproduce an executed training run.</p>
+                  </article>
+                </div>
+                <div class="probe-cursor" data-label="RoPE probe" aria-hidden="true"></div>
+              </div>
+
+              <div id="trace-shapes" role="tabpanel" aria-labelledby="trace-tab-shapes" hidden>
+                <table class="evidence-table">
+                  <thead><tr><th>Boundary</th><th>Input</th><th>Output</th><th>Invariant to verify</th></tr></thead>
+                  <tbody>
+                    <tr><td>Tokenizer → model</td><td>text or bytes</td><td><code>[B,S]</code> integer IDs</td><td>special IDs and truncation policy are pinned</td></tr>
+                    <tr><td>Embedding</td><td><code>[B,S]</code></td><td><code>[B,S,d]</code></td><td>lookup is trainable and may tie to LM head</td></tr>
+                    <tr><td>QKV projection</td><td><code>[B,S,d]</code></td><td><code>Q:[B,S,Hq,dh]</code>; <code>K,V:[B,S,Hkv,dh]</code></td><td><code>Hq % Hkv = 0</code></td></tr>
+                    <tr><td>LM head</td><td><code>[B,S,d]</code></td><td><code>[B,S,V]</code></td><td>labels are shifted next-token IDs; ignored tokens are masked</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div id="trace-evidence" role="tabpanel" aria-labelledby="trace-tab-evidence" hidden>
+                <table class="evidence-table">
+                  <thead><tr><th>Transparency axis</th><th>What would prove it</th><th>This guide’s status</th></tr></thead>
+                  <tbody>
+                    <tr><td>Algorithm</td><td>equations, block graph, objectives, scaling hypothesis</td><td><span class="status status-primary">primary sources mapped</span></td></tr>
+                    <tr><td>Recipe</td><td>full config, data manifests, seeds, schedule, hardware, parallelism</td><td><span class="status status-repo">OLMo scripts inspectable</span></td></tr>
+                    <tr><td>Execution</td><td>all trials, immutable logs, failures, checkpoints, measured curves, hashes</td><td><span class="status status-caution">learner runs not executed yet</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <aside class="proof-inspector" aria-labelledby="inspector-title">
+              <div class="panel-toolbar inspector-section">
+                <h2 id="inspector-title">Proof inspector</h2>
+                <span class="status status-primary">primary source</span>
+              </div>
+              <section class="inspector-section">
+                <h3>RoPE relative-position property</h3>
+                <div class="equation">
+                  <strong>Paired rotation</strong>
+                  q′<sub>m</sub> = R(m)q<sub>m</sub><br />
+                  k′<sub>n</sub> = R(n)k<sub>n</sub><br /><br />
+                  (R(m)q)ᵀ(R(n)k) = qᵀR(n−m)k
+                </div>
+                <p>Because <code>R(m)ᵀR(n)=R(n−m)</code>, the rotated dot product depends on relative displacement. That does not mean every RoPE frequency simply decays with distance.</p>
+              </section>
+              <section class="inspector-section">
+                <h3>Exact trail</h3>
+                <p><a href="../../src/olmo_core/nn/rope.py"><code>src/olmo_core/nn/rope.py</code></a></p>
+                <span class="source-chip is-primary">RoFormer §3.2</span>
+                <span class="source-chip is-repo">OLMo-core text RoPE</span>
+                <span class="source-chip is-caution">vision M-RoPE external</span>
+              </section>
+              <section class="inspector-section">
+                <h3>Repository boundary</h3>
+                <p>OLMo-core implements text RoPE plus ABF, PI, stepwise, and YaRN scaling. Its vision encoder uses learned absolute positions with interpolation, not Qwen-style 2D/M-RoPE.</p>
+              </section>
+            </aside>
+          </div>
+
+          <div class="lab-console">
+            <div>
+              <h2>Lab console · relative-position check</h2>
+              <p>Rotate random q and k at positions m and n. Numerically verify the dot product equals the unrotated pair with angle n−m; then break the pair layout and observe the invariant fail.</p>
+            </div>
+            <a class="button button-primary" href="labs.html#lab-rope">Open the lab contract</a>
+          </div>
+        </section>
+
+        <section class="section-band" aria-labelledby="path-title">
+          <div class="section-heading">
+            <h2 id="path-title">One path, four altitudes.</h2>
+            <p>The local folders do not contain CS224N material. Use its current official syllabus as the foundation bridge, use CS336 for from-scratch systems practice, then read OLMo-core as a production glass box. The capstone is a report you can audit—not just a model you can describe.</p>
+          </div>
+          <div class="study-path" role="list" aria-label="Recommended learning path">
+            <article class="path-stage">
+              <strong>CS224N bridge</strong>
+              <span>linear algebra · probability · CE · backprop · embeddings · Transformer foundations</span>
+            </article>
+            <div class="path-connector" aria-hidden="true">→</div>
+            <article class="path-stage">
+              <strong>CS336 from scratch</strong>
+              <span>BPE · decoder LM · profiling · kernels · parallelism · scaling · data · alignment</span>
+            </article>
+            <div class="path-connector" aria-hidden="true">→</div>
+            <article class="path-stage">
+              <strong>OLMo-core glass box</strong>
+              <span>configs · published stages · MoE · mixtures · eval callbacks · distributed training</span>
+            </article>
+            <div class="path-connector" aria-hidden="true">→</div>
+            <article class="path-stage">
+              <strong>Transparent report</strong>
+              <span>model + data + scaling trials + recipe + execution + eval + inference + security</span>
+            </article>
+          </div>
+        </section>
+
+        <section class="section-band is-dark" aria-labelledby="authority-title">
+          <div class="section-heading">
+            <h2 id="authority-title">Do not merge the sources into one voice.</h2>
+            <p>“Helpful” and “authoritative” are separate states. The unofficial notes are searchable explanation drafts; one MoE section is scientifically unsafe and lecture 17 describes a different year’s course. Every claim travels with its authority class.</p>
+          </div>
+          <div class="source-boundary">
+            <article class="source-level">
+              <span class="status status-primary">claim authority</span>
+              <h3>Primary papers and standards</h3>
+              <p>Equations, algorithm claims, reported model choices, security terminology.</p>
+            </article>
+            <article class="source-level">
+              <span class="status status-repo">implementation authority</span>
+              <h3>This OLMo-core checkout</h3>
+              <p>What the library actually builds, trains, evaluates, profiles, and generates.</p>
+            </article>
+            <article class="source-level">
+              <span class="status status-primary">course authority</span>
+              <h3>Official CS336 Spring 2026</h3>
+              <p>Course framing and current lecture sequence at pinned commit <code>8b59b507</code>.</p>
+            </article>
+            <article class="source-level">
+              <span class="status status-caution">explanation lead</span>
+              <h3>Unofficial Spring 2025 notes</h3>
+              <p>Auto-generated; timestamps and sections contain defects. Verify before teaching.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section-band" aria-labelledby="gaps-title">
+          <div class="section-heading">
+            <h2 id="gaps-title">Knowledge-gap routing table</h2>
+            <p>Each row answers a different question: which foundation comes first, which CS336 exercise makes it concrete, where OLMo-core shows production structure, and where the repository honestly stops.</p>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="gap-matrix">
+              <thead>
+                <tr><th>Probe</th><th>Foundation</th><th>CS336 practice</th><th>OLMo-core trail</th><th>External boundary</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Transformer construction</td><td>matrix shapes, residuals, CE</td><td>A1 decoder LM</td><td><code>nn/transformer</code></td><td>—</td></tr>
+                <tr><td>Activations and gated FFNs</td><td>scalar functions + parameter count</td><td>controlled FFN comparison</td><td><code>nn/feed_forward.py</code></td><td>ReLU baseline is educational</td></tr>
+                <tr><td>Text / image RoPE</td><td>2D rotations and dot products</td><td>relative-position test; 2026 L17</td><td><code>nn/rope.py</code></td><td>2D/M-RoPE not implemented here</td></tr>
+                <tr><td>Attention heads</td><td>QKV tensors and bandwidth</td><td>MHA/GQA/MQA cache sweep</td><td><code>nn/attention</code></td><td>production request scheduling absent</td></tr>
+                <tr><td>MoE and losses</td><td>top-k, softmax, histograms</td><td>collapse + balance lab</td><td><code>nn/moe</code></td><td>not an exact DeepSeek recipe</td></tr>
+                <tr><td>Tokenization and data</td><td>BPE and learned lookup distinction</td><td>A1 tokenizer; A4 data</td><td><code>data/composable</code></td><td>raw crawl curation belongs in Dolma</td></tr>
+                <tr><td>Scaling and trials</td><td>power-law fits and uncertainty</td><td>A3 IsoFLOPs</td><td><code>model_ladder</code></td><td>no fitter or multi-seed runner</td></tr>
+                <tr><td>Phases and eval</td><td>selection versus final tests</td><td>L12, L15–16</td><td>callbacks + OLMo3 scripts</td><td>DPO/RLVR uses Open Instruct</td></tr>
+                <tr><td>Inference systems</td><td>roofline, memory, queueing</td><td>L10 profile</td><td><code>generate</code> + KV cache</td><td>no continuous batching/PagedAttention</td></tr>
+                <tr><td>Training/data security</td><td>threat models and provenance</td><td>curation + incident exercise</td><td>secret plumbing only</td><td>full controls are an extension</td></tr>
+                <tr><td>RL rollout</td><td>policy ratios, rewards, advantages</td><td>online rollout lab</td><td>generation precursor only</td><td>orchestration/trainer absent</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section-band" aria-labelledby="next-title">
+          <div class="section-heading">
+            <h2 id="next-title">Choose the next breakpoint.</h2>
+            <p>If the math feels abstract, start from the photos. If the terms feel familiar but ungrounded, open the model workbench. If you already know the architecture, use the report builder to find what a technical report still fails to disclose.</p>
+          </div>
+          <div class="button-row">
+            <a class="button button-primary" href="notebook.html">Proofread every blue dot</a>
+            <a class="button" href="model.html">Open the model workbench</a>
+            <a class="button" href="report.html">Audit a transparent report</a>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="site-footer">
+      <p>Local-first learning artifact · illustrative values are labeled · source claims remain auditable.</p>
+      <p><a href="sources.html">Evidence desk</a> · <span data-current-year></span></p>
+    </footer>
+  </body>
+</html>

@@ -67,3 +67,12 @@ light.
 
 No deployment target is chosen. The static site is local-first. Actual lab results and measured GPU
 traces do not exist yet and must never be implied by illustrative demos.
+
+## Approved composition
+
+Task-led hybrid. The composition board failed before recording a response, so the choice was
+delegated from the brief. `comp-a-trace-first.png` governs the landing and model workbench,
+`comp-b-notebook-first.png` governs the notebook decoder, and `comp-c-ledger-first.png` governs the
+transparent-report builder. They share the same utility strip, lifecycle rail, probe cursor,
+inspector anatomy, colors, rule weights, typography, and evidence states. The compositions are north
+stars rather than claim-bearing screenshots; invented metrics in them must never ship as real data.

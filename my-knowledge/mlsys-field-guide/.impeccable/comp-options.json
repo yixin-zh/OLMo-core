@@ -1,0 +1,57 @@
+{
+  "title": "Choose the Pipeline Debugger composition",
+  "question": "Which composition should govern the site? The hybrid keeps one visual system while letting each task lead with its strongest surface.",
+  "options": [
+    {
+      "id": "hybrid",
+      "label": "Task-led hybrid",
+      "kicker": "RECOMMENDED",
+      "lineage": "one debugger, three synchronized workspaces",
+      "thesis": "Trace-first teaches the lifecycle, notebook-first decodes the photos, and ledger-first audits model transparency.",
+      "palette": ["#f3f5f3", "#111418", "#1557d6", "#f2c84b", "#c63d32"],
+      "materials": ["matte instrument panels", "probe traces", "evidence tape"],
+      "viewport": "The landing page uses the trace-first composition; notebook and report pages inherit the same controls and probes with task-specific density.",
+      "risk": "Shared component grammar must be strict so the topology changes feel intentional rather than like separate products.",
+      "sketch": ".impeccable/mocks/comp-a-trace-first.png"
+    },
+    {
+      "id": "trace-first",
+      "label": "Trace everywhere",
+      "kicker": "COMPOSITION A",
+      "lineage": "compiler pipeline and tensor debugger",
+      "thesis": "Every page single-steps left-to-right through one dominant execution trace.",
+      "palette": ["#f3f5f3", "#111418", "#1557d6", "#f2c84b", "#c63d32"],
+      "materials": ["matte panels", "probe cursor", "diagnostic rules"],
+      "viewport": "Lifecycle rail, dominant token-to-release trace, proof inspector, and lab console.",
+      "risk": "The notebook photos and report matrix have to fight the trace for space.",
+      "sketch": ".impeccable/mocks/comp-a-trace-first.png"
+    },
+    {
+      "id": "notebook-first",
+      "label": "Notebook everywhere",
+      "kicker": "COMPOSITION B",
+      "lineage": "source workbench and live proof inspector",
+      "thesis": "The learner always begins from one photographed question and translates it into math and code.",
+      "palette": ["#f3f5f3", "#111418", "#1557d6", "#f2c84b", "#c63d32"],
+      "materials": ["source raster", "probe pins", "proofreading channel"],
+      "viewport": "Large notebook source, normalized concept, and live systems inspector.",
+      "risk": "It underplays the full lifecycle and makes later systems topics feel secondary.",
+      "sketch": ".impeccable/mocks/comp-b-notebook-first.png"
+    },
+    {
+      "id": "ledger-first",
+      "label": "Ledger everywhere",
+      "kicker": "COMPOSITION C",
+      "lineage": "release audit and experiment tracker",
+      "thesis": "Every lesson begins from a missing disclosure or experiment artifact in the transparent-report matrix.",
+      "palette": ["#f3f5f3", "#111418", "#1557d6", "#f2c84b", "#c63d32"],
+      "materials": ["evidence matrix", "inline plots", "status tape"],
+      "viewport": "Release ledger, selected scaling experiment, transparency inspector, and token-to-release trace.",
+      "risk": "It is powerful for synthesis but too advanced as the first contact with Transformer fundamentals.",
+      "sketch": ".impeccable/mocks/comp-c-ledger-first.png"
+    }
+  ],
+  "reroll": false,
+  "canon": false,
+  "steer": true
+}

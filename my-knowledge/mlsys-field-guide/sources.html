@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Evidence desk for the ML Systems Field Guide: pinned source versions, repository coverage, corrections, and a remote-only primary-paper registry."
+    />
+    <title>ML Systems Field Guide — Evidence desk</title>
+    <link rel="stylesheet" href="assets/css/site.css" />
+    <script src="assets/js/site.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the evidence desk</a>
+    <header class="utility-bar">
+      <a class="brand" href="index.html" aria-label="ML Systems Field Guide home">
+        <span class="brand-mark" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </span>
+        <span class="brand-copy">
+          <strong>ML Systems Field Guide</strong>
+          <span>From blue dot to evidence</span>
+        </span>
+      </a>
+      <nav class="primary-nav" data-primary-nav aria-label="Primary navigation">
+        <a href="index.html">Study console</a>
+        <a href="notebook.html">Notebook</a>
+        <a href="model.html">Model</a>
+        <a href="training.html">Training</a>
+        <a href="systems.html">Systems</a>
+        <a href="labs.html">Labs</a>
+        <a href="report.html">Report</a>
+        <a href="sources.html" aria-current="page">Evidence</a>
+      </nav>
+      <div class="utility-actions">
+        <button class="utility-button" type="button" data-print>Print</button>
+        <button
+          class="utility-button nav-toggle"
+          type="button"
+          data-nav-toggle
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >Menu</button>
+      </div>
+    </header>
+
+    <div class="evidence-ribbon" role="note" aria-label="Evidence legend">
+      <strong>Evidence states</strong>
+      <span class="status-key status-primary">primary or official source</span>
+      <span class="status-key status-repo">verified in this checkout</span>
+      <span class="status-key status-caution">illustrative or needs verification</span>
+      <span class="status-key status-contradiction">correction required</span>
+    </div>
+
+    <div class="app-shell">
+      <aside class="lifecycle-rail" aria-label="Learning lifecycle">
+        <p class="rail-heading">Lifecycle</p>
+        <ol class="rail-list">
+          <li class="is-complete">
+            <a href="notebook.html">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Sources</strong><small>notes · authority · gaps</small></span>
+            </a>
+          </li>
+          <li class="is-complete">
+            <a href="training.html#tokens">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Tokens</strong><small>curate · tokenize · pack</small></span>
+            </a>
+          </li>
+          <li class="is-complete">
+            <a href="model.html">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Model</strong><small>attend · route · predict</small></span>
+            </a>
+          </li>
+          <li class="is-complete">
+            <a href="training.html">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Train</strong><small>scale · optimize · checkpoint</small></span>
+            </a>
+          </li>
+          <li class="is-complete">
+            <a href="training.html#eval-gates">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Eval</strong><small>monitor · select · claim</small></span>
+            </a>
+          </li>
+          <li class="is-complete">
+            <a href="systems.html#inference">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Serve</strong><small>prefill · decode · schedule</small></span>
+            </a>
+          </li>
+          <li>
+            <a href="sources.html" aria-current="step">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Release</strong><small>artifacts · evidence · risk</small></span>
+            </a>
+          </li>
+        </ol>
+        <div class="rail-block">
+          <strong>Audit rule</strong>
+          <p>A paper can establish an algorithm claim. Code can establish checkout behavior. Only immutable run artifacts establish what an experiment actually did.</p>
+        </div>
+      </aside>
+
+      <main class="page-main" id="main">
+        <section class="page-lede" aria-labelledby="page-title">
+          <div>
+            <h1 id="page-title">Evidence Desk</h1>
+            <p>
+              Trace each statement to the right kind of authority: an official course or primary
+              paper for the claim, a pinned checkout for implementation behavior, and run artifacts
+              for executed results. This page freezes the boundary before the learning labs begin.
+            </p>
+          </div>
+          <div class="lede-controls">
+            <strong>Registry state · 2026-08-13</strong>
+            <p><span class="status status-caution">0 local PDFs</span> Every paper link below is canonical and remote. “P0/P1/P2 download” is a queue label, not proof of download.</p>
+            <div class="button-row">
+              <a class="button button-primary" href="#paper-registry">Open paper registry</a>
+              <a class="button" href="#corrections">Read corrections</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-band" aria-labelledby="boundary-title">
+          <div class="section-heading">
+            <h2 id="boundary-title">Version boundary: what was actually inspected</h2>
+            <p>
+              These hashes identify the evidence snapshot, not the current website revision. Later
+              field-guide commits do not silently widen claims about the OLMo library or course notes.
+            </p>
+          </div>
+          <div class="instrument-panel">
+            <div class="panel-toolbar">
+              <h3>Source ledger</h3>
+              <span class="source-chip is-repo">hashes recorded in full</span>
+            </div>
+            <div class="panel-body" role="region" aria-label="Pinned source ledger" tabindex="0" style="overflow-x:auto">
+              <table class="evidence-table">
+                <thead>
+                  <tr>
+                    <th>Source family</th>
+                    <th>Frozen version</th>
+                    <th>Authority</th>
+                    <th>Limit</th>
+                    <th>Open</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>CS336 Spring 2026 lectures</strong><br /><span class="status status-primary">official course</span></td>
+                    <td><code>8b59b50730766695c2ffedd1a79c50cd09b9eb91</code></td>
+                    <td>Current local course framing, lecture sequence, diagrams, and exercise context.</td>
+                    <td>Pedagogical material is not an executed model run or a substitute for each cited paper.</td>
+                    <td><a href="../cs336-26spr-lectures/index.html">local snapshot</a> · <a href="https://github.com/stanford-cs336/lectures">canonical repository</a></td>
+                  </tr>
+                  <tr>
+                    <td><strong>CS336 Spring 2025 transcription</strong><br /><span class="status status-caution">unofficial notes</span></td>
+                    <td><code>d7d100e4619d1ed1b3665bf11cf344f13a48890d</code></td>
+                    <td>Searchable discovery aid, study prompts, and rough explanations.</td>
+                    <td>Auto-generated, a different course year, and known to contain duplication and transcription defects.</td>
+                    <td><a href="../cs336-transcription/index.html">local site</a> · <a href="https://github.com/QihongRuan/stanford-cs336-notes">canonical repository</a></td>
+                  </tr>
+                  <tr>
+                    <td><strong>OLMo-core</strong><br /><span class="status status-repo">implementation baseline</span></td>
+                    <td><code>1e03ad1c2dcb0836c6805e27b89e22a70cd7523f</code> (<code>1e03ad1</code>)</td>
+                    <td>What this checkout configures and implements in model, training, data loading, evaluation, generation, and distributed systems.</td>
+                    <td>A script or class proves available behavior—not that a published run used it, finished, or achieved a reported metric.</td>
+                    <td><a href="https://github.com/allenai/OLMo-core/tree/1e03ad1c2dcb0836c6805e27b89e22a70cd7523f">canonical snapshot</a></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Three learner photographs</strong><br /><span class="status status-caution">personal observation</span></td>
+                    <td>Local files inventoried 2026-08-13</td>
+                    <td>Authoritative for what was underlined, marked with blue dots, or still uncertain.</td>
+                    <td>Not authoritative for equations, acronyms, model behavior, or paper claims.</td>
+                    <td><a href="../20260812_174414.JPG">photo 1</a> · <a href="../20260812_174420.JPG">photo 2</a> · <a href="../20260812_174430.JPG">photo 3</a></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Prior chat synthesis</strong><br /><span class="status status-caution">tertiary draft</span></td>
+                    <td>Local file inventoried 2026-08-13; no independent version pin</td>
+                    <td>Useful for recovering vocabulary, open questions, and candidate reading trails.</td>
+                    <td>Conversation-derived prose can compound earlier errors; no technical claim is promoted without a source above it.</td>
+                    <td><a href="../Chat_history.md">local chat history</a></td>
+                  </tr>
+                  <tr>
+                    <td><strong>CS224N</strong><br /><span class="status status-contradiction">no local notes found</span></td>
+                    <td>No local snapshot or commit</td>
+                    <td>The official Stanford course page is the external foundation bridge.</td>
+                    <td>Do not describe CS224N notes as locally reviewed, cached, or version-pinned.</td>
+                    <td><a href="https://web.stanford.edu/class/cs224n/">official course page</a></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="caution-box">
+            <strong>Boundary, not chronology.</strong>
+            <p>The field-guide HTML may be newer than <code>1e03ad1</code>. All “verified in this checkout” statements on this page refer to the frozen OLMo-core code baseline above unless a later hash is explicitly named.</p>
+          </div>
+        </section>
+
+        <section class="section-band is-dark" aria-labelledby="hierarchy-title">
+          <div class="section-heading">
+            <h2 id="hierarchy-title">The source hierarchy is claim-shaped</h2>
+            <p>No source sits at the top for every question. Select authority by the claim being made, then preserve its version and limitations.</p>
+          </div>
+          <div class="source-boundary">
+            <article class="source-level">
+              <span class="status status-primary">algorithm authority</span>
+              <h3>Primary paper or standard</h3>
+              <p>Defines an equation, method, reported experiment, or shared security vocabulary. It does not prove this checkout matches it.</p>
+            </article>
+            <article class="source-level">
+              <span class="status status-repo">implementation authority</span>
+              <h3>Code at a frozen commit</h3>
+              <p>Shows what can be constructed or called at that revision. It does not prove a training job executed that path.</p>
+            </article>
+            <article class="source-level">
+              <span class="status status-caution">execution authority</span>
+              <h3>Run artifacts</h3>
+              <p>Immutable config, data manifest, seed, logs, hardware trace, checkpoints, and eval outputs establish what happened. Learner runs do not exist yet.</p>
+            </article>
+            <article class="source-level">
+              <span class="status status-caution">discovery aid</span>
+              <h3>Transcript or personal note</h3>
+              <p>Locates questions and explanations. Every factual claim must travel upward to an official source, paper, code anchor, or run artifact.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section-band" id="repo-coverage" aria-labelledby="coverage-title">
+          <div class="section-heading">
+            <h2 id="coverage-title">Repository coverage matrix</h2>
+            <p>
+              “In the repository” is intentionally narrow. The anchor column names inspectable code;
+              the boundary column prevents adjacent systems from being mistaken for hidden features.
+            </p>
+          </div>
+          <div role="region" aria-label="OLMo-core coverage matrix" tabindex="0" style="overflow-x:auto">
+            <table class="gap-matrix">
+              <thead>
+                <tr>
+                  <th>Question</th>
+                  <th>Exact checkout anchor</th>
+                  <th>What the baseline establishes</th>
+                  <th>What it does not establish</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Transformer, embedding, LM loss</td>
+                  <td><a href="../../src/olmo_core/nn/transformer/model.py"><code>nn/transformer/model.py</code></a><br /><a href="../../src/olmo_core/nn/lm_head.py"><code>nn/lm_head.py</code></a></td>
+                  <td>Decoder model construction, token embedding lookup, output projection, and configurable loss path.</td>
+                  <td>Tokenizer training and raw-text normalization happen outside the model.</td>
+                </tr>
+                <tr>
+                  <td>Text and image position</td>
+                  <td><a href="../../src/olmo_core/nn/rope.py"><code>nn/rope.py</code></a><br /><a href="../../src/olmo_core/nn/vision/image_vit.py"><code>nn/vision/image_vit.py</code></a></td>
+                  <td>Text RoPE plus ABF, position interpolation, stepwise scaling, and YaRN; vision uses learned absolute positions with interpolation.</td>
+                  <td>No Qwen-style 2D/M-RoPE implementation; no universal long-context guarantee.</td>
+                </tr>
+                <tr>
+                  <td>Attention heads and KV state</td>
+                  <td><a href="../../src/olmo_core/nn/attention/base.py"><code>nn/attention/base.py</code></a><br /><a href="../../src/olmo_core/nn/attention/kv_cache.py"><code>nn/attention/kv_cache.py</code></a></td>
+                  <td>Configurable attention, head grouping, backends, and a KV-cache abstraction for generation.</td>
+                  <td>No production request scheduler, PagedAttention allocator, or continuous batching service.</td>
+                </tr>
+                <tr>
+                  <td>Dense FFN and MoE losses</td>
+                  <td><a href="../../src/olmo_core/nn/feed_forward.py"><code>nn/feed_forward.py</code></a><br /><a href="../../src/olmo_core/nn/moe/router.py"><code>nn/moe/router.py</code></a> · <a href="../../src/olmo_core/nn/moe/loss.py"><code>loss.py</code></a> · <a href="../../src/olmo_core/nn/moe/moe.py"><code>moe.py</code></a></td>
+                  <td>Gated/dense feed-forward choices, routing, load-balancing terms, router z-loss, and expert-parallel building blocks.</td>
+                  <td>Not an exact reproduction of DeepSeek’s private production stack or every paper’s training recipe.</td>
+                </tr>
+                <tr>
+                  <td>Tokenized data, packing, and mixtures</td>
+                  <td><a href="../../src/olmo_core/data/composable/__init__.py"><code>data/composable/__init__.py</code></a><br /><a href="../../src/olmo_core/data/composable/numpy_document_source.py"><code>numpy_document_source.py</code></a></td>
+                  <td>Consumption, sampling, mixing, slicing, packing, and visualization of pre-tokenized sources.</td>
+                  <td>No tokenizer trainer, raw web crawl, PII scrubber, licensing adjudication, or full curation pipeline.</td>
+                </tr>
+                <tr>
+                  <td>Scaling points and TPP</td>
+                  <td><a href="../../src/olmo_core/model_ladder/base.py"><code>model_ladder/base.py</code></a><br /><a href="../../src/olmo_core/model_ladder/wsds_chinchilla_run_configurator.py"><code>wsds_chinchilla_run_configurator.py</code></a></td>
+                  <td>Model-ladder configuration and tokens-per-parameter budgeting heuristics for candidate runs.</td>
+                  <td>No general power-law fitter, uncertainty report, seed policy, or automatic independent-trial manager.</td>
+                </tr>
+                <tr>
+                  <td>Training, eval, checkpoints, parallelism</td>
+                  <td><a href="../../src/olmo_core/train/trainer.py"><code>train/trainer.py</code></a><br /><a href="../../src/olmo_core/train/callbacks/evaluator_callback.py"><code>evaluator_callback.py</code></a> · <a href="../../src/olmo_core/distributed/parallel/tensor_parallel.py"><code>distributed/parallel/tensor_parallel.py</code></a></td>
+                  <td>Training loop, callback-driven evaluation and checkpointing, plus DP/TP/PP/CP/EP configuration.</td>
+                  <td>Code presence alone does not show a particular run’s topology, failures, or completed eval gates.</td>
+                </tr>
+                <tr>
+                  <td>Pretrain, midtrain, long context, posttrain handoff</td>
+                  <td><a href="../../src/scripts/official/OLMo3/README.md"><code>scripts/official/OLMo3/README.md</code></a></td>
+                  <td>Published phase-specific OLMo 3 scripts and the repository’s documented handoff points.</td>
+                  <td>Online RL orchestration and the full DPO/RLVR execution stack are external; SFT support is not proof of a completed posttraining run.</td>
+                </tr>
+                <tr>
+                  <td>Generation and profiling</td>
+                  <td><a href="../../src/olmo_core/generate/generation_module/transformer/generation_module.py"><code>generate/.../generation_module.py</code></a><br /><a href="../../src/olmo_core/train/callbacks/profiler.py"><code>train/callbacks/profiler.py</code></a></td>
+                  <td>Fixed-batch model generation primitives and training-side profiler integration.</td>
+                  <td>No production queueing, admission control, autoscaling, request-level SLO system, or serving benchmark harness.</td>
+                </tr>
+                <tr>
+                  <td>Security, provenance, and integrity</td>
+                  <td><a href="../../src/olmo_core/io.py"><code>io.py</code></a><br /><a href="../../src/olmo_core/data/composable/numpy_document_source.py"><code>numpy_document_source.py</code></a></td>
+                  <td>Storage/credential plumbing and a reproducibility-oriented source fingerprint.</td>
+                  <td>No complete threat model, poisoning defense, model-weight signing, PII governance, or content-addressed dataset integrity system.</td>
+                </tr>
+                <tr>
+                  <td>Online RL rollout</td>
+                  <td><a href="../../src/olmo_core/generate/generation_module/generation_module.py"><code>generate/generation_module.py</code></a></td>
+                  <td>Generation is a precursor that can produce samples.</td>
+                  <td>No end-to-end actor/reference/reward/critic rollout service, advantage computation, PPO/GRPO trainer, or replay lifecycle.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="evidence-box">
+            <strong>Inference timing caution</strong>
+            <p>The generation module’s first-token timing is measured around its internal first forward pass. It is not end-to-end arrival-to-first-byte TTFT: queueing, tokenization, network transport, scheduler delay, and response serialization are outside that timer.</p>
+          </div>
+        </section>
+
+        <section class="section-band" id="corrections" aria-labelledby="corrections-title">
+          <div class="section-heading">
+            <h2 id="corrections-title">Known corrections and transcription traps</h2>
+            <p>Keep the question that produced a mistaken note, but repair the claim beside it. Repetition, confident wording, and equation-like typography are not independent evidence.</p>
+          </div>
+          <div class="workbench-grid">
+            <article class="correction-box">
+              <strong>Unofficial means verification required</strong>
+              <p>The transcription repository’s own README describes the notes as automatically generated and potentially erroneous. Use them to locate a topic, then verify against the lecture, primary paper, or code.</p>
+              <p><a href="../cs336-transcription/README.md">local README</a> · <a href="https://github.com/QihongRuan/stanford-cs336-notes#readme">canonical README</a></p>
+            </article>
+            <article class="correction-box">
+              <strong>2025 and 2026 are different course snapshots</strong>
+              <p>The official material here is Spring 2026; the transcript is Spring 2025. Lecture numbers, examples, assignments, and contemporary model claims must not be merged as if they came from one release.</p>
+            </article>
+            <article class="correction-box">
+              <strong>Duplicated prose is a generation defect</strong>
+              <p><a href="../cs336-transcription/notes/lec15.md"><code>notes/lec15.md</code></a> repeats the “Training Data: Instruction Tuning Datasets” section. <a href="../cs336-transcription/notes/lec07.md"><code>notes/lec07.md</code></a> repeats its practical takeaways/TL;DR and contains a malformed <code>errors.## TL;DR</code> boundary. Repetition is not corroboration.</p>
+            </article>
+            <article class="correction-box">
+              <strong>Currency once collided with MathJax</strong>
+              <p>The pinned transcript commit <code>d7d100e4</code> fixes dollar currency being parsed as math delimiters. Older HTML or copied excerpts may still contain broken inline equations; compare with the pinned source.</p>
+            </article>
+            <article class="correction-box">
+              <strong>TPP is a ratio, not throughput</strong>
+              <p><code>TPP = training tokens / parameter count</code>. Name the denominator—total, non-embedding, or active parameters—especially for MoE. A checkpoint from one trajectory is not an independent scaling point; each point requires its own run.</p>
+            </article>
+            <article class="correction-box">
+              <strong><code>alpha_f</code> is not a Boolean</strong>
+              <p>In the scheduler schema it is a floating terminal learning-rate fraction: <code>η_min = η_initial × α_f</code>. A handwritten question mark can mean “check this type”; resolve it from the schema instead of silently deleting it.</p>
+              <p><a href="../../src/olmo_core/optim/scheduler.py"><code>optim/scheduler.py</code></a></p>
+            </article>
+            <article class="correction-box">
+              <strong>Tokenization is not embedding</strong>
+              <p>A tokenizer deterministically maps normalized text or bytes to integer IDs under a pinned vocabulary and rules. An embedding is a trainable lookup from IDs to model vectors. The data pipeline crosses that boundary at <code>[B,S]</code>.</p>
+            </article>
+            <article class="correction-box">
+              <strong>RoPE rotates Q and K</strong>
+              <p>Standard RoPE applies position-dependent paired rotations after Q/K projection—not to the token embedding table. Image-position schemes vary: the OLMo vision path inspected here is not Qwen-style M-RoPE.</p>
+            </article>
+            <article class="correction-box">
+              <strong>Two z-losses must not be conflated</strong>
+              <p>Router z-loss penalizes the squared router <code>logsumexp</code> to control logits. Load balance is a separate objective. The LM-head softmax z-loss has a different scope even when the mathematical motif looks similar.</p>
+            </article>
+            <article class="correction-box">
+              <strong>“Auxiliary-loss-free” needs a footnote</strong>
+              <p>DeepSeek-V3 removes the usual token-level auxiliary balancing objective, but uses per-expert routing bias and reports a complementary sequence-wise balance loss. The phrase does not mean “no balancing mechanism or related loss.”</p>
+            </article>
+            <article class="correction-box">
+              <strong>A fingerprint is not automatically a security hash</strong>
+              <p>The inspected NumPy document-source fingerprint is derived from source metadata such as paths and sizes, rather than hashing every file’s bytes. Treat it as reproducibility identity, not proof against tampering.</p>
+              <p><a href="../../src/olmo_core/data/composable/numpy_document_source.py"><code>numpy_document_source.py</code></a></p>
+            </article>
+            <article class="correction-box">
+              <strong>Assignments are not official solutions</strong>
+              <p>The unofficial assignment pages are useful study guidance. They do not establish Stanford grading criteria, reference outputs, or endorsed solutions. Link claims back to the official course snapshot.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section-band is-dark" id="paper-registry" aria-labelledby="papers-title">
+          <div class="section-heading">
+            <h2 id="papers-title">Primary-paper registry</h2>
+            <p>
+              Canonical abstract and PDF links are live and remote. P0 is foundational for the first
+              learning pass, P1 supports a named comparison or lab, and P2 is a deeper implementation
+              extension. No paper has been downloaded into this repository.
+            </p>
+          </div>
+          <div class="caution-box">
+            <strong>Download ledger</strong>
+            <p><span class="status status-caution">0 files cached</span> A “P0 download” chip is a planned action. It must not be converted to “available locally” until a file, checksum, license note, and source URL are recorded.</p>
+          </div>
+          <div class="instrument-panel">
+            <div class="trace-toolbar">
+              <h3>Choose a paper family</h3>
+              <div class="tab-list" role="tablist" aria-label="Paper registry sections" data-tabs>
+                <button class="tab-button" type="button" role="tab" aria-selected="true" aria-controls="papers-model" id="papers-tab-model">Model + math</button>
+                <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="papers-training" id="papers-tab-training" tabindex="-1">Data + scaling</button>
+                <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="papers-systems" id="papers-tab-systems" tabindex="-1">Systems + posttrain</button>
+              </div>
+            </div>
+
+            <section id="papers-model" role="tabpanel" aria-labelledby="papers-tab-model">
+              <div class="panel-body" role="region" aria-label="Model and mathematics papers" tabindex="0" style="overflow-x:auto">
+                <table class="evidence-table">
+                  <thead><tr><th>Topic · primary source</th><th>Why it belongs</th><th>Authority boundary</th><th>Links · queue</th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Transformer</strong><br />Vaswani et al., “Attention Is All You Need” (2017)</td>
+                      <td>Defines scaled dot-product attention, multi-head attention, positional encoding, and the original block.</td>
+                      <td>Original encoder–decoder architecture; not a modern decoder-only recipe or serving design.</td>
+                      <td><a href="https://arxiv.org/abs/1706.03762">abstract</a> · <a href="https://arxiv.org/pdf/1706.03762">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Subword tokenization</strong><br />Sennrich et al., “Neural Machine Translation of Rare Words with Subword Units” (2015)</td>
+                      <td>Introduces BPE-style subword segmentation for open-vocabulary neural language tasks.</td>
+                      <td>Does not specify today’s byte-level pre-tokenizers, normalization choices, or production tokenizer provenance.</td>
+                      <td><a href="https://arxiv.org/abs/1508.07909">abstract</a> · <a href="https://arxiv.org/pdf/1508.07909">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>ReLU, GLU, SwiGLU</strong><br />Shazeer, “GLU Variants Improve Transformer” (2020)</td>
+                      <td>Motivates and empirically compares gated FFN variants, including GEGLU and SwiGLU.</td>
+                      <td>Empirical model-quality comparison, not a universal hardware-efficiency ranking.</td>
+                      <td><a href="https://arxiv.org/abs/2002.05202">abstract</a> · <a href="https://arxiv.org/pdf/2002.05202">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>1D RoPE</strong><br />Su et al., “RoFormer” (2021)</td>
+                      <td>Defines rotary position embedding and its relative-position dot-product structure.</td>
+                      <td>Does not define Qwen’s multimodal M-RoPE or guarantee extrapolation beyond training context.</td>
+                      <td><a href="https://arxiv.org/abs/2104.09864">abstract</a> · <a href="https://arxiv.org/pdf/2104.09864">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>RoPE context extension</strong><br />Peng et al., “YaRN” (2023)</td>
+                      <td>Combines frequency-aware interpolation and attention scaling for context-window extension.</td>
+                      <td>Results depend on the base model, target length, data, and continued-training recipe.</td>
+                      <td><a href="https://arxiv.org/abs/2309.00071">abstract</a> · <a href="https://arxiv.org/pdf/2309.00071">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>MHA → GQA</strong><br />Ainslie et al., “GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints” (2023)</td>
+                      <td>Defines grouped-query attention and analyzes the quality/speed trade between MHA and MQA.</td>
+                      <td>Serving gains remain workload- and kernel-dependent; head grouping alone is not a full inference system.</td>
+                      <td><a href="https://arxiv.org/abs/2305.13245">abstract</a> · <a href="https://arxiv.org/pdf/2305.13245">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Multimodal RoPE</strong><br />Wang et al., “Qwen2-VL” (2024)</td>
+                      <td>Reports multimodal rotary position embedding over temporal and spatial dimensions.</td>
+                      <td>A model technical report; not evidence that the inspected OLMo vision path implements M-RoPE.</td>
+                      <td><a href="https://arxiv.org/abs/2409.12191">abstract</a> · <a href="https://arxiv.org/pdf/2409.12191">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Interleaved M-RoPE</strong><br />Qwen Team, “Qwen3-VL Technical Report” (2025)</td>
+                      <td>Extends the multimodal position design and reports enhanced interleaving and textual timestamps.</td>
+                      <td>Current external report, not a local implementation anchor; reported gains are recipe-specific.</td>
+                      <td><a href="https://arxiv.org/abs/2511.21631">abstract</a> · <a href="https://arxiv.org/pdf/2511.21631">remote PDF</a><br /><span class="source-chip is-primary">P2 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Sparse experts</strong><br />Fedus et al., “Switch Transformers” (2021)</td>
+                      <td>Establishes a practical top-1 sparse-expert design and its capacity/load-balancing concerns.</td>
+                      <td>Encoder–decoder experiments and specific routing choices do not define all modern decoder MoEs.</td>
+                      <td><a href="https://arxiv.org/abs/2101.03961">abstract</a> · <a href="https://arxiv.org/pdf/2101.03961">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Stable MoE routing</strong><br />Zoph et al., “ST-MoE” (2022)</td>
+                      <td>Analyzes router stability, load balance, capacity, and router z-loss at scale.</td>
+                      <td>Its auxiliary objectives must be mapped term-by-term before comparing with another MoE.</td>
+                      <td><a href="https://arxiv.org/abs/2202.08906">abstract</a> · <a href="https://arxiv.org/pdf/2202.08906">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Fine-grained/shared experts</strong><br />Dai et al., “DeepSeekMoE” (2024)</td>
+                      <td>Motivates expert segmentation and shared experts to increase specialization.</td>
+                      <td>Reported architecture and ablations do not expose every production implementation detail.</td>
+                      <td><a href="https://arxiv.org/abs/2401.06066">abstract</a> · <a href="https://arxiv.org/pdf/2401.06066">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Auxiliary-loss-free balance</strong><br />DeepSeek-AI, “DeepSeek-V3 Technical Report” (2024)</td>
+                      <td>Describes per-expert routing bias, complementary sequence-wise balance loss, and an MoE training system.</td>
+                      <td>Technical-report disclosure is substantial but not a complete trial ledger or fully open run environment.</td>
+                      <td><a href="https://arxiv.org/abs/2412.19437">abstract</a> · <a href="https://arxiv.org/pdf/2412.19437">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Dense real example</strong><br />Touvron et al., “Llama 2” (2023)</td>
+                      <td>Concrete decoder-only example using RMSNorm, SwiGLU, RoPE, GQA at larger sizes, and phased posttraining.</td>
+                      <td>A system/model report, not full pretraining data release or a complete reproducibility package.</td>
+                      <td><a href="https://arxiv.org/abs/2307.09288">abstract</a> · <a href="https://arxiv.org/pdf/2307.09288">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Open MoE real example</strong><br />Muennighoff et al., “OLMoE” (2024)</td>
+                      <td>Connects sparse architecture, data, training, checkpoints, and evaluation in a more open release.</td>
+                      <td>A different release/code snapshot; do not infer exact compatibility with baseline <code>1e03ad1</code>.</td>
+                      <td><a href="https://arxiv.org/abs/2409.02060">abstract</a> · <a href="https://arxiv.org/pdf/2409.02060">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section id="papers-training" role="tabpanel" aria-labelledby="papers-tab-training" hidden>
+              <div class="panel-body" role="region" aria-label="Data scaling and evaluation papers" tabindex="0" style="overflow-x:auto">
+                <table class="evidence-table">
+                  <thead><tr><th>Topic · primary source</th><th>Why it belongs</th><th>Authority boundary</th><th>Links · queue</th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Scaling laws</strong><br />Kaplan et al., “Scaling Laws for Neural Language Models” (2020)</td>
+                      <td>Introduces empirical power-law relationships among loss, model size, dataset size, and compute.</td>
+                      <td>Fitted regimes, architecture, and optimization choices are historical; coefficients are not universal constants.</td>
+                      <td><a href="https://arxiv.org/abs/2001.08361">abstract</a> · <a href="https://arxiv.org/pdf/2001.08361">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Compute-optimal training</strong><br />Hoffmann et al., “Training Compute-Optimal Large Language Models” (2022)</td>
+                      <td>Re-estimates compute-optimal model/data allocation and motivates the Chinchilla point.</td>
+                      <td>The often-repeated ≈20 tokens/parameter is contextual, not a universal recipe; parameter counting must be explicit.</td>
+                      <td><a href="https://arxiv.org/abs/2203.15556">abstract</a> · <a href="https://arxiv.org/pdf/2203.15556">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Open training lifecycle</strong><br />Groeneveld et al., “OLMo” (2024)</td>
+                      <td>Links architecture, training data, code, checkpoints, logs, and evaluations in an open language-model release.</td>
+                      <td>Still version-specific; openness does not remove the need to match hashes, manifests, and run IDs.</td>
+                      <td><a href="https://arxiv.org/abs/2402.00838">abstract</a> · <a href="https://arxiv.org/pdf/2402.00838">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Midtraining and staged recipe</strong><br />OLMo Team, “2 OLMo 2 Furious” (2025)</td>
+                      <td>Documents a modern open recipe, including training-stage choices and evaluation evidence.</td>
+                      <td>The paper’s release snapshot is not automatically the same as this checkout or any locally executed run.</td>
+                      <td><a href="https://arxiv.org/abs/2501.00656">abstract</a> · <a href="https://arxiv.org/pdf/2501.00656">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Training dynamics and checkpoints</strong><br />Biderman et al., “Pythia” (2023)</td>
+                      <td>Provides multiple model scales and dense intermediate checkpoints for studying training dynamics.</td>
+                      <td>Checkpoints along one run are temporally dependent and are not independent scaling trials.</td>
+                      <td><a href="https://arxiv.org/abs/2304.01373">abstract</a> · <a href="https://arxiv.org/pdf/2304.01373">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Data curation and mixture</strong><br />Soldaini et al., “Dolma” (2024)</td>
+                      <td>Documents a large open corpus, source composition, filtering, deduplication, and tooling.</td>
+                      <td>Dataset documentation does not prove a downstream run used an unchanged manifest or every governance control.</td>
+                      <td><a href="https://arxiv.org/abs/2402.00159">abstract</a> · <a href="https://arxiv.org/pdf/2402.00159">remote PDF</a> · <a href="https://github.com/allenai/dolma">toolkit</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Data selection benchmark</strong><br />Li et al., “DataComp-LM” (2024)</td>
+                      <td>Provides controlled pools, scales, baselines, and evaluation for comparing language-model data curation strategies.</td>
+                      <td>Benchmark rank is conditional on its pool, model scales, compute, and evaluation protocol.</td>
+                      <td><a href="https://arxiv.org/abs/2406.11794">abstract</a> · <a href="https://arxiv.org/pdf/2406.11794">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Evaluation protocol</strong><br />OLMo Team, “OLMES” (2024)</td>
+                      <td>Standardizes task implementations and documents choices that make base-model evaluation comparable.</td>
+                      <td>Evaluation protocol is a measurement contract, not evidence of training-data cleanliness or deployment safety.</td>
+                      <td><a href="https://arxiv.org/abs/2406.08446">abstract</a> · <a href="https://arxiv.org/pdf/2406.08446">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section id="papers-systems" role="tabpanel" aria-labelledby="papers-tab-systems" hidden>
+              <div class="panel-body" role="region" aria-label="Systems posttraining and security papers" tabindex="0" style="overflow-x:auto">
+                <table class="evidence-table">
+                  <thead><tr><th>Topic · primary source</th><th>Why it belongs</th><th>Authority boundary</th><th>Links · queue</th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Attention IO</strong><br />Dao et al., “FlashAttention” (2022)</td>
+                      <td>Derives an IO-aware exact-attention algorithm and analyzes memory movement.</td>
+                      <td>Preserves attention math; kernel speedups depend on shapes, hardware, precision, and implementation version.</td>
+                      <td><a href="https://arxiv.org/abs/2205.14135">abstract</a> · <a href="https://arxiv.org/pdf/2205.14135">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Distributed model training</strong><br />Shoeybi et al., “Megatron-LM” (2019)</td>
+                      <td>Establishes practical intra-layer tensor parallelism for large Transformer training.</td>
+                      <td>One systems design point; modern deployments combine additional data, pipeline, context, and expert parallel strategies.</td>
+                      <td><a href="https://arxiv.org/abs/1909.08053">abstract</a> · <a href="https://arxiv.org/pdf/1909.08053">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Paged KV cache and serving</strong><br />Kwon et al., “Efficient Memory Management for Large Language Model Serving with PagedAttention” (2023)</td>
+                      <td>Connects paged KV-cache management, continuous batching, fragmentation, and serving throughput.</td>
+                      <td>Reported throughput is not a promise for current hardware or OLMo-core, which is not a vLLM serving stack.</td>
+                      <td><a href="https://arxiv.org/abs/2309.06180">abstract</a> · <a href="https://arxiv.org/pdf/2309.06180">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>RLHF pipeline</strong><br />Ouyang et al., “Training Language Models to Follow Instructions with Human Feedback” (2022)</td>
+                      <td>Documents SFT, reward-model training, PPO optimization, and human evaluation as distinct stages.</td>
+                      <td>A specific pipeline and model era; does not define all modern online-RL systems or safety guarantees.</td>
+                      <td><a href="https://arxiv.org/abs/2203.02155">abstract</a> · <a href="https://arxiv.org/pdf/2203.02155">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Direct preference optimization</strong><br />Rafailov et al., “DPO” (2023)</td>
+                      <td>Derives a preference objective that avoids an explicit reward model and online rollout during optimization.</td>
+                      <td>DPO is offline preference learning, not an online-RL rollout algorithm; data collection remains a separate system.</td>
+                      <td><a href="https://arxiv.org/abs/2305.18290">abstract</a> · <a href="https://arxiv.org/pdf/2305.18290">remote PDF</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>PPO foundation</strong><br />Schulman et al., “Proximal Policy Optimization Algorithms” (2017)</td>
+                      <td>Defines clipped policy-ratio objectives and the optimization family behind classic RLHF trainers.</td>
+                      <td>Generic RL algorithm; LM rollouts also require masking, KL/reference handling, rewards, batching, and distributed generation.</td>
+                      <td><a href="https://arxiv.org/abs/1707.06347">abstract</a> · <a href="https://arxiv.org/pdf/1707.06347">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>GRPO and verifiable rewards</strong><br />Shao et al., “DeepSeekMath” (2024)</td>
+                      <td>Introduces GRPO in a language-model reasoning setting and motivates group-relative advantages.</td>
+                      <td>A particular recipe; GRPO still needs rollout, reward, reference-policy, filtering, and distributed-systems decisions.</td>
+                      <td><a href="https://arxiv.org/abs/2402.03300">abstract</a> · <a href="https://arxiv.org/pdf/2402.03300">remote PDF</a><br /><span class="source-chip is-primary">P1 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Training data and model security vocabulary</strong><br />NIST AI 100-2e2025, “Adversarial Machine Learning” (2025)</td>
+                      <td>Provides a taxonomy for poisoning, evasion, privacy, misuse, and mitigations across the ML lifecycle.</td>
+                      <td>Normative terminology and survey guidance—not certification, implementation evidence, or a complete organization-specific threat model.</td>
+                      <td><a href="https://csrc.nist.gov/pubs/ai/100/2/e2025/final">canonical publication</a><br /><span class="source-chip is-primary">P0 download</span> <span class="source-chip is-caution">remote only</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Posttraining implementation boundary</strong><br />AI2, Open Instruct</td>
+                      <td>Authoritative open implementation companion for SFT, preference optimization, and RL-style recipes used adjacent to OLMo releases.</td>
+                      <td>Code repository rather than a paper; must be pinned separately and is not part of OLMo-core baseline <code>1e03ad1</code>.</td>
+                      <td><a href="https://github.com/allenai/open-instruct">canonical repository</a><br /><span class="source-chip is-repo">P1 inspect</span> <span class="source-chip is-caution">not cloned here</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="section-band" aria-labelledby="workflow-title">
+          <div class="section-heading">
+            <h2 id="workflow-title">Promotion workflow: from note to report claim</h2>
+            <p>A source becomes useful when its claim, version, implementation, experiment, and limitation can be inspected independently.</p>
+          </div>
+          <div class="source-boundary">
+            <article class="source-level">
+              <span class="status status-caution">1 · question</span>
+              <h3>Preserve the learner mark</h3>
+              <p>Record the underline, blue dot, example algorithm, or question mark without converting uncertainty into a fact.</p>
+            </article>
+            <article class="source-level">
+              <span class="status status-primary">2 · ground</span>
+              <h3>Find the defining source</h3>
+              <p>Capture the exact equation, paper section, official lecture, terminology version, and scope.</p>
+            </article>
+            <article class="source-level">
+              <span class="status status-repo">3 · trace</span>
+              <h3>Anchor executable behavior</h3>
+              <p>Pin the code commit, config path, tensor shapes, defaults, and boundary where another repository takes over.</p>
+            </article>
+            <article class="source-level">
+              <span class="status status-caution">4 · execute</span>
+              <h3>Produce run evidence</h3>
+              <p>Save data manifest, tokenizer hash, seed, full config, environment, logs, profiler trace, checkpoints, eval outputs, failures, and costs.</p>
+            </article>
+          </div>
+          <div class="evidence-box">
+            <strong>Minimum transparent-report test</strong>
+            <p>A reader should be able to distinguish model definition, parameter convention, data and mixture, scaling hypothesis, independent points and trials, token budget and TPP, optimizer and schedule, phase boundaries, eval selection/final gates, measured loss curves, inference workload and SLOs, hardware/parallelism, security controls, and released artifacts. Missing fields stay visibly missing.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="site-footer">
+      <p>Source audit frozen 2026-08-13 · OLMo-core <code>1e03ad1</code> · CS336 official <code>8b59b507</code> · unofficial transcript <code>d7d100e4</code> · no PDFs downloaded.</p>
+      <p><a href="#boundary-title">Version boundary</a> · <a href="#paper-registry">Paper registry</a> · <span data-current-year></span></p>
+    </footer>
+  </body>
+</html>

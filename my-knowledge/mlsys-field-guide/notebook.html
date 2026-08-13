@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Proofread the three pivotal ML systems notebook pages, one evidence-linked probe at a time." />
+    <title>ML Systems Field Guide — Notebook decoder</title>
+    <link rel="stylesheet" href="assets/css/site.css" />
+    <script src="assets/js/notebook-probes.js" defer></script>
+    <script src="assets/js/site.js" defer></script>
+  </head>
+  <body>
+    <!--
+    THESIS: Turn every underline, blue dot, algorithm, and question mark into a typed, confidence-scored probe; refuse to clean the notebook into false certainty.
+    OWN-WORLD: The photographed page is the source workbench; cobalt pins, proofread readouts, amber uncertainty, and exact source badges form one debugger grammar.
+    STORY: Choose a page, select a marked concept, compare literal and normalized readings, see the correction, then route into math, code, or a lab.
+    FIRST VIEWPORT: Utility strip, horizontal lifecycle rail on narrow screens, large uncropped notebook at left, synchronized proofread inspector at right, probe index below.
+    FORM: Pipeline Debugger notebook-first composition, approved task-led hybrid, seed f328a503.
+    FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+    -->
+    <a class="skip-link" href="#main">Skip to the notebook decoder</a>
+    <header class="utility-bar">
+      <a class="brand" href="index.html" aria-label="ML Systems Field Guide home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+        <span class="brand-copy"><strong>ML Systems Field Guide</strong><span>From blue dot to evidence</span></span>
+      </a>
+      <nav class="primary-nav" data-primary-nav aria-label="Primary navigation">
+        <a href="index.html">Study console</a><a href="notebook.html" aria-current="page">Notebook</a><a href="model.html">Model</a><a href="training.html">Training</a><a href="systems.html">Systems</a><a href="labs.html">Labs</a><a href="report.html">Report</a><a href="sources.html">Evidence</a>
+      </nav>
+      <div class="utility-actions"><button class="utility-button" type="button" data-print>Print</button><button class="utility-button nav-toggle" type="button" data-nav-toggle aria-expanded="false">Menu</button></div>
+    </header>
+    <div class="evidence-ribbon">
+      <strong>Notebook decoder</strong>
+      <span class="status-key status-primary">literal source preserved</span>
+      <span class="status-key status-repo">normalized against code</span>
+      <span class="status-key status-caution">uncertain readings stay visible</span>
+      <span id="probe-count" class="mono">Loading probe manifest…</span>
+    </div>
+
+    <div class="app-shell">
+      <aside class="lifecycle-rail" aria-label="Learning lifecycle">
+        <p class="rail-heading">Lifecycle</p>
+        <ol class="rail-list">
+          <li><a href="notebook.html" aria-current="step"><span class="rail-dot"></span><span class="rail-label"><strong>Sources</strong><small>decode · verify · route</small></span></a></li>
+          <li><a href="training.html#tokens"><span class="rail-dot"></span><span class="rail-label"><strong>Tokens</strong><small>curate · tokenize · pack</small></span></a></li>
+          <li><a href="model.html"><span class="rail-dot"></span><span class="rail-label"><strong>Model</strong><small>attend · route · predict</small></span></a></li>
+          <li><a href="training.html"><span class="rail-dot"></span><span class="rail-label"><strong>Train</strong><small>scale · optimize · checkpoint</small></span></a></li>
+          <li><a href="training.html#eval-gates"><span class="rail-dot"></span><span class="rail-label"><strong>Eval</strong><small>monitor · select · claim</small></span></a></li>
+          <li><a href="systems.html#inference"><span class="rail-dot"></span><span class="rail-label"><strong>Serve</strong><small>prefill · decode · schedule</small></span></a></li>
+          <li><a href="report.html"><span class="rail-dot"></span><span class="rail-label"><strong>Release</strong><small>artifacts · evidence · risk</small></span></a></li>
+        </ol>
+        <div class="rail-block"><strong>Question-mark types</strong><p><b>Boolean</b>: probable true/false field. <b>Learner question</b>: concept to resolve. <b>Uncertain transcription</b>: ink or source schema is unclear.</p></div>
+      </aside>
+
+      <main class="page-main" id="main">
+        <section class="page-lede">
+          <div>
+            <h1>Keep the ink. Remove the ambiguity.</h1>
+            <p>The three photos are one contiguous configuration checklist: model and MoE structure → losses and trainer state → scheduler, tokenizer, initialization, evaluation, and data. Each pin preserves the literal reading, classifies the mark, and records what must change before the term is safe to teach.</p>
+          </div>
+          <div class="lede-controls">
+            <strong>What a pin proves</strong>
+            <p>A pin is not a correctness badge. It connects source ink to a normalized term, confidence, correction, lesson, and evidence route. Semantic clusters keep related underlines and arrows together.</p>
+            <a class="button" href="sources.html#local-materials">Inspect source versions</a>
+          </div>
+        </section>
+
+        <section aria-labelledby="workbench-title">
+          <div class="panel-toolbar" style="margin-bottom:1rem">
+            <h2 id="workbench-title">Source workbench</h2>
+            <div class="button-row" role="group" aria-label="Choose notebook page">
+              <button class="button button-primary" type="button" data-page="20260812_174414.JPG" aria-pressed="true">Page 1 · model</button>
+              <button class="button" type="button" data-page="20260812_174420.JPG" aria-pressed="false">Page 2 · training</button>
+              <button class="button" type="button" data-page="20260812_174430.JPG" aria-pressed="false">Page 3 · data</button>
+            </div>
+          </div>
+
+          <div class="notebook-workspace">
+            <div class="notebook-viewer">
+              <div class="panel-toolbar" style="padding:.75rem 1rem;background:var(--ink);color:white">
+                <h3 id="photo-title">Page 1 · model, vision, MoE</h3>
+                <div class="button-row">
+                  <button class="utility-button" id="zoom-out" type="button" aria-label="Zoom out">−</button>
+                  <output id="zoom-readout" class="mono" for="zoom-out zoom-in">100%</output>
+                  <button class="utility-button" id="zoom-in" type="button" aria-label="Zoom in">+</button>
+                  <a class="button" id="original-link" href="../20260812_174414.JPG">Original</a>
+                </div>
+              </div>
+              <div style="overflow:auto;max-height:76vh">
+                <div class="notebook-canvas" id="notebook-canvas">
+                  <img id="notebook-image" src="assets/images/notes/note-1.webp" alt="Upright full notebook page one, covering training YAML, model, vision, activations, and MoE fields." />
+                  <div id="probe-pins"></div>
+                </div>
+              </div>
+            </div>
+
+            <aside class="notebook-inspector" aria-labelledby="selected-probe-title">
+              <div class="panel-toolbar inspector-section">
+                <h2 id="selected-probe-title">Selected probe</h2>
+                <span id="selected-mark" class="source-chip is-repo">loading</span>
+              </div>
+              <div class="inspector-section">
+                <h3 id="selected-normalized">Loading manifest…</h3>
+                <dl>
+                  <div class="field-readout"><dt>Literal ink</dt><dd id="selected-literal">—</dd></div>
+                  <div class="field-readout"><dt>Question meaning</dt><dd id="selected-question">—</dd></div>
+                  <div class="field-readout"><dt>Lesson route</dt><dd><a id="selected-lesson" href="model.html">—</a></dd></div>
+                </dl>
+                <div class="confidence-meter"><span>confidence</span><progress id="confidence-progress" max="1" value="0"></progress><output id="confidence-label">—</output></div>
+              </div>
+              <section class="inspector-section">
+                <h3>Proofread correction</h3>
+                <p id="selected-correction">—</p>
+              </section>
+              <section class="inspector-section">
+                <h3>Evidence boundary</h3>
+                <p id="selected-boundary">The handwritten page is a question source, not claim authority. Follow the lesson route for equations, code, and primary sources.</p>
+                <span class="source-chip is-primary">photo: primary learner artifact</span>
+                <span class="source-chip is-caution">claim: verify elsewhere</span>
+              </section>
+              <div class="inspector-section button-row">
+                <button class="button" id="previous-probe" type="button">Previous probe</button>
+                <button class="button button-primary" id="next-probe" type="button">Next probe</button>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="section-band" aria-labelledby="index-title">
+          <div class="section-heading">
+            <h2 id="index-title">Probe index</h2>
+            <p>Every semantic mark cluster remains findable even when pins overlap at this scale. Filter by question semantics to distinguish probable Boolean fields from learner questions and genuinely unresolved transcription.</p>
+          </div>
+          <div class="probe-index">
+            <div class="probe-index-controls">
+              <label class="control">Search literal or normalized term<input id="probe-search" type="search" placeholder="e.g. z-loss, alpha_f, FSDP" /></label>
+              <label class="control">Question semantics<select id="question-filter"><option value="all">All semantics</option><option value="boolean">Boolean notation</option><option value="learner-question">Learner question</option><option value="transcription-uncertain">Uncertain transcription</option><option value="not-question">Not a question</option></select></label>
+              <label class="control">Confidence<select id="confidence-filter"><option value="all">All confidence</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></label>
+            </div>
+            <ol class="probe-list" id="probe-list" aria-live="polite"></ol>
+          </div>
+        </section>
+
+        <section class="section-band is-dark" aria-labelledby="continuity-title">
+          <div class="section-heading">
+            <h2 id="continuity-title">How the three pages connect</h2>
+            <p>Page 1 starts with a scaling-schedule question, then inventories model, vision, and MoE configuration. Its MoE branch flows directly into Page 2’s router and loss diagram. Page 2 continues from trainer state into the optimizer; Page 3 continues with its scheduler, then finishes tokenizer, initialization, eval, and data-loader fields.</p>
+          </div>
+          <div class="study-path">
+            <article class="path-stage"><strong>Page 1</strong><span>scaling coupling → model → vision → activations → MoE</span></article><div class="path-connector">→</div>
+            <article class="path-stage"><strong>Page 2</strong><span>LM/MoE losses → trainer state → FSDP → profiling → optimizer</span></article><div class="path-connector">→</div>
+            <article class="path-stage"><strong>Page 3</strong><span>scheduler → tokenizer → initialization → evaluation → data</span></article><div class="path-connector">→</div>
+            <article class="path-stage"><strong>Capstone</strong><span>expand every field into a transparent, executed training report</span></article>
+          </div>
+        </section>
+
+        <section class="section-band" aria-labelledby="unsafe-title">
+          <div class="section-heading"><h2 id="unsafe-title">Corrections that change the mental model</h2><p>These are not spelling fixes. Each one prevents a wrong implementation or a misleading technical report.</p></div>
+          <div class="workbench-grid">
+            <div class="correction-box"><strong>FlashAttention and fused cross-entropy are different kernels.</strong><p>FlashAttention tiles exact attention to reduce HBM traffic. Fused linear cross-entropy avoids materializing a full vocabulary-logit tensor. Neither implies the other.</p></div>
+            <div class="correction-box"><strong>Router z-loss and vocabulary z-loss act on different logits.</strong><p>Both can penalize a squared log-partition, but one stabilizes expert routing and the other stabilizes LM-output logits.</p></div>
+            <div class="caution-box"><strong>Question marks are typed, not erased.</strong><p><code>compile?</code> is plausibly Boolean; <code>alpha_f?</code> is numeric; <code>mm?</code> is uncertain transcription. The UI keeps those categories separate.</p></div>
+            <div class="caution-box"><strong>“Won’t work with FSDP” is too categorical.</strong><p>Initialization compatibility depends on materialization, meta tensors, sharding, and synchronization. It must be verified for the implementation.</p></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="site-footer"><p>The resized WebP files are full-page reading copies; each viewer links to the tracked original JPEG.</p><p><a href="model.html">Continue to model math</a></p></footer>
+
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const records = Array.isArray(window.NOTEBOOK_PROBES) ? window.NOTEBOOK_PROBES : [];
+        const pages = {
+          '20260812_174414.JPG': { image: 'assets/images/notes/note-1.webp', original: '../20260812_174414.JPG', title: 'Page 1 · model, vision, MoE', alt: 'Upright full notebook page one, covering scaling, training YAML, model, vision, activations, and MoE fields.' },
+          '20260812_174420.JPG': { image: 'assets/images/notes/note-2.webp', original: '../20260812_174420.JPG', title: 'Page 2 · losses, trainer, optimizer', alt: 'Upright full notebook page two, covering LM and MoE losses, trainer state, FSDP, profiling, and optimizer fields.' },
+          '20260812_174430.JPG': { image: 'assets/images/notes/note-3.webp', original: '../20260812_174430.JPG', title: 'Page 3 · scheduler, tokenizer, eval, data', alt: 'Upright full notebook page three, covering scheduler, tokenizer, initialization, evaluation, and data-loader fields.' }
+        };
+        const routes = {
+          model: 'model.html', position: 'model.html#rope', attention: 'model.html#attention', moe: 'model.html#moe', activation: 'model.html#activations', normalization: 'model.html#transformer', ffn: 'model.html#activations', vision: 'model.html#rope', weight: 'model.html#transformer', initialization: 'training.html#recipe', token: 'training.html#tokens', tokenizer: 'training.html#tokens', data: 'training.html#data', scheduler: 'training.html#scaling', optimizer: 'training.html#recipe', batch: 'training.html#recipe', checkpoint: 'training.html#phases', resume: 'training.html#phases', evaluation: 'training.html#eval-gates', training: 'training.html', run: 'training.html', scaling: 'training.html#scaling', profiling: 'systems.html#profiling', fsdp: 'systems.html#parallelism', distributed: 'systems.html#parallelism', kernel: 'systems.html#profiling', preemption: 'systems.html#parallelism', multimodal: 'model.html#rope', projection: 'model.html#transformer', special: 'training.html#tokens'
+        };
+        const coords = {
+          '20260812_174414.JPG': [[71,9],[39,26],[36,35],[51,39],[70,38],[52,45],[77,45],[13,53],[42,55],[54,57],[69,57],[87,58],[31,65],[23,68],[62,69],[58,78],[89,79],[53,87],[49,93],[54,97],[23,96],[34,97],[88,96],[8,96]],
+          '20260812_174420.JPG': [[44,8],[48,13],[48,19],[33,27],[20,32],[48,35],[61,38],[63,44],[63,49],[62,55],[60,60],[66,65],[42,70],[50,74],[53,78],[58,82],[66,87],[62,92],[67,96]],
+          '20260812_174430.JPG': [[42,8],[61,13],[78,18],[50,23],[68,27],[31,31],[54,36],[42,45],[75,50],[45,61],[48,72],[70,78],[72,84],[70,90],[57,96]]
+        };
+        const confidenceValue = { high: 0.94, medium: 0.67, low: 0.35 };
+        let currentPage = '20260812_174414.JPG';
+        let selected = 0;
+        let zoom = 1;
+        const image = document.getElementById('notebook-image');
+        const canvas = document.getElementById('notebook-canvas');
+        const pins = document.getElementById('probe-pins');
+        const list = document.getElementById('probe-list');
+        const search = document.getElementById('probe-search');
+        const questionFilter = document.getElementById('question-filter');
+        const confidenceFilter = document.getElementById('confidence-filter');
+        document.getElementById('probe-count').textContent = records.length + ' semantic probes';
+
+        function pageRecords() { return records.filter((record) => record.page === currentPage); }
+        function lessonHref(id) {
+          const prefix = Object.keys(routes).find((key) => id.startsWith(key) || id.includes(key));
+          return routes[prefix] || 'labs.html';
+        }
+        function renderPins() {
+          pins.innerHTML = '';
+          pageRecords().forEach((record, index) => {
+            const point = (coords[currentPage] || [])[index] || [82, 8 + (index * 84 / Math.max(1, pageRecords().length - 1))];
+            const button = document.createElement('button');
+            button.className = 'probe-pin';
+            button.type = 'button';
+            button.style.left = point[0] + '%';
+            button.style.top = point[1] + '%';
+            button.dataset.index = String(index + 1).padStart(2, '0');
+            button.setAttribute('aria-label', 'Probe ' + (index + 1) + ': ' + record.normalized);
+            button.setAttribute('aria-pressed', String(index === selected));
+            button.addEventListener('click', () => selectProbe(index));
+            pins.append(button);
+          });
+        }
+        function renderList() {
+          const query = search.value.trim().toLowerCase();
+          const qSem = questionFilter.value;
+          const conf = confidenceFilter.value;
+          list.innerHTML = '';
+          pageRecords().forEach((record, index) => {
+            const haystack = (record.literal + ' ' + record.normalized + ' ' + record.correction).toLowerCase();
+            if (query && !haystack.includes(query)) return;
+            if (qSem !== 'all' && record.question_semantics !== qSem) return;
+            if (conf !== 'all' && record.confidence !== conf) return;
+            const item = document.createElement('li');
+            const button = document.createElement('button');
+            button.className = 'probe-button';
+            button.type = 'button';
+            button.setAttribute('aria-pressed', String(index === selected));
+            button.innerHTML = '<span class="mono">' + String(index + 1).padStart(2, '0') + '</span><span><strong>' + escapeHtml(record.normalized) + '</strong></span><span>' + escapeHtml(record.literal) + '</span><span>' + escapeHtml(record.question_semantics) + '</span>';
+            button.addEventListener('click', () => selectProbe(index));
+            item.append(button); list.append(item);
+          });
+          if (!list.children.length) list.innerHTML = '<li style="padding:1rem">No probes match these filters. Clear a filter to recover the full page.</li>';
+        }
+        function escapeHtml(value) {
+          return String(value).replace(/[&<>'"]/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+        }
+        function selectProbe(index) {
+          const available = pageRecords(); if (!available.length) return;
+          selected = (index + available.length) % available.length;
+          const record = available[selected];
+          document.getElementById('selected-mark').textContent = record.mark_type;
+          document.getElementById('selected-normalized').textContent = record.normalized;
+          document.getElementById('selected-literal').textContent = record.literal;
+          document.getElementById('selected-question').textContent = record.question_semantics;
+          document.getElementById('selected-correction').textContent = record.correction;
+          const lesson = document.getElementById('selected-lesson');
+          lesson.textContent = record.lesson_id; lesson.href = lessonHref(record.lesson_id);
+          const value = confidenceValue[record.confidence] || 0.5;
+          document.getElementById('confidence-progress').value = value;
+          document.getElementById('confidence-label').textContent = record.confidence + ' · ' + Math.round(value * 100) + '%';
+          renderPins(); renderList();
+        }
+        function setPage(page) {
+          currentPage = page; selected = 0; zoom = 1;
+          const meta = pages[page]; image.src = meta.image; image.alt = meta.alt;
+          document.getElementById('photo-title').textContent = meta.title;
+          const original = document.getElementById('original-link'); original.href = meta.original;
+          canvas.style.transform = 'scale(1)'; document.getElementById('zoom-readout').textContent = '100%';
+          document.querySelectorAll('[data-page]').forEach((button) => {
+            const pressed = button.dataset.page === page;
+            button.setAttribute('aria-pressed', String(pressed));
+            button.classList.toggle('button-primary', pressed);
+          });
+          selectProbe(0);
+        }
+        document.querySelectorAll('[data-page]').forEach((button) => button.addEventListener('click', () => setPage(button.dataset.page)));
+        document.getElementById('previous-probe').addEventListener('click', () => selectProbe(selected - 1));
+        document.getElementById('next-probe').addEventListener('click', () => selectProbe(selected + 1));
+        [search, questionFilter, confidenceFilter].forEach((control) => control.addEventListener('input', renderList));
+        document.getElementById('zoom-in').addEventListener('click', () => { zoom = Math.min(1.75, zoom + 0.15); canvas.style.transform = 'scale(' + zoom + ')'; document.getElementById('zoom-readout').textContent = Math.round(zoom * 100) + '%'; });
+        document.getElementById('zoom-out').addEventListener('click', () => { zoom = Math.max(0.7, zoom - 0.15); canvas.style.transform = 'scale(' + zoom + ')'; document.getElementById('zoom-readout').textContent = Math.round(zoom * 100) + '%'; });
+        setPage(currentPage);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="An interactive, code-grounded model workbench for Transformer shapes, gated activations, RoPE, attention heads, KV cache, and mixture-of-experts losses."
+    >
+    <title>Model workbench — ML Systems Field Guide</title>
+    <link rel="stylesheet" href="assets/css/site.css">
+    <script src="assets/js/site.js" defer></script>
+    <style>
+      .model-stage {
+        width: 100%;
+        border: 0;
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .model-stage:hover,
+      .model-stage[aria-pressed="true"] {
+        background: var(--probe-soft);
+        box-shadow: inset 0 3px 0 var(--probe);
+      }
+
+      .model-stage[aria-pressed="true"] .lane-note {
+        color: var(--ink);
+      }
+
+      .model-stage .lane-visual {
+        min-height: 7.5rem;
+      }
+
+      .lane .stage-name {
+        display: block;
+        min-height: 2.8rem;
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 700;
+      }
+
+      .has-top-gap {
+        margin-top: 1rem;
+      }
+
+      .has-small-top-gap {
+        margin-top: 0.75rem;
+      }
+
+      .has-compact-top-gap {
+        margin-top: 0.8rem;
+      }
+
+      .table-scroll {
+        overflow-x: auto;
+      }
+
+      .shape-ledger {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1px;
+        border: 1px solid var(--rule);
+        background: var(--rule);
+      }
+
+      .shape-ledger > div {
+        padding: 0.7rem;
+        background: var(--surface);
+      }
+
+      .shape-ledger strong,
+      .shape-ledger code {
+        display: block;
+      }
+
+      .shape-ledger strong {
+        margin-bottom: 0.2rem;
+        font-size: 0.75rem;
+      }
+
+      .shape-ledger code {
+        color: var(--probe);
+        font-size: 0.75rem;
+      }
+
+      .plot-caption {
+        margin: 0;
+        padding: 0.6rem 1rem;
+        color: var(--muted);
+        border-bottom: 1px solid var(--rule);
+        font-size: 0.75rem;
+      }
+
+      .legend-swatch.is-relu { background: #111418; }
+      .legend-swatch.is-gelu { background: #087a50; }
+      .legend-swatch.is-silu { background: #1557d6; }
+      .legend-swatch.is-swiglu { background: #b28c00; }
+
+      .readout-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+
+      .readout-grid .metric {
+        padding: 0.75rem;
+        border: 1px solid var(--rule);
+        background: var(--surface);
+      }
+
+      .axis-readout {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1px;
+        border: 1px solid var(--rule);
+        background: var(--rule);
+      }
+
+      .axis-readout > div {
+        padding: 0.75rem;
+        background: var(--surface);
+      }
+
+      .axis-readout strong,
+      .axis-readout span {
+        display: block;
+      }
+
+      .axis-readout span {
+        margin-top: 0.15rem;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+      }
+
+      .frequency-tape {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        min-height: 2.4rem;
+        margin-top: 0.8rem;
+        border: 1px solid var(--rule);
+      }
+
+      .frequency-tape span {
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        background: var(--surface-2);
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+      }
+
+      .frequency-tape span + span {
+        border-left: 1px solid var(--rule);
+      }
+
+      .frequency-tape.is-interleaved span:nth-child(3n + 1) { background: var(--probe-soft); }
+      .frequency-tape.is-interleaved span:nth-child(3n + 2) { background: var(--green-soft); }
+      .frequency-tape.is-interleaved span:nth-child(3n) { background: var(--amber-soft); }
+
+      .compact-choice {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .head-blocks {
+        --head-count: 16;
+        grid-template-columns: repeat(var(--head-count, 8), minmax(0.25rem, 1fr));
+      }
+
+      .kv-group {
+        --kv-count: 8;
+      }
+
+      .head-blocks i.is-shared {
+        background: var(--amber-soft);
+        box-shadow: inset 0 0 0 1px #b28c00;
+      }
+
+      .kv-group i {
+        position: relative;
+      }
+
+      .kv-group i::after {
+        content: attr(data-label);
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+      }
+
+      .route-cell {
+        position: relative;
+        min-height: 2.25rem;
+      }
+
+      .route-cell span {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+      }
+
+      .route-cell.is-selected span,
+      .route-cell.is-second span {
+        color: var(--surface);
+        font-weight: 700;
+      }
+
+      .route-cell.is-second span {
+        color: var(--ink);
+      }
+
+      .expert-item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.5rem;
+      }
+
+      .code-trail {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .code-trail li {
+        display: grid;
+        grid-template-columns: minmax(11rem, 0.55fr) minmax(0, 1fr);
+        gap: 0.75rem;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid var(--rule);
+        font-size: 0.75rem;
+      }
+
+      .code-trail li:last-child {
+        border-bottom: 0;
+      }
+
+      .code-trail span {
+        color: var(--muted);
+      }
+
+      .formula-note {
+        margin-top: 0.7rem;
+        color: var(--muted);
+        font-size: 0.75rem;
+      }
+
+      .inline-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.7rem;
+        align-items: end;
+      }
+
+      .inline-controls .control {
+        flex: 1 1 9rem;
+      }
+
+      .inline-controls .button {
+        flex: 0 0 auto;
+      }
+
+      @media (max-width: 880px) {
+        .shape-ledger,
+        .readout-grid,
+        .axis-readout {
+          grid-template-columns: 1fr;
+        }
+
+        .compact-choice {
+          grid-template-columns: 1fr;
+        }
+
+        .compact-choice button + button {
+          border-top: 1px solid var(--rule);
+          border-left: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+    THESIS: Trace one token through the model while every architectural choice exposes its equation, tensor cost, code anchor, and failure mode; refuse a passive glossary or architecture poster.
+    OWN-WORLD: Cool-white instrument panels, charcoal rules, cobalt probes, amber breakpoints, compact controls, dense plots, and conclusions written beside every visual.
+    STORY: Establish the tensor path, compare gated FFNs fairly, derive positional rotation, price KV memory, then stress a sparse router before recording evidence.
+    FIRST VIEWPORT: Sticky utility strip and lifecycle rail frame a horizontal Transformer trace with a synchronized proof inspector; the first probe begins at token IDs.
+    FORM: Pipeline Debugger, grounded direction 4, seed f328a503; task-led hybrid approved by delegation after the decision server failed.
+    FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+    -->
+    <a class="skip-link" href="#main">Skip to the model workbench</a>
+
+    <header class="utility-bar">
+      <a class="brand" href="index.html" aria-label="ML Systems Field Guide home">
+        <span class="brand-mark" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </span>
+        <span class="brand-copy">
+          <strong>ML Systems Field Guide</strong>
+          <span>From blue dot to evidence</span>
+        </span>
+      </a>
+      <nav class="primary-nav" data-primary-nav aria-label="Primary navigation">
+        <a href="index.html">Study console</a>
+        <a href="notebook.html">Notebook</a>
+        <a href="model.html" aria-current="page">Model</a>
+        <a href="training.html">Training</a>
+        <a href="systems.html">Systems</a>
+        <a href="labs.html">Labs</a>
+        <a href="report.html">Report</a>
+        <a href="sources.html">Evidence</a>
+      </nav>
+      <div class="utility-actions">
+        <button class="utility-button" type="button" data-print>Print</button>
+        <button
+          class="utility-button nav-toggle"
+          type="button"
+          data-nav-toggle
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >Menu</button>
+      </div>
+    </header>
+
+    <div class="evidence-ribbon" role="note" aria-label="Evidence legend">
+      <strong>Model desk</strong>
+      <span class="status-key status-primary">paper-established</span>
+      <span class="status-key status-repo">verified in this checkout</span>
+      <span class="status-key status-caution">educational extension</span>
+      <span class="status-key status-contradiction">common trap corrected</span>
+    </div>
+
+    <div class="app-shell">
+      <aside class="lifecycle-rail" aria-label="Learning lifecycle">
+        <p class="rail-heading">Lifecycle</p>
+        <ol class="rail-list">
+          <li class="is-complete">
+            <a href="notebook.html">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Sources</strong><small>notes · authority · gaps</small></span>
+            </a>
+          </li>
+          <li class="is-complete">
+            <a href="training.html#tokens">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Tokens</strong><small>curate · tokenize · pack</small></span>
+            </a>
+          </li>
+          <li>
+            <a href="model.html" aria-current="step">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Model</strong><small>attend · route · predict</small></span>
+            </a>
+          </li>
+          <li>
+            <a href="training.html">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Train</strong><small>scale · optimize · checkpoint</small></span>
+            </a>
+          </li>
+          <li>
+            <a href="training.html#eval-gates">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Eval</strong><small>monitor · select · claim</small></span>
+            </a>
+          </li>
+          <li>
+            <a href="systems.html#inference">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Serve</strong><small>prefill · decode · schedule</small></span>
+            </a>
+          </li>
+          <li>
+            <a href="report.html">
+              <span class="rail-dot" aria-hidden="true"></span>
+              <span class="rail-label"><strong>Release</strong><small>artifacts · evidence · risk</small></span>
+            </a>
+          </li>
+        </ol>
+        <div class="rail-block">
+          <strong>Trace rule</strong>
+          <p>Move from shape → equation → implementation → systems cost. A model name is an example, not an explanation.</p>
+        </div>
+      </aside>
+
+      <main class="page-main" id="main">
+        <section class="page-lede" aria-labelledby="page-title">
+          <div>
+            <h1 id="page-title">Watch one token become a prediction.</h1>
+            <p>
+              Single-step the decoder, perturb one architectural choice at a time, and keep the
+              math synchronized with memory cost and the exact OLMo-core trail. Every plot below
+              publishes its current conclusion as text.
+            </p>
+          </div>
+          <div class="lede-controls">
+            <strong>Recommended pass</strong>
+            <p>Trace the shapes first. Then compare SwiGLU, RoPE scaling, KV heads, and router pressure in that order.</p>
+            <div class="button-row">
+              <a class="button button-primary" href="#transformer">Start at token IDs</a>
+              <a class="button" href="#attention">Price the KV cache</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="transformer" aria-labelledby="transformer-title">
+          <div class="trace-workspace">
+            <div class="trace-stage">
+              <div class="trace-toolbar">
+                <h2 id="transformer-title">Transformer tensor journey</h2>
+                <span class="status status-repo">OLMo-core traced</span>
+              </div>
+              <div class="execution-lanes" id="tensor-stages" role="group" aria-label="Clickable Transformer stages">
+                <button class="lane model-stage" type="button" data-stage="ids" aria-pressed="true">
+                  <span class="stage-name">Token IDs</span>
+                  <span class="shape">[B, S]</span>
+                  <span class="lane-visual mono">128000 · 471 · 338</span>
+                  <span class="lane-note">Tokenizer output: integers, not semantic vectors.</span>
+                  <span class="lane-arrow" aria-hidden="true">→</span>
+                </button>
+                <button class="lane model-stage" type="button" data-stage="embed" aria-pressed="false">
+                  <span class="stage-name">Embedding</span>
+                  <span class="shape">[B, S, d]</span>
+                  <span class="lane-visual" aria-hidden="true">
+                    <span class="tensor-row"><i class="tensor-cell"></i><i class="tensor-cell"></i><i class="tensor-cell"></i><i class="tensor-cell"></i></span>
+                    <span class="tensor-row"><i class="tensor-cell"></i><i class="tensor-cell"></i><i class="tensor-cell"></i><i class="tensor-cell"></i></span>
+                  </span>
+                  <span class="lane-note">Trainable lookup inside the model.</span>
+                  <span class="lane-arrow" aria-hidden="true">→</span>
+                </button>
+                <button class="lane model-stage" type="button" data-stage="qkv" aria-pressed="false">
+                  <span class="stage-name">Q, K, V</span>
+                  <span class="shape">Q:[B,S,Hq,dh]</span>
+                  <span class="lane-visual formula-stack"><code>Q=XWq</code><code>K=XWk</code><code>V=XWv</code></span>
+                  <span class="lane-note">KV head count controls cache width.</span>
+                  <span class="lane-arrow" aria-hidden="true">→</span>
+                </button>
+                <button class="lane model-stage" type="button" data-stage="rope" aria-pressed="false">
+                  <span class="stage-name">RoPE</span>
+                  <span class="shape">rotate Q and K</span>
+                  <span class="lane-visual mono">R(m)q · R(n)k</span>
+                  <span class="lane-note">Relative offset enters the dot product.</span>
+                  <span class="lane-arrow" aria-hidden="true">→</span>
+                </button>
+                <button class="lane model-stage" type="button" data-stage="attention" aria-pressed="false">
+                  <span class="stage-name">Attention</span>
+                  <span class="shape">[B,Hq,S,S]</span>
+                  <span class="lane-visual mono">softmax(QKᵀ/√dh + M)V</span>
+                  <span class="lane-note">Causal mask blocks future keys.</span>
+                  <span class="lane-arrow" aria-hidden="true">→</span>
+                </button>
+                <button class="lane model-stage" type="button" data-stage="residual" aria-pressed="false">
+                  <span class="stage-name">Residual</span>
+                  <span class="shape">[B, S, d]</span>
+                  <span class="lane-visual mono">h = x + branch(x)</span>
+                  <span class="lane-note">Norm placement is an architectural choice.</span>
+                  <span class="lane-arrow" aria-hidden="true">→</span>
+                </button>
+                <button class="lane model-stage" type="button" data-stage="ffn" aria-pressed="false">
+                  <span class="stage-name">Gated FFN</span>
+                  <span class="shape">[B, S, d]</span>
+                  <span class="lane-visual mono">W₂[SiLU(W₁h) ⊙ W₃h]</span>
+                  <span class="lane-note">Three matrices; match width fairly.</span>
+                  <span class="lane-arrow" aria-hidden="true">→</span>
+                </button>
+                <button class="lane model-stage" type="button" data-stage="head" aria-pressed="false">
+                  <span class="stage-name">Logits + CE</span>
+                  <span class="shape">[B, S, V] → scalar</span>
+                  <span class="lane-visual mono">−log softmax(z)<sub>label</sub></span>
+                  <span class="lane-note">Labels arrive already aligned by the data path.</span>
+                </button>
+              </div>
+            </div>
+
+            <aside class="proof-inspector" aria-labelledby="tensor-inspector-title">
+              <div class="panel-toolbar inspector-section">
+                <h2 id="tensor-inspector-title">Stage inspector</h2>
+                <span class="status status-repo" id="tensor-status">repo anchor</span>
+              </div>
+              <section class="inspector-section" aria-live="polite" aria-atomic="true">
+                <h3 id="tensor-stage-name">Token IDs</h3>
+                <div class="equation" id="tensor-equation">X ∈ ℕ<sup>B×S</sup></div>
+                <p id="tensor-explanation">The tokenizer maps text or bytes to discrete vocabulary IDs. Embedding happens next, inside the model.</p>
+              </section>
+              <section class="inspector-section">
+                <h3>Exact code trail</h3>
+                <p><a id="tensor-code-link" href="../../src/olmo_core/nn/transformer/model.py"><code id="tensor-code-path">nn/transformer/model.py:523–615</code></a></p>
+                <p class="formula-note" id="tensor-caveat">Do not call token IDs “embeddings.” One is discrete data; the other is a trainable lookup result.</p>
+              </section>
+              <section class="inspector-section">
+                <h3>Block-order correction</h3>
+                <p>Generic OLMo-core blocks are pre-norm. OLMo 2 factories select <code>reordered_norm</code>, which normalizes each branch output before adding it to the residual.</p>
+                <a href="../../src/olmo_core/nn/transformer/block.py"><code>block.py:293–309</code></a>
+              </section>
+            </aside>
+          </div>
+
+          <div class="lab-console">
+            <div>
+              <h2>Invariant to carry forward</h2>
+              <p id="tensor-live-conclusion" aria-live="polite">Selected Token IDs: input [B,S] becomes an embedding tensor [B,S,d]; tokenization and embedding are distinct operations.</p>
+            </div>
+            <a class="button button-primary" href="labs.html#lab-transformer">Open shape-check lab</a>
+          </div>
+        </section>
+
+        <section class="section-band" id="activations" aria-labelledby="activations-title">
+          <div class="section-heading">
+            <h2 id="activations-title">An activation curve is not a gated FFN.</h2>
+            <p>Compare scalar nonlinearities, then repair the comparison for SwiGLU’s extra matrix. The systems question is not only “which curve?” but also “which width at equal parameters and FLOPs?”</p>
+          </div>
+
+          <div class="choice-strip" id="activation-choices" role="group" aria-label="Activation focus">
+            <button type="button" data-activation="relu" aria-pressed="true"><strong>ReLU</strong><small>hard zero gate</small></button>
+            <button type="button" data-activation="gelu" aria-pressed="false"><strong>GELU</strong><small>smooth xΦ(x)</small></button>
+            <button type="button" data-activation="silu" aria-pressed="false"><strong>SiLU</strong><small>smooth xσ(x)</small></button>
+            <button type="button" data-activation="swiglu" aria-pressed="false"><strong>SwiGLU</strong><small>gate × value stream</small></button>
+          </div>
+
+          <div class="workbench-grid has-top-gap">
+            <article class="instrument-panel" aria-labelledby="activation-plot-title">
+              <div class="panel-toolbar panel-body">
+                <h3 id="activation-plot-title">Response scope</h3>
+                <span class="status status-caution">SwiGLU slice is illustrative</span>
+              </div>
+              <div class="plot-wrap">
+                <canvas id="activation-canvas" height="320" role="img" aria-describedby="activation-conclusion">
+                  Activation curves from x = −4 to 4. Use the text comparison below if canvas is unavailable.
+                </canvas>
+              </div>
+              <p class="plot-caption">The SwiGLU trace fixes both learned projections to the same scalar, <code>u=v=x</code>, only to expose multiplication. A trained SwiGLU is a vector module, not this scalar curve.</p>
+              <div class="plot-legend" aria-hidden="true">
+                <span><i class="legend-swatch is-relu"></i>ReLU</span>
+                <span><i class="legend-swatch is-gelu"></i>GELU</span>
+                <span><i class="legend-swatch is-silu"></i>SiLU</span>
+                <span><i class="legend-swatch is-swiglu"></i>SwiGLU slice</span>
+              </div>
+              <output class="live-conclusion" id="activation-conclusion" aria-live="polite">ReLU is selected: max(0,x) is cheap and exactly sparse on the negative side, but its derivative is zero there.</output>
+            </article>
+
+            <aside class="instrument-panel" aria-labelledby="parameter-title">
+              <div class="panel-toolbar panel-body">
+                <h3 id="parameter-title">Parameter-matching bench</h3>
+                <span class="status status-primary">paper-established</span>
+              </div>
+              <div class="panel-body">
+                <div class="control-grid">
+                  <label class="control">Model width d
+                    <input id="ffn-d-model" type="number" min="128" max="32768" step="128" value="4096">
+                  </label>
+                  <label class="control">Plain FFN ratio h/d
+                    <input id="ffn-ratio" type="number" min="1" max="16" step="0.25" value="4">
+                  </label>
+                  <label class="control">Round gated width to
+                    <select id="ffn-multiple">
+                      <option value="1">no rounding</option>
+                      <option value="64">64</option>
+                      <option value="128">128</option>
+                      <option value="256" selected>256</option>
+                      <option value="512">512</option>
+                      <option value="1024">1024</option>
+                    </select>
+                  </label>
+                  <label class="control">Count bias terms
+                    <select id="ffn-bias"><option value="0" selected>No</option><option value="1">Yes</option></select>
+                  </label>
+                </div>
+                <div class="readout-grid">
+                  <div class="metric"><span>Plain width</span><strong id="plain-width">16,384</strong></div>
+                  <div class="metric"><span>Matched gated width</span><strong id="gated-width">11,008</strong></div>
+                  <div class="metric"><span>Parameter delta</span><strong id="ffn-param-delta">+0.8%</strong></div>
+                </div>
+                <div class="equation has-top-gap">
+                  Plain ≈ 2dh<br>Gated ≈ 3dh<sub>g</sub><br>h<sub>g</sub> = 2h/3
+                </div>
+                <output class="live-conclusion" id="ffn-conclusion" aria-live="polite">At d=4,096, a 4d plain FFN uses width 16,384. The exact matched gated width is 10,922.7; rounding to 256 gives 11,008 and a +0.8% parameter difference.</output>
+              </div>
+            </aside>
+          </div>
+
+          <div class="table-scroll has-top-gap">
+            <table class="comparison-table">
+              <thead><tr><th>Choice</th><th>Equation</th><th>Why it was raised</th><th>Real example</th><th>Do not infer</th></tr></thead>
+              <tbody>
+                <tr><td>ReLU</td><td><code>max(0,x)</code></td><td>Cheap, exact zeros, simple gradient.</td><td>Original Transformer</td><td>Zero negative response is not automatically better sparsity for every LM.</td></tr>
+                <tr><td>GELU</td><td><code>xΦ(x)</code></td><td>Smoothly gates by input magnitude and retains negative response.</td><td>BERT</td><td>Exact GELU and tanh approximation are not numerically identical.</td></tr>
+                <tr><td>SiLU</td><td><code>xσ(x)</code></td><td>Smooth, non-monotone near the origin, small negative response.</td><td>Gate inside Llama-style FFNs</td><td>A standalone SiLU FFN is not SwiGLU.</td></tr>
+                <tr><td>SwiGLU</td><td><code>W₂[SiLU(W₁x)⊙W₃x]</code></td><td>A learned gate modulates a separate learned value stream.</td><td>Llama 2; OLMo 2/3; DeepSeek-V3 experts</td><td>Three matrices require a narrower hidden width for a fair comparison.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="evidence-box has-top-gap">
+            <strong>OLMo-core boundary.</strong> <code>ActivationFunction</code> exposes SiLU and tanh-approximate GELU, but <code>FeedForward</code> is always gated. In this checkout those mean SwiGLU and GeGLU; there is no plain ReLU baseline.
+            <a href="../../src/olmo_core/nn/feed_forward.py"><code>feed_forward.py:29–50, 87–105, 142–171</code></a>
+          </div>
+        </section>
+
+        <section class="section-band" id="rope" aria-labelledby="rope-title">
+          <div class="section-heading">
+            <h2 id="rope-title">RoPE turns position into relative phase.</h2>
+            <p>First derive one paired rotation. Then change the coordinate system: a text index, an image grid, or temporal-height-width M-RoPE. Finally change the frequency spectrum for longer context.</p>
+          </div>
+
+          <div class="choice-strip" id="rope-modes" role="group" aria-label="RoPE coordinate mode">
+            <button type="button" data-rope-mode="text" aria-pressed="true"><strong>Text 1D</strong><small>one position index</small></button>
+            <button type="button" data-rope-mode="image" aria-pressed="false"><strong>Image 2D</strong><small>height + width axes</small></button>
+            <button type="button" data-rope-mode="mrope" aria-pressed="false"><strong>Video M-RoPE</strong><small>time + height + width</small></button>
+            <button type="button" data-rope-mode="interleaved" aria-pressed="false"><strong>Interleaved M-RoPE</strong><small>each axis spans frequencies</small></button>
+          </div>
+
+          <div class="workbench-grid has-top-gap">
+            <article class="instrument-panel" aria-labelledby="rope-plot-title">
+              <div class="panel-toolbar panel-body">
+                <h3 id="rope-plot-title">Relative-phase scope</h3>
+                <span class="status status-primary">derived invariant</span>
+              </div>
+              <div class="plot-wrap">
+                <canvas id="rope-canvas" height="320" role="img" aria-describedby="rope-conclusion">
+                  Position-dependent rotations for temporal, height, and width axes.
+                </canvas>
+              </div>
+              <div class="axis-readout" role="group" aria-label="Current relative coordinates">
+                <div><strong>Δ temporal</strong><span id="delta-t">3</span></div>
+                <div><strong>Δ height</strong><span id="delta-h">3</span></div>
+                <div><strong>Δ width</strong><span id="delta-w">3</span></div>
+              </div>
+              <div class="frequency-tape" id="frequency-tape" role="img" aria-label="Rotary channel allocation from high to low frequency">
+                <span>t</span><span>t</span><span>t</span><span>t</span><span>h</span><span>h</span><span>h</span><span>h</span><span>w</span><span>w</span><span>w</span><span>w</span>
+              </div>
+              <output class="live-conclusion" id="rope-conclusion" aria-live="polite">Text 1D selected: temporal, height, and width IDs are identical, so M-RoPE reduces to ordinary 1D RoPE with relative offset Δm=3.</output>
+            </article>
+
+            <aside class="instrument-panel" aria-labelledby="rope-controls-title">
+              <div class="panel-toolbar panel-body">
+                <h3 id="rope-controls-title">Coordinate + spectrum controls</h3>
+                <span class="status status-caution">image modes external</span>
+              </div>
+              <div class="panel-body">
+                <div class="control-grid">
+                  <label class="control">Position A · t
+                    <input id="rope-a-t" type="number" min="0" max="1000000" value="2">
+                  </label>
+                  <label class="control">Position B · t
+                    <input id="rope-b-t" type="number" min="0" max="1000000" value="5">
+                  </label>
+                  <label class="control">Position A · h
+                    <input id="rope-a-h" type="number" min="0" max="4096" value="1">
+                  </label>
+                  <label class="control">Position B · h
+                    <input id="rope-b-h" type="number" min="0" max="4096" value="4">
+                  </label>
+                  <label class="control">Position A · w
+                    <input id="rope-a-w" type="number" min="0" max="4096" value="3">
+                  </label>
+                  <label class="control">Position B · w
+                    <input id="rope-b-w" type="number" min="0" max="4096" value="6">
+                  </label>
+                  <label class="control">Context strategy
+                    <select id="rope-scaling">
+                      <option value="none">Vanilla</option>
+                      <option value="abf">ABF · change θ</option>
+                      <option value="pi">Position interpolation</option>
+                      <option value="stepwise">Stepwise / Llama 3.1</option>
+                      <option value="yarn">YaRN</option>
+                    </select>
+                  </label>
+                  <label class="control">Expansion factor
+                    <input id="rope-factor" type="number" min="1" max="64" step="1" value="8">
+                  </label>
+                </div>
+                <div class="equation has-top-gap">
+                  q′<sub>m</sub> = R(m)q<br>k′<sub>n</sub> = R(n)k<br>(R(m)q)ᵀ(R(n)k) = qᵀR(n−m)k
+                </div>
+                <p class="formula-note" id="scaling-explanation">Vanilla keeps the base inverse-frequency spectrum unchanged.</p>
+              </div>
+            </aside>
+          </div>
+
+          <div class="correction-box has-top-gap">
+            <strong>Two meanings of “2D.”</strong> RoFormer’s two-dimensional derivation rotates each pair of feature coordinates. Image 2D RoPE instead assigns separate spatial row and column coordinates to channel groups. Do not collapse them into one claim.
+          </div>
+          <div class="caution-box has-small-top-gap">
+            <strong>Repository boundary.</strong> OLMo-core implements text RoPE, ABF, PI, stepwise scaling, YaRN, and partial rotation. Its vision encoder uses learned absolute positional embeddings with interpolation—not Qwen-style 2D/M-RoPE.
+            <a href="../../src/olmo_core/nn/rope.py"><code>rope.py:48–50, 72–290, 294–323, 428–484</code></a> ·
+            <a href="../../src/olmo_core/nn/vision/image_vit.py"><code>vision/image_vit.py:242–277</code></a>
+          </div>
+        </section>
+
+        <section class="section-band" id="attention" aria-labelledby="attention-title">
+          <div class="section-heading">
+            <h2 id="attention-title">KV heads are a serving decision made in architecture.</h2>
+            <p>MHA, GQA, and MQA keep the query-head count while changing how many key/value streams must be projected, stored, and read during autoregressive decoding.</p>
+          </div>
+
+          <div class="choice-strip compact-choice" id="attention-modes" role="group" aria-label="Attention head arrangement">
+            <button type="button" data-attention-mode="mha" aria-pressed="false"><strong>MHA</strong><small>Hkv = Hq</small></button>
+            <button type="button" data-attention-mode="gqa" aria-pressed="true"><strong>GQA</strong><small>1 &lt; Hkv &lt; Hq</small></button>
+            <button type="button" data-attention-mode="mqa" aria-pressed="false"><strong>MQA</strong><small>Hkv = 1</small></button>
+          </div>
+
+          <div class="workbench-grid has-top-gap">
+            <article class="instrument-panel" aria-labelledby="attention-diagram-title">
+              <div class="panel-toolbar panel-body">
+                <h3 id="attention-diagram-title">Head sharing map</h3>
+                <span class="status status-repo">cache shape verified</span>
+              </div>
+              <div class="attention-diagram">
+                <div class="head-stack">
+                  <strong>Query heads</strong>
+                  <div class="head-row"><span>Q</span><span class="head-blocks" id="query-heads"></span></div>
+                  <p class="formula-note" id="query-head-label">40 query heads</p>
+                </div>
+                <div class="kv-groups">
+                  <strong>Physical K/V heads</strong>
+                  <div class="kv-group" id="kv-heads"></div>
+                  <p class="formula-note" id="sharing-label">Each KV head serves 5 query heads.</p>
+                </div>
+                <div class="metric-stack">
+                  <div class="metric"><span>KV cache</span><strong id="kv-cache-value">64.00 GiB</strong></div>
+                  <div class="metric"><span>versus MHA</span><strong id="kv-ratio">20.0%</strong></div>
+                  <div class="metric"><span>saved</span><strong id="kv-saved">256.00 GiB</strong></div>
+                </div>
+              </div>
+              <output class="live-conclusion" id="attention-conclusion" aria-live="polite">GQA selected: 40 query heads share 8 KV heads in groups of 5. The cache is 20.0% of same-shape MHA before sharding and allocator overhead.</output>
+            </article>
+
+            <aside class="instrument-panel" aria-labelledby="kv-controls-title">
+              <div class="panel-toolbar panel-body">
+                <h3 id="kv-controls-title">KV-cache calculator</h3>
+                <span class="status status-primary">shape-derived</span>
+              </div>
+              <div class="panel-body">
+                <div class="control-grid">
+                  <label class="control">Batch B
+                    <input id="kv-batch" type="number" min="1" max="4096" value="8">
+                  </label>
+                  <label class="control">Layers L
+                    <input id="kv-layers" type="number" min="1" max="256" value="64">
+                  </label>
+                  <label class="control">Cached tokens S
+                    <input id="kv-sequence" type="number" min="1" max="1048576" value="32768">
+                  </label>
+                  <label class="control">Query heads Hq
+                    <select id="kv-query-heads"><option>8</option><option>16</option><option>32</option><option selected>40</option><option>64</option><option>128</option></select>
+                  </label>
+                  <label class="control">KV heads Hkv
+                    <select id="kv-head-count"><option>1</option><option>2</option><option>4</option><option selected>8</option><option>10</option><option>20</option><option>40</option></select>
+                  </label>
+                  <label class="control">Head dimension dh
+                    <select id="kv-head-dim"><option>64</option><option selected>128</option><option>256</option></select>
+                  </label>
+                  <label class="control">Cache precision
+                    <select id="kv-bytes"><option value="1">8-bit · 1 byte</option><option value="2" selected>BF16/FP16 · 2 bytes</option><option value="4">FP32 · 4 bytes</option></select>
+                  </label>
+                </div>
+                <div class="equation has-top-gap">bytes = 2 · B · L · S · H<sub>kv</sub> · d<sub>h</sub> · bytes/element</div>
+                <p class="formula-note">The factor 2 is K plus V. Queries are computed for the current token and are not retained in the KV cache.</p>
+              </div>
+            </aside>
+          </div>
+
+          <div class="evidence-box has-top-gap">
+            OLMo-core allocates K and V as <code>[B,S,Hkv,dh]</code>, then repeats them logically when a backend needs one K/V view per query head.
+            <a href="../../src/olmo_core/nn/attention/kv_cache.py"><code>attention/kv_cache.py:11–40</code></a> ·
+            <a href="../../src/olmo_core/nn/attention/backend.py"><code>attention/backend.py:352–365, 1136–1145</code></a>.
+            OLMo2-32B uses 40 query / 8 KV heads; the Llama2-like 70B config uses 64 / 8.
+          </div>
+          <div class="correction-box has-small-top-gap"><strong>Do not overclaim.</strong> Reducing KV heads shrinks K/V projection parameters and cache bandwidth. It does not reduce query heads, and end-to-end attention FLOPs do not fall by the same ratio.</div>
+        </section>
+
+        <section class="section-band" id="moe" aria-labelledby="moe-title">
+          <div class="section-heading">
+            <h2 id="moe-title">A sparse router needs two different kinds of pressure.</h2>
+            <p>Top-k decides which experts execute. Load balancing discourages collapse; router z-loss controls logit scale. DeepSeek-V3’s bias controller changes the first mechanism, but does not make every auxiliary balance term disappear.</p>
+          </div>
+
+          <div class="workbench-grid">
+            <article class="instrument-panel" aria-labelledby="router-title">
+              <div class="panel-toolbar panel-body">
+                <h3 id="router-title">Deterministic routing batch</h3>
+                <span class="status status-caution">synthetic logits</span>
+              </div>
+              <div class="router-grid">
+                <div class="token-list" id="moe-token-list" role="group" aria-label="Synthetic tokens"></div>
+                <div class="route-matrix" id="moe-route-matrix" role="grid" aria-label="Router scores by token and expert"></div>
+                <div class="expert-list" id="moe-expert-list" role="group" aria-label="Expert loads"></div>
+              </div>
+              <output class="live-conclusion" id="moe-conclusion" aria-live="polite">Top-2 softmax routing selected without selection bias. 6/8 experts receive tokens; peak-to-mean load is 3.33×. Lbal=1.685 targets allocation, while Lz=8.234 targets router-logit scale.</output>
+            </article>
+
+            <aside class="instrument-panel" aria-labelledby="router-controls-title">
+              <div class="panel-toolbar panel-body">
+                <h3 id="router-controls-title">Router controls</h3>
+                <span class="status status-repo">formula-matched</span>
+              </div>
+              <div class="panel-body">
+                <div class="control-grid">
+                  <label class="control">Selected experts K
+                    <select id="moe-top-k"><option value="1">1</option><option value="2" selected>2</option><option value="4">4</option></select>
+                  </label>
+                  <label class="control">Gating function
+                    <select id="moe-gate"><option value="softmax" selected>softmax</option><option value="sigmoid">sigmoid</option></select>
+                  </label>
+                  <label class="control">Balance weight α
+                    <input id="moe-alpha" type="number" min="0" max="1" step="0.0001" value="0.01">
+                  </label>
+                  <label class="control">Router z weight β
+                    <input id="moe-beta" type="number" min="0" max="1" step="0.0001" value="0.001">
+                  </label>
+                  <label class="control">Bias update γ
+                    <input id="moe-gamma" type="number" min="0" max="0.1" step="0.0001" value="0.001">
+                  </label>
+                  <label class="control">Selection bias
+                    <select id="moe-use-bias"><option value="0" selected>off</option><option value="1">on · aux-free style</option></select>
+                  </label>
+                </div>
+                <div class="button-row has-compact-top-gap">
+                  <button class="button" id="moe-step-bias" type="button">Apply one bias update</button>
+                  <button class="button" id="moe-reset" type="button">Reset bias</button>
+                </div>
+                <div class="readout-grid">
+                  <div class="metric"><span>L<sub>bal</sub></span><strong id="moe-lbal">1.685</strong></div>
+                  <div class="metric"><span>L<sub>z</sub></span><strong id="moe-lz">8.234</strong></div>
+                  <div class="metric"><span>αL<sub>bal</sub> + βL<sub>z</sub></span><strong id="moe-weighted">0.0251</strong></div>
+                </div>
+                <div class="equation has-top-gap">
+                  f<sub>e</sub> = assignments<sub>e</sub>/(KT)<br>P<sub>e</sub> = mean<sub>t</sub> p<sub>te</sub><br>L<sub>bal</sub> = N Σ<sub>e</sub> f<sub>e</sub>P<sub>e</sub><br>L<sub>z</sub> = mean<sub>t</sub>[log Σ<sub>e</sub> exp(r<sub>te</sub>)]²
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <div class="correction-box has-top-gap">
+            <strong>DeepSeek caveat.</strong> DeepSeek-V3 uses a non-gradient per-expert bias for its main batch-wise load control: the bias affects top-k selection, while the original affinity supplies the gate weight. It still adds a tiny complementary sequence-wise balance loss, reported as α = 0.0001. “Auxiliary-loss-free” does not mean “no auxiliary balance term anywhere.”
+          </div>
+          <div class="caution-box has-small-top-gap">
+            <strong>Two z-losses live in this checkout.</strong> MoE router z-loss acts on expert logits. LM softmax z-loss acts on vocabulary logits. Both square a <code>logsumexp</code>, but they regularize different distributions.
+          </div>
+          <div class="evidence-box has-small-top-gap">
+            Exact trails:
+            <a href="../../src/olmo_core/nn/moe/router.py"><code>moe/router.py:303–325, 339–359, 416–512</code></a> ·
+            <a href="../../src/olmo_core/nn/moe/loss.py"><code>moe/loss.py:29–138</code></a> ·
+            <a href="../../src/olmo_core/nn/functional/cross_entropy_loss.py"><code>functional/cross_entropy_loss.py:12–50</code></a>.
+            OLMo’s optional shared MLP is a useful analogue, but its fixed mixing is not an exact DeepSeekMoE reproduction.
+          </div>
+        </section>
+
+        <section class="section-band is-dark" aria-labelledby="trail-title">
+          <div class="section-heading">
+            <h2 id="trail-title">Leave the workbench with exact trails.</h2>
+            <p>Primary papers establish the algorithm and reported model choice. This checkout establishes what OLMo-core actually implements. Educational visualizations bridge the two without pretending the boundary disappeared.</p>
+          </div>
+          <div class="source-boundary">
+            <article class="source-level">
+              <span class="status status-primary">activation evidence</span>
+              <h3>GLU Variants + Llama 2</h3>
+              <p><a href="https://arxiv.org/abs/2002.05202">Parameter-matched gated FFNs</a>; <a href="https://arxiv.org/abs/2307.09288">Llama 2 architecture and GQA</a>.</p>
+            </article>
+            <article class="source-level">
+              <span class="status status-primary">position evidence</span>
+              <h3>RoFormer + Qwen VL</h3>
+              <p><a href="https://arxiv.org/abs/2104.09864">Relative rotation</a>; <a href="https://arxiv.org/abs/2409.12191">Qwen2-VL M-RoPE</a>; <a href="https://arxiv.org/abs/2511.21631">Qwen3-VL interleaving</a>.</p>
+            </article>
+            <article class="source-level">
+              <span class="status status-primary">sparsity evidence</span>
+              <h3>DeepSeekMoE + V3</h3>
+              <p><a href="https://arxiv.org/abs/2401.06066">Fine-grained and shared experts</a>; <a href="https://arxiv.org/abs/2412.19437">bias balancing and its sequence-wise caveat</a>.</p>
+            </article>
+            <article class="source-level">
+              <span class="status status-repo">implementation evidence</span>
+              <h3>OLMo-core</h3>
+              <p><a href="../../src/olmo_core/nn/transformer/model.py">Transformer</a>, <a href="../../src/olmo_core/nn/rope.py">RoPE</a>, <a href="../../src/olmo_core/nn/attention/">attention</a>, and <a href="../../src/olmo_core/nn/moe/">MoE</a>.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section-band" aria-labelledby="next-title">
+          <div class="section-heading">
+            <h2 id="next-title">The next breakpoint is execution.</h2>
+            <p>These manipulators establish mechanics and accounting. The labs turn each invariant into a small test; the training desk then places model choices inside scaling trials, schedules, checkpoints, and evaluation gates.</p>
+          </div>
+          <div class="button-row">
+            <a class="button button-primary" href="labs.html">Run the model labs</a>
+            <a class="button" href="training.html">Continue to training</a>
+            <a class="button" href="report.html">Record report evidence</a>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="site-footer">
+      <p>Local-first learning artifact · synthetic router values are labeled · model claims remain source-linked.</p>
+      <p><a href="sources.html">Evidence desk</a> · <span data-current-year></span></p>
+    </footer>
+
+    <noscript>
+      <p class="caution-box">JavaScript is disabled. All equations, comparisons, code trails, and default conclusions remain readable; interactive recalculation is unavailable.</p>
+    </noscript>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const formatInteger = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+        const clampNumber = (value, min, max, fallback) => {
+          const parsed = Number(value);
+          return Number.isFinite(parsed) ? Math.min(max, Math.max(min, parsed)) : fallback;
+        };
+
+        function pressChoice(container, chosen) {
+          container.querySelectorAll("button").forEach((button) => {
+            button.setAttribute("aria-pressed", String(button === chosen));
+          });
+        }
+
+        function setCanvasSize(canvas) {
+          const ratio = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+          const rect = canvas.getBoundingClientRect();
+          const width = Math.max(320, Math.round(rect.width));
+          const height = 320;
+          canvas.width = Math.round(width * ratio);
+          canvas.height = Math.round(height * ratio);
+          const context = canvas.getContext("2d");
+          context.setTransform(ratio, 0, 0, ratio, 0, 0);
+          return { context, width, height };
+        }
+
+        const tensorData = {
+          ids: {
+            name: "Token IDs",
+            equation: "X ∈ ℕ^(B×S)",
+            explanation: "The tokenizer maps text or bytes to discrete vocabulary IDs. Embedding happens next, inside the model.",
+            path: "nn/transformer/model.py:523–590",
+            href: "../../src/olmo_core/nn/transformer/model.py",
+            caveat: "Do not call token IDs embeddings. One is discrete data; the other is a trainable lookup result.",
+            conclusion: "Selected Token IDs: input [B,S] becomes an embedding tensor [B,S,d]; tokenization and embedding are distinct operations."
+          },
+          embed: {
+            name: "Embedding lookup",
+            equation: "H₀ = E[X] ∈ ℝ^(B×S×d)",
+            explanation: "Each ID indexes a row of a learned V×d table. Optional scale and embedding norm occur after lookup.",
+            path: "nn/transformer/model.py:132–140, 583–592",
+            href: "../../src/olmo_core/nn/transformer/model.py",
+            caveat: "Precomputed multimodal embeddings bypass lookup, scaling, and embedding norm in this forward path.",
+            conclusion: "Selected Embedding: V×d learned rows convert discrete IDs into [B,S,d] hidden states; this is a model operation."
+          },
+          qkv: {
+            name: "Q/K/V projections",
+            equation: "Q=XWq; K=XWk; V=XWv",
+            explanation: "Queries use Hq heads; keys and values use Hkv heads. Their head dimensions match so grouped sharing is possible.",
+            path: "nn/attention/__init__.py:371–390, 577–602",
+            href: "../../src/olmo_core/nn/attention/__init__.py",
+            caveat: "Hq % Hkv must be zero for equal query groups; fewer KV heads do not mean fewer query heads.",
+            conclusion: "Selected Q/K/V: Q has Hq streams while K and V may have fewer Hkv streams, fixing the future cache width."
+          },
+          rope: {
+            name: "Rotary position",
+            equation: "(R(m)q)ᵀ(R(n)k) = qᵀR(n−m)k",
+            explanation: "Orthogonal paired rotations preserve norms while making the dot product depend on relative displacement.",
+            path: "nn/rope.py:48–50, 428–484",
+            href: "../../src/olmo_core/nn/rope.py",
+            caveat: "RoPE rotates Q and K, not V. Image-coordinate M-RoPE is not implemented in this checkout.",
+            conclusion: "Selected RoPE: Q and K are rotated pairwise; their dot product depends on n−m because R(m)ᵀR(n)=R(n−m)."
+          },
+          attention: {
+            name: "Causal attention",
+            equation: "A = softmax(QKᵀ/√dh + M); O = AV",
+            explanation: "Each query weights legal past values. The output heads are concatenated and projected back to model width.",
+            path: "nn/attention/__init__.py:610–654",
+            href: "../../src/olmo_core/nn/attention/__init__.py",
+            caveat: "FlashAttention changes memory traffic and tiling while preserving the attention result up to numerical effects.",
+            conclusion: "Selected Attention: causal scores [B,Hq,S,S] mix V, then the output projection returns [B,S,d]."
+          },
+          residual: {
+            name: "Norm and residual",
+            equation: "h = x + branch(norm(x))",
+            explanation: "A residual stream carries the identity path while normalization controls the branch input or output, depending on block type.",
+            path: "nn/transformer/block.py:96–153, 293–309",
+            href: "../../src/olmo_core/nn/transformer/block.py",
+            caveat: "OLMo 2’s reordered norm is not the generic pre-norm equation shown above; inspect the selected block factory.",
+            conclusion: "Selected Residual: shape stays [B,S,d], but norm placement changes optimization behavior and must be reported."
+          },
+          ffn: {
+            name: "Gated feed-forward",
+            equation: "W₂[φ(W₁h) ⊙ W₃h]",
+            explanation: "A learned gate modulates a separate value stream before projection back to d. SiLU gives SwiGLU; GELU gives GeGLU.",
+            path: "nn/feed_forward.py:142–171",
+            href: "../../src/olmo_core/nn/feed_forward.py",
+            caveat: "Three matrices require a 2/3 hidden-width correction against a two-matrix FFN before comparing parameters or FLOPs.",
+            conclusion: "Selected Gated FFN: [B,S,d] is expanded into two branches, multiplied elementwise, and projected back to [B,S,d]."
+          },
+          head: {
+            name: "LM head and loss",
+            equation: "z = Wout·norm(h); CE = −log softmax(z)_label",
+            explanation: "The LM head maps hidden states to vocabulary logits and computes cross-entropy when labels are supplied.",
+            path: "nn/lm_head.py:201–283",
+            href: "../../src/olmo_core/nn/lm_head.py",
+            caveat: "The model does not silently shift arbitrary labels here; the data path must supply the intended next-token alignment and ignore mask.",
+            conclusion: "Selected Logits + CE: [B,S,d] becomes [B,S,V]; labeled positions contribute next-token cross-entropy."
+          }
+        };
+
+        const tensorStages = document.getElementById("tensor-stages");
+        tensorStages.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-stage]");
+          if (!button) return;
+          pressChoice(tensorStages, button);
+          const data = tensorData[button.dataset.stage];
+          document.getElementById("tensor-stage-name").textContent = data.name;
+          document.getElementById("tensor-equation").textContent = data.equation;
+          document.getElementById("tensor-explanation").textContent = data.explanation;
+          document.getElementById("tensor-code-path").textContent = data.path;
+          document.getElementById("tensor-code-link").href = data.href;
+          document.getElementById("tensor-caveat").textContent = data.caveat;
+          document.getElementById("tensor-live-conclusion").textContent = data.conclusion;
+        });
+
+        const activationColors = { relu: "#111418", gelu: "#087a50", silu: "#1557d6", swiglu: "#b28c00" };
+        const activationLabels = {
+          relu: "ReLU is selected: max(0,x) is cheap and exactly sparse on the negative side, but its derivative is zero there.",
+          gelu: "GELU is selected: xΦ(x) is smooth and retains a graded negative response; OLMo-core implements the tanh approximation.",
+          silu: "SiLU is selected: xσ(x) is smooth and slightly non-monotone near the origin. Used alone, it is not yet SwiGLU.",
+          swiglu: "SwiGLU is selected: the amber scalar slice is SiLU(x)·x only for illustration. The real module multiplies two separately learned vector projections."
+        };
+        let activeActivation = "relu";
+        const activationCanvas = document.getElementById("activation-canvas");
+        const sigmoid = (x) => 1 / (1 + Math.exp(-x));
+        const erf = (x) => {
+          const sign = x < 0 ? -1 : 1;
+          const a = Math.abs(x);
+          const t = 1 / (1 + 0.3275911 * a);
+          const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-a * a);
+          return sign * y;
+        };
+        const activationFns = {
+          relu: (x) => Math.max(0, x),
+          gelu: (x) => x * 0.5 * (1 + erf(x / Math.SQRT2)),
+          silu: (x) => x * sigmoid(x),
+          swiglu: (x) => x * x * sigmoid(x)
+        };
+
+        function drawActivationPlot() {
+          const { context: ctx, width, height } = setCanvasSize(activationCanvas);
+          const pad = { left: 48, right: 18, top: 22, bottom: 36 };
+          const xMin = -4;
+          const xMax = 4;
+          const yMin = -1.2;
+          const yMax = 5;
+          const xToPx = (x) => pad.left + ((x - xMin) / (xMax - xMin)) * (width - pad.left - pad.right);
+          const yToPx = (y) => pad.top + ((yMax - y) / (yMax - yMin)) * (height - pad.top - pad.bottom);
+          ctx.clearRect(0, 0, width, height);
+          ctx.font = "11px SFMono-Regular, Consolas, monospace";
+          ctx.fillStyle = "#4f5b66";
+          ctx.strokeStyle = "#c7cfcb";
+          ctx.lineWidth = 1;
+          for (let x = -4; x <= 4; x += 1) {
+            const px = xToPx(x);
+            ctx.beginPath(); ctx.moveTo(px, pad.top); ctx.lineTo(px, height - pad.bottom); ctx.stroke();
+            ctx.fillText(String(x), px - 4, height - 14);
+          }
+          for (let y = -1; y <= 5; y += 1) {
+            const py = yToPx(y);
+            ctx.beginPath(); ctx.moveTo(pad.left, py); ctx.lineTo(width - pad.right, py); ctx.stroke();
+            ctx.fillText(String(y), 20, py + 4);
+          }
+          ctx.strokeStyle = "#8d9994";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.moveTo(xToPx(0), pad.top); ctx.lineTo(xToPx(0), height - pad.bottom); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(pad.left, yToPx(0)); ctx.lineTo(width - pad.right, yToPx(0)); ctx.stroke();
+
+          Object.keys(activationFns).forEach((name) => {
+            ctx.strokeStyle = activationColors[name];
+            ctx.lineWidth = name === activeActivation ? 3.5 : 1.4;
+            ctx.globalAlpha = name === activeActivation ? 1 : 0.45;
+            ctx.setLineDash(name === "swiglu" ? [6, 4] : []);
+            ctx.beginPath();
+            for (let step = 0; step <= 240; step += 1) {
+              const x = xMin + (step / 240) * (xMax - xMin);
+              const y = Math.max(yMin, Math.min(yMax, activationFns[name](x)));
+              const px = xToPx(x);
+              const py = yToPx(y);
+              if (step === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+          });
+          ctx.setLineDash([]);
+          ctx.globalAlpha = 1;
+        }
+
+        document.getElementById("activation-choices").addEventListener("click", (event) => {
+          const button = event.target.closest("[data-activation]");
+          if (!button) return;
+          activeActivation = button.dataset.activation;
+          pressChoice(event.currentTarget, button);
+          document.getElementById("activation-conclusion").textContent = activationLabels[activeActivation];
+          drawActivationPlot();
+        });
+
+        function updateFfnMatch() {
+          const d = clampNumber(document.getElementById("ffn-d-model").value, 128, 32768, 4096);
+          const ratio = clampNumber(document.getElementById("ffn-ratio").value, 1, 16, 4);
+          const multiple = clampNumber(document.getElementById("ffn-multiple").value, 1, 4096, 256);
+          const bias = document.getElementById("ffn-bias").value === "1";
+          const plainWidth = d * ratio;
+          const exactGatedWidth = (2 * plainWidth) / 3;
+          const gatedWidth = Math.ceil(exactGatedWidth / multiple) * multiple;
+          const plainParams = 2 * d * plainWidth + (bias ? plainWidth + d : 0);
+          const gatedParams = 3 * d * gatedWidth + (bias ? 2 * gatedWidth + d : 0);
+          const delta = ((gatedParams / plainParams) - 1) * 100;
+          document.getElementById("plain-width").textContent = formatInteger.format(plainWidth);
+          document.getElementById("gated-width").textContent = formatInteger.format(gatedWidth);
+          document.getElementById("ffn-param-delta").textContent = `${delta >= 0 ? "+" : ""}${delta.toFixed(1)}%`;
+          document.getElementById("ffn-conclusion").textContent = `At d=${formatInteger.format(d)}, a ${ratio}d plain FFN uses width ${formatInteger.format(plainWidth)}. The exact matched gated width is ${exactGatedWidth.toFixed(1)}; rounding to ${formatInteger.format(multiple)} gives ${formatInteger.format(gatedWidth)} and a ${delta >= 0 ? "+" : ""}${delta.toFixed(1)}% parameter difference${bias ? " with biases counted" : " without biases"}.`;
+        }
+        ["ffn-d-model", "ffn-ratio", "ffn-multiple", "ffn-bias"].forEach((id) => {
+          document.getElementById(id).addEventListener("input", updateFfnMatch);
+        });
+
+        let ropeMode = "text";
+        const ropeCanvas = document.getElementById("rope-canvas");
+        const ropeInputs = ["rope-a-t", "rope-b-t", "rope-a-h", "rope-b-h", "rope-a-w", "rope-b-w", "rope-scaling", "rope-factor"];
+        const ropeModeLabels = {
+          text: "Text 1D",
+          image: "Image 2D",
+          mrope: "Video M-RoPE",
+          interleaved: "Interleaved M-RoPE"
+        };
+
+        function ropeCoordinates() {
+          const aT = clampNumber(document.getElementById("rope-a-t").value, 0, 1000000, 2);
+          const bT = clampNumber(document.getElementById("rope-b-t").value, 0, 1000000, 5);
+          const aH = clampNumber(document.getElementById("rope-a-h").value, 0, 4096, 1);
+          const bH = clampNumber(document.getElementById("rope-b-h").value, 0, 4096, 4);
+          const aW = clampNumber(document.getElementById("rope-a-w").value, 0, 4096, 3);
+          const bW = clampNumber(document.getElementById("rope-b-w").value, 0, 4096, 6);
+          if (ropeMode === "text") return { a: [aT, aT, aT], b: [bT, bT, bT] };
+          if (ropeMode === "image") return { a: [0, aH, aW], b: [0, bH, bW] };
+          return { a: [aT, aH, aW], b: [bT, bH, bW] };
+        }
+
+        function drawRopePlot() {
+          const { context: ctx, width, height } = setCanvasSize(ropeCanvas);
+          const coordinates = ropeCoordinates();
+          const labels = ["temporal", "height", "width"];
+          const colors = ["#1557d6", "#087a50", "#b28c00"];
+          const radius = Math.min(62, (width - 64) / 7.2);
+          ctx.clearRect(0, 0, width, height);
+          ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+          labels.forEach((label, index) => {
+            const centerX = ((index + 0.5) / 3) * width;
+            const centerY = 126;
+            ctx.strokeStyle = "#c7cfcb";
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.arc(centerX, centerY, radius, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(centerX - radius - 8, centerY); ctx.lineTo(centerX + radius + 8, centerY); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(centerX, centerY - radius - 8); ctx.lineTo(centerX, centerY + radius + 8); ctx.stroke();
+            const angles = [coordinates.a[index] * 0.34, coordinates.b[index] * 0.34];
+            angles.forEach((angle, vectorIndex) => {
+              ctx.strokeStyle = vectorIndex === 0 ? colors[index] : "#b8322a";
+              ctx.lineWidth = vectorIndex === 0 ? 3 : 2;
+              ctx.setLineDash(vectorIndex === 0 ? [] : [5, 3]);
+              ctx.beginPath();
+              ctx.moveTo(centerX, centerY);
+              ctx.lineTo(centerX + Math.cos(angle) * radius * 0.82, centerY - Math.sin(angle) * radius * 0.82);
+              ctx.stroke();
+            });
+            ctx.setLineDash([]);
+            ctx.fillStyle = "#111418";
+            ctx.textAlign = "center";
+            ctx.fillText(label, centerX, 224);
+            ctx.fillStyle = "#4f5b66";
+            ctx.font = "11px SFMono-Regular, Consolas, monospace";
+            ctx.fillText(`A:${coordinates.a[index]}  B:${coordinates.b[index]}`, centerX, 243);
+            ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+          });
+          ctx.fillStyle = "#4f5b66";
+          ctx.textAlign = "left";
+          ctx.fillText("solid = position A · dashed red = position B · angle is compressed for display", 18, 292);
+        }
+
+        function updateRope() {
+          const coordinates = ropeCoordinates();
+          const deltas = coordinates.b.map((value, index) => value - coordinates.a[index]);
+          document.getElementById("delta-t").textContent = String(deltas[0]);
+          document.getElementById("delta-h").textContent = String(deltas[1]);
+          document.getElementById("delta-w").textContent = String(deltas[2]);
+          const scaling = document.getElementById("rope-scaling").value;
+          const factor = clampNumber(document.getElementById("rope-factor").value, 1, 64, 8);
+          const scalingText = {
+            none: "Vanilla keeps the base inverse-frequency spectrum unchanged.",
+            abf: `ABF changes θ, shifting the wavelength spectrum; it is not the same operation as dividing every frequency by ${factor}.`,
+            pi: `Position interpolation divides every inverse frequency by ${factor}, compressing positions into the trained angular range.`,
+            stepwise: `Stepwise scaling preserves high frequencies, divides low frequencies by ${factor}, and smoothly blends the middle band.`,
+            yarn: `YaRN blends unscaled and 1/${factor}-scaled spectra across dimensions and also rescales attention.`
+          }[scaling];
+          document.getElementById("scaling-explanation").textContent = scalingText;
+          const coordinateText = ropeMode === "text"
+            ? `all three IDs are tied, giving ordinary relative offset Δm=${deltas[0]}`
+            : ropeMode === "image"
+              ? `time is fixed while the score can depend on Δh=${deltas[1]} and Δw=${deltas[2]}`
+              : `the score can depend on Δt=${deltas[0]}, Δh=${deltas[1]}, and Δw=${deltas[2]}`;
+          const allocationText = ropeMode === "interleaved" ? " Each axis is spread across high-to-low frequency bands." : "";
+          document.getElementById("rope-conclusion").textContent = `${ropeModeLabels[ropeMode]} selected: ${coordinateText}.${allocationText} ${scalingText}`;
+          const tape = document.getElementById("frequency-tape");
+          tape.classList.toggle("is-interleaved", ropeMode === "interleaved");
+          const sequence = ropeMode === "interleaved"
+            ? ["t", "h", "w", "t", "h", "w", "t", "h", "w", "t", "h", "w"]
+            : ["t", "t", "t", "t", "h", "h", "h", "h", "w", "w", "w", "w"];
+          Array.from(tape.children).forEach((span, index) => { span.textContent = sequence[index]; });
+          drawRopePlot();
+        }
+
+        document.getElementById("rope-modes").addEventListener("click", (event) => {
+          const button = event.target.closest("[data-rope-mode]");
+          if (!button) return;
+          ropeMode = button.dataset.ropeMode;
+          pressChoice(event.currentTarget, button);
+          updateRope();
+        });
+        ropeInputs.forEach((id) => document.getElementById(id).addEventListener("input", updateRope));
+
+        let attentionMode = "gqa";
+        const attentionModeContainer = document.getElementById("attention-modes");
+        const kvHeadSelect = document.getElementById("kv-head-count");
+        const kvInputs = ["kv-batch", "kv-layers", "kv-sequence", "kv-query-heads", "kv-head-count", "kv-head-dim", "kv-bytes"];
+
+        function formatBytes(bytes) {
+          const units = ["B", "KiB", "MiB", "GiB", "TiB"];
+          let value = bytes;
+          let index = 0;
+          while (value >= 1024 && index < units.length - 1) { value /= 1024; index += 1; }
+          return `${value.toFixed(value >= 100 ? 0 : 2)} ${units[index]}`;
+        }
+
+        function populateKvDivisors(hq, preferred) {
+          const divisors = [];
+          for (let value = 1; value <= hq; value += 1) if (hq % value === 0) divisors.push(value);
+          kvHeadSelect.textContent = "";
+          divisors.forEach((value) => {
+            const option = document.createElement("option");
+            option.value = String(value);
+            option.textContent = String(value);
+            kvHeadSelect.appendChild(option);
+          });
+          const valid = divisors.includes(preferred) ? preferred : divisors.filter((value) => value < hq).pop() || 1;
+          kvHeadSelect.value = String(valid);
+        }
+
+        function renderHeadBlocks(container, count, cap, shared) {
+          container.textContent = "";
+          const visible = Math.min(count, cap);
+          container.style.setProperty("--head-count", String(visible));
+          for (let index = 0; index < visible; index += 1) {
+            const block = document.createElement("i");
+            if (shared && index % 2 === 1) block.className = "is-shared";
+            block.setAttribute("aria-hidden", "true");
+            container.appendChild(block);
+          }
+        }
+
+        function updateAttention() {
+          const batch = clampNumber(document.getElementById("kv-batch").value, 1, 4096, 8);
+          const layers = clampNumber(document.getElementById("kv-layers").value, 1, 256, 64);
+          const sequence = clampNumber(document.getElementById("kv-sequence").value, 1, 1048576, 32768);
+          const hq = clampNumber(document.getElementById("kv-query-heads").value, 1, 256, 40);
+          const headDim = clampNumber(document.getElementById("kv-head-dim").value, 1, 1024, 128);
+          const elementBytes = clampNumber(document.getElementById("kv-bytes").value, 1, 8, 2);
+          let hkv = clampNumber(kvHeadSelect.value, 1, hq, 8);
+          if (attentionMode === "mha") hkv = hq;
+          if (attentionMode === "mqa") hkv = 1;
+          if (attentionMode === "gqa" && (hkv === 1 || hkv === hq)) {
+            hkv = Array.from(kvHeadSelect.options).map((option) => Number(option.value)).find((value) => value > 1 && value < hq) || 1;
+          }
+          kvHeadSelect.value = String(hkv);
+          kvHeadSelect.disabled = attentionMode !== "gqa";
+          const bytes = 2 * batch * layers * sequence * hkv * headDim * elementBytes;
+          const mhaBytes = 2 * batch * layers * sequence * hq * headDim * elementBytes;
+          const ratio = hkv / hq;
+          const groupSize = hq / hkv;
+          document.getElementById("kv-cache-value").textContent = formatBytes(bytes);
+          document.getElementById("kv-ratio").textContent = `${(ratio * 100).toFixed(1)}%`;
+          document.getElementById("kv-saved").textContent = formatBytes(mhaBytes - bytes);
+          document.getElementById("query-head-label").textContent = `${formatInteger.format(hq)} query heads${hq > 16 ? " · 16 shown" : ""}`;
+          document.getElementById("sharing-label").textContent = groupSize === 1 ? "Each query head has its own K/V head." : `Each KV head serves ${groupSize} query heads.`;
+          renderHeadBlocks(document.getElementById("query-heads"), hq, 16, attentionMode !== "mha");
+          const kvContainer = document.getElementById("kv-heads");
+          kvContainer.textContent = "";
+          const visibleKv = Math.min(hkv, 16);
+          kvContainer.style.setProperty("--kv-count", String(visibleKv));
+          for (let index = 0; index < visibleKv; index += 1) {
+            const block = document.createElement("i");
+            block.dataset.label = `KV${index + 1}`;
+            block.setAttribute("aria-hidden", "true");
+            kvContainer.appendChild(block);
+          }
+          const modeName = attentionMode.toUpperCase();
+          document.getElementById("attention-conclusion").textContent = `${modeName} selected: ${hq} query heads use ${hkv} KV head${hkv === 1 ? "" : "s"}${groupSize === 1 ? " independently" : ` in groups of ${groupSize}`}. The cache is ${(ratio * 100).toFixed(1)}% of same-shape MHA before sharding and allocator overhead: ${formatBytes(bytes)} for the current controls.`;
+        }
+
+        attentionModeContainer.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-attention-mode]");
+          if (!button) return;
+          attentionMode = button.dataset.attentionMode;
+          pressChoice(attentionModeContainer, button);
+          updateAttention();
+        });
+        document.getElementById("kv-query-heads").addEventListener("change", (event) => {
+          const hq = Number(event.target.value);
+          populateKvDivisors(hq, Math.min(8, hq));
+          updateAttention();
+        });
+        kvInputs.filter((id) => id !== "kv-query-heads").forEach((id) => document.getElementById(id).addEventListener("input", updateAttention));
+
+        const moeTokens = ["the", "kernel", "proof", "tensor", "image", "router"];
+        const expertCount = 8;
+        let routerBias = new Array(expertCount).fill(0);
+        const baseLogits = moeTokens.map((_, tokenIndex) => Array.from({ length: expertCount }, (_, expertIndex) => {
+          const cluster = [0, 0, 0, 2, 4, 0][tokenIndex];
+          return 1.2 * Math.cos((tokenIndex + 1) * (expertIndex + 2) * 0.61) + (expertIndex === cluster ? 2.2 : 0) - expertIndex * 0.025;
+        }));
+
+        function softmax(values) {
+          const max = Math.max(...values);
+          const exps = values.map((value) => Math.exp(value - max));
+          const total = exps.reduce((sum, value) => sum + value, 0);
+          return exps.map((value) => value / total);
+        }
+
+        function moeState() {
+          const topK = clampNumber(document.getElementById("moe-top-k").value, 1, 4, 2);
+          const gate = document.getElementById("moe-gate").value;
+          const useBias = document.getElementById("moe-use-bias").value === "1";
+          const scores = baseLogits.map((logits) => gate === "softmax" ? softmax(logits) : logits.map((value) => 1 / (1 + Math.exp(-value)) + 1e-7));
+          const selections = scores.map((row) => row.map((score, index) => ({ index, rankScore: score + (useBias ? routerBias[index] : 0) })).sort((a, b) => b.rankScore - a.rankScore).slice(0, topK).map((item) => item.index));
+          const loads = new Array(expertCount).fill(0);
+          selections.forEach((row) => row.forEach((index) => { loads[index] += 1; }));
+          const normalizedForBalance = scores.map((row) => gate === "softmax" ? row : row.map((value) => value / row.reduce((sum, current) => sum + current, 0)));
+          const meanProb = new Array(expertCount).fill(0).map((_, expertIndex) => normalizedForBalance.reduce((sum, row) => sum + row[expertIndex], 0) / moeTokens.length);
+          const fractions = loads.map((load) => load / (topK * moeTokens.length));
+          const lbal = expertCount * fractions.reduce((sum, fraction, expertIndex) => sum + fraction * meanProb[expertIndex], 0);
+          const lz = baseLogits.reduce((sum, row) => {
+            const max = Math.max(...row);
+            const logsumexp = max + Math.log(row.reduce((inner, value) => inner + Math.exp(value - max), 0));
+            return sum + logsumexp * logsumexp;
+          }, 0) / moeTokens.length;
+          return { topK, gate, useBias, scores, selections, loads, lbal, lz };
+        }
+
+        function renderMoe() {
+          const state = moeState();
+          const tokenList = document.getElementById("moe-token-list");
+          const routeMatrix = document.getElementById("moe-route-matrix");
+          const expertList = document.getElementById("moe-expert-list");
+          tokenList.textContent = "";
+          routeMatrix.textContent = "";
+          expertList.textContent = "";
+          moeTokens.forEach((token, tokenIndex) => {
+            const item = document.createElement("div");
+            item.className = "token-item";
+            item.textContent = token;
+            tokenList.appendChild(item);
+            state.scores[tokenIndex].forEach((score, expertIndex) => {
+              const cell = document.createElement("div");
+              cell.className = "route-cell";
+              const rank = state.selections[tokenIndex].indexOf(expertIndex);
+              if (rank === 0) cell.classList.add("is-selected");
+              if (rank > 0) cell.classList.add("is-second");
+              cell.setAttribute("role", "gridcell");
+              cell.setAttribute("aria-label", `${token} to expert ${expertIndex + 1}: score ${score.toFixed(2)}${rank >= 0 ? `, selected rank ${rank + 1}` : ", not selected"}`);
+              const label = document.createElement("span");
+              label.textContent = score.toFixed(2);
+              cell.appendChild(label);
+              routeMatrix.appendChild(cell);
+            });
+          });
+          state.loads.forEach((load, index) => {
+            const item = document.createElement("div");
+            item.className = "expert-item";
+            const name = document.createElement("span");
+            name.textContent = `E${index + 1}`;
+            const value = document.createElement("strong");
+            value.textContent = `${load} route${load === 1 ? "" : "s"}`;
+            item.append(name, value);
+            expertList.appendChild(item);
+          });
+          const alpha = clampNumber(document.getElementById("moe-alpha").value, 0, 1, 0.01);
+          const beta = clampNumber(document.getElementById("moe-beta").value, 0, 1, 0.001);
+          const nonzeroLoads = state.loads.filter((value) => value > 0);
+          const meanLoad = state.loads.reduce((sum, value) => sum + value, 0) / expertCount;
+          const imbalance = Math.max(...state.loads) / Math.max(meanLoad, Number.EPSILON);
+          document.getElementById("moe-lbal").textContent = state.lbal.toFixed(3);
+          document.getElementById("moe-lz").textContent = state.lz.toFixed(3);
+          document.getElementById("moe-weighted").textContent = (alpha * state.lbal + beta * state.lz).toFixed(4);
+          document.getElementById("moe-conclusion").textContent = `Top-${state.topK} ${state.gate} routing selected${state.useBias ? " with per-expert selection bias" : " without selection bias"}. ${nonzeroLoads.length}/${expertCount} experts receive tokens; peak-to-mean load is ${imbalance.toFixed(2)}×. Lbal=${state.lbal.toFixed(3)} targets allocation, while Lz=${state.lz.toFixed(3)} targets router-logit scale.`;
+          return state;
+        }
+
+        ["moe-top-k", "moe-gate", "moe-alpha", "moe-beta", "moe-gamma", "moe-use-bias"].forEach((id) => {
+          document.getElementById(id).addEventListener("input", renderMoe);
+        });
+        document.getElementById("moe-step-bias").addEventListener("click", () => {
+          const state = moeState();
+          const gamma = clampNumber(document.getElementById("moe-gamma").value, 0, 0.1, 0.001);
+          const ideal = state.loads.reduce((sum, value) => sum + value, 0) / expertCount;
+          routerBias = routerBias.map((bias, index) => bias + gamma * Math.sign(ideal - state.loads[index]));
+          document.getElementById("moe-use-bias").value = "1";
+          renderMoe();
+        });
+        document.getElementById("moe-reset").addEventListener("click", () => {
+          routerBias = new Array(expertCount).fill(0);
+          document.getElementById("moe-use-bias").value = "0";
+          renderMoe();
+        });
+
+        const redrawCanvases = () => { drawActivationPlot(); drawRopePlot(); };
+        if ("ResizeObserver" in window) {
+          const observer = new ResizeObserver(redrawCanvases);
+          observer.observe(activationCanvas);
+          observer.observe(ropeCanvas);
+        } else {
+          window.addEventListener("resize", redrawCanvases);
+        }
+
+        updateFfnMatch();
+        updateRope();
+        populateKvDivisors(40, 8);
+        updateAttention();
+        renderMoe();
+        drawActivationPlot();
+      })();
+    </script>
+  </body>
+</html>
